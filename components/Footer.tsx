@@ -1,0 +1,236 @@
+import Link from 'next/link';
+
+const quickLinks = [
+  { label: 'Contact Us', href: '/contact' },
+  { label: 'Our Company', href: '/our-company' },
+  { label: 'Buy Peptides', href: '/peptides' },
+  { label: 'How It Works', href: '/how-it-works' },
+  { label: 'COA Library', href: '/coa' },
+];
+
+const legalLinks = [
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Terms of Use', href: '/terms' },
+  { label: 'Shipping & Payments', href: '/shipping' },
+  { label: 'Refunds & Returns', href: '/refunds' },
+  { label: 'Accessibility Statement', href: '/accessibility' },
+];
+
+const contactItems = [
+  {
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+      </svg>
+    ),
+    label: 'Phone',
+    value: '805-427-2246',
+    sub: 'Mon–Fri  ·  9AM – 4PM PST',
+    href: 'tel:8054272246',
+  },
+  {
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    ),
+    label: 'Email',
+    value: 'info@peptidepure.com',
+    sub: 'Replies within 1 business day',
+    href: 'mailto:info@peptidepure.com',
+  },
+  {
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+    ),
+    label: 'Shipping Days',
+    value: 'Mon–Fri',
+    sub: 'Except U.S. Holidays',
+    href: null,
+  },
+];
+
+export default function Footer() {
+  return (
+    <footer style={{ background: 'var(--navy)' }} className="text-white">
+      {/* Gold accent top line */}
+      <div className="h-0.5 w-full" style={{ background: 'linear-gradient(to right, transparent, var(--gold), transparent)' }} />
+
+      {/* Main footer body */}
+      <div className="container-xl">
+        <div className="grid grid-cols-12 gap-x-10 gap-y-8  pt-14 pb-12">
+
+          {/* ── Brand column (wider) */}
+          <div className="col-span-12 md:col-span-4 lg:col-span-4 flex flex-col gap-4">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2.5 w-fit">
+              <HexLogoWhite />
+              <span className="font-bold text-xl tracking-tight leading-none">
+                PEPTIDE<span style={{ color: 'var(--gold)' }}>PURE</span>
+                <sup className="text-xs font-normal ml-0.5 text-gray-400">™</sup>
+              </span>
+            </Link>
+
+            <p className="text-sm text-gray-400 leading-relaxed max-w-xs">
+              A clinician-facing platform focused on peptide education, protocol development, and observational research support — built for providers who demand precision.
+            </p>
+
+            {/* Trust badges row */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              {['cGMP', 'ISO 9001', '>99% Purity', '503A/503B'].map((badge) => (
+                <span
+                  key={badge}
+                  className="text-xs px-2.5 py-1 rounded-md font-medium"
+                  style={{
+                    background: 'rgba(200,149,44,0.1)',
+                    border: '1px solid rgba(200,149,44,0.25)',
+                    color: 'var(--gold-light)',
+                  }}
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Spacer on lg */}
+          <div className="hidden lg:block lg:col-span-1" />
+
+          {/* ── Quick Links */}
+          <div className="col-span-6 md:col-span-2 lg:col-span-2">
+            <ColumnHeader>Quick Links</ColumnHeader>
+            <ul className="space-y-2.5 mt-3">
+              {quickLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 group"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-gold transition-colors" style={{ flexShrink: 0 }} />
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* ── Legal */}
+          <div className="col-span-6 md:col-span-2 lg:col-span-2">
+            <ColumnHeader>Legal</ColumnHeader>
+            <ul className="space-y-2.5 mt-3">
+              {legalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 group"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-gold transition-colors" style={{ flexShrink: 0 }} />
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* ── Support / Contact */}
+          <div className="col-span-12 md:col-span-4 lg:col-span-3">
+            <ColumnHeader>Support</ColumnHeader>
+            <ul className="space-y-4 mt-3">
+              {contactItems.map((item) => (
+                <li key={item.label} className="flex items-start gap-3">
+                  {/* Icon pill */}
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    style={{
+                      background: 'rgba(200,149,44,0.12)',
+                      border: '1px solid rgba(200,149,44,0.2)',
+                      color: 'var(--gold)',
+                    }}
+                  >
+                    {item.icon}
+                  </div>
+                  {/* Text */}
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-0.5">
+                      {item.label}
+                    </p>
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        className="text-sm text-gray-200 hover:text-white transition-colors font-medium"
+                      >
+                        {item.value}
+                      </a>
+                    ) : (
+                      <p className="text-sm text-gray-200 font-medium">{item.value}</p>
+                    )}
+                    <p className="text-xs text-gray-500 mt-0.5">{item.sub}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="container-xl">
+        <div className="h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
+      </div>
+
+      {/* Disclaimer */}
+      <div className="container-xl">
+        <p className="text-xs text-gray-500 py-6 leading-relaxed text-center max-w-4xl mx-auto">
+          Peptide Pure does not provide medical advice, prescribe treatment, or direct patient care. All clinical decisions, dosing, administration, and patient management remain the sole responsibility of the licensed clinician. Compounds made available through this platform are not FDA-approved drugs unless explicitly stated and may be used in accordance with applicable federal and state laws, institutional policies, and clinical-study requirements. Information presented on this site is for professional and educational purposes only and is not intended to replace independent clinical judgment.
+        </p>
+      </div>
+
+      {/* Bottom bar */}
+      <div style={{ background: 'rgba(0,0,0,0.25)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="container-xl !py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-gray-600">
+            © 2025 Peptidepure.com · All Rights Reserved
+          </p>
+          <div className="flex items-center gap-4">
+            {[
+              { label: 'Privacy', href: '/privacy' },
+              { label: 'Terms', href: '/terms' },
+              { label: 'Accessibility', href: '/accessibility' },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function ColumnHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <div>
+      <h4 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--gold)' }}>
+        {children}
+      </h4>
+      <div className="mt-1.5 h-px w-6" style={{ background: 'var(--gold)', opacity: 0.4 }} />
+    </div>
+  );
+}
+
+function HexLogoWhite() {
+  return (
+    <svg width="30" height="34" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 1L30 9V27L16 35L2 27V9L16 1Z" stroke="#C8952C" strokeWidth="1.8" fill="rgba(200,149,44,0.08)" />
+      <path d="M16 8L24 12.5V21.5L16 26L8 21.5V12.5L16 8Z" fill="rgba(200,149,44,0.15)" />
+      <text x="11.5" y="21.5" fill="#C8952C" fontSize="10" fontWeight="bold" fontFamily="system-ui">P</text>
+    </svg>
+  );
+}
