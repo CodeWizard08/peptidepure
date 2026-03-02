@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import HexLogo from '@/components/ui/HexLogo';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -48,7 +49,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <HexLogo />
+            <HexLogo width={32} height={36} />
             <span
               className="font-bold text-xl tracking-tight transition-colors duration-300"
               style={{ color: glass ? 'white' : 'var(--navy)' }}
@@ -77,7 +78,7 @@ export default function Header() {
           {/* Right actions */}
           <div className="hidden md:flex items-center gap-3">
             <Link
-              href="/sign-in"
+              href="/account"
               className={`flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md transition-all duration-200 ${
                 glass ? 'hover:bg-white/10' : 'hover:bg-gray-50'
               }`}
@@ -136,7 +137,7 @@ export default function Header() {
               </Link>
             ))}
             <div className="pt-3 flex gap-2">
-              <Link href="/sign-in" className="btn-outline text-sm flex-1 justify-center" onClick={() => setMobileOpen(false)}>
+              <Link href="/account" className="btn-outline text-sm flex-1 justify-center" onClick={() => setMobileOpen(false)}>
                 Sign In
               </Link>
               <Link href="/peptides" className="btn-primary text-sm flex-1 justify-center" onClick={() => setMobileOpen(false)}>
@@ -150,12 +151,3 @@ export default function Header() {
   );
 }
 
-function HexLogo() {
-  return (
-    <svg width="32" height="36" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M16 1L30 9V27L16 35L2 27V9L16 1Z" stroke="#C8952C" strokeWidth="2" fill="none" />
-      <path d="M16 8L24 12.5V21.5L16 26L8 21.5V12.5L16 8Z" fill="#C8952C" opacity="0.15" />
-      <text x="11" y="21" fill="#C8952C" fontSize="11" fontWeight="bold" fontFamily="system-ui">P</text>
-    </svg>
-  );
-}

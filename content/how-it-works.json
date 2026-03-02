@@ -1,0 +1,96 @@
+{
+  "hero": {
+    "sectionLabel": "The Platform",
+    "heading": "How PeptidePure™ Works",
+    "subtitle": "A smarter, cleaner path to peptide medicine — without the risks, uncertainty, or gray market."
+  },
+  "intro": {
+    "sectionLabel": "The Solution",
+    "heading": "PeptidePure™ Gives Licensed Clinicians a Smarter Path",
+    "paragraphs": [
+      "We provide the most in-demand, best-studied peptides and deliver them in the right milligram strengths with streamlined, clinician-friendly protocols. No confusion. No wasted time. No losing money chasing hype. Just better outcomes for patients and a better system for providers.",
+      "Stop chasing the gray market. Lead with precision. Practice medicine the right way."
+    ],
+    "videoUrl": "https://player.vimeo.com/video/1153253421?h=8cb1ecdf85&autopause=0&loop=0&title=0&portrait=0&byline=0",
+    "videoTitle": "Dr. Scott Mortensen, MD — Founder Introduction"
+  },
+  "educationalFocus": {
+    "heading": "Educational & Clinical Focus",
+    "items": [
+      "Order with confidence for use within approved observational research frameworks",
+      "Choose from our most-utilized protocol packages (GLP-based programs, GH secretagogues, mitochondrial support)",
+      "Optionally select individual compounds as needed for your clinic (MOOs may apply)",
+      "Reorder on a monthly cadence aligned with protocol design and participant demand",
+      "Access our education library for reconstitution guidance, dosing references, and peer-reviewed literature",
+      "Join our professional community for ongoing updates on emerging compounds and regulatory landscape"
+    ]
+  },
+  "createAccount": {
+    "heading": "Create Account",
+    "description": "Create a secure account using your professional credentials. Access is limited to licensed healthcare professionals (MD, DO, PA-C, NP, ND, DC, and qualified researchers). Once registered, your account enters credential review."
+  },
+  "afterVerification": {
+    "heading": "After Verification",
+    "items": [
+      "Purchase peptides",
+      "Participate in observational protocols",
+      "Use compounds for professional education and research consistent with applicable regulations"
+    ]
+  },
+  "solutionFeatures": [
+    {
+      "title": "3RD Party COAs",
+      "desc": "Multi-lab verification on every lot (≥99% purity, sterility). Labeling with your logo and \"Clinician Use Only\". Never the red-flag \"Not for Human or Animal Use\"."
+    },
+    {
+      "title": "> 99% Purity",
+      "desc": "Sourcing from ISO 9001-certified, cGMP-compliant manufacturers with DMF- or CEP-backed API, or FDA-registered 503A/503B and research grade facilities."
+    },
+    {
+      "title": "Fast Shipping",
+      "desc": "U.S.A.-based fulfillment with secure packaging and tracking. Designed to meet the operational needs of busy clinical practices."
+    }
+  ],
+  "pricing": {
+    "label": "Real 2026 Market Pricing",
+    "columns": {
+      "protocol": "Popular Peptide Protocols:",
+      "pp": "Peptide Pure™",
+      "gray": "Gray Market",
+      "retail": "Clinic Retail"
+    },
+    "rows": [
+      { "protocol": "BPC-157 10 mg", "pp": "$44", "gray": "$50 – $65", "retail": "$150 – $225" },
+      { "protocol": "BPC-157 10mg / TB500 10mg", "pp": "$88", "gray": "$200", "retail": "$300" },
+      { "protocol": "Retatrutide 30 mg (~3 month supply)", "pp": "$196", "gray": "$450 – $550", "retail": "$900 – $1,200" },
+      { "protocol": "Tirzepatide 30 mg (~1 month supply)", "pp": "$180", "gray": "$250 – $375", "retail": "$600 – $1,000" },
+      { "protocol": "CJC-1295 5mg / Ipamorelin 5mg", "pp": "$75", "gray": "$95 – $150", "retail": "$350" }
+    ]
+  },
+  "relevanceStats": {
+    "sectionLabel": "Relevance in Medicine",
+    "items": [
+      { "stat": "7,000+", "label": "Natural Peptides", "desc": "Identified in biological systems, each with unique functions and potential therapeutic applications." },
+      { "stat": "60+", "label": "FDA-Approved", "desc": "Peptide-based medications currently available, with hundreds more in clinical trials." },
+      { "stat": "$150B", "label": "Market Value", "desc": "Projected global peptide therapeutics market by 2028, growing at over 8% annually." },
+      { "stat": "10–100×", "label": "Targeting Precision", "desc": "Unprecedented specificity vs. conventional pharmaceuticals, with fewer systemic side effects." }
+    ]
+  },
+  "steps": {
+    "heading": "Review. Register. Implement.",
+    "subtitle": "A peptide supply platform designed for real clinical growth.",
+    "items": [
+      { "step": "1", "icon": "💬", "title": "Contact Peptide Pure", "desc": "Connect with our team to review access options and determine the right fit for your clinical site. Or simply sign up online; we will verify your NPI number." },
+      { "step": "2", "icon": "🔍", "title": "Implement With Confidence", "desc": "Access reconstitution guidance, dosing references, patient education templates, and informed consent templates — designed to support consistent, defensible clinical workflows." },
+      { "step": "3", "icon": "📈", "title": "Optimize Ongoing Ordering", "desc": "As your clinic and patient volume grow, refine your monthly ordering based on real demand. Once product needs are established, lead times are reduced and reordering becomes streamlined and automatic." }
+    ]
+  },
+  "cta": {
+    "heading": "Ready to Practice Peptide Medicine the Right Way?",
+    "subtitle": "Join hundreds of licensed clinicians already using PeptidePure™.",
+    "primaryCtaLabel": "Create Account",
+    "primaryCtaHref": "/account",
+    "secondaryCtaLabel": "Contact Us",
+    "secondaryCtaHref": "/contact"
+  }
+}

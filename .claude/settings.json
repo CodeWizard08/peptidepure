@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//e/projects/Web/scott''s project/**)",
+      "Read(//e/projects/Web/scott''s project/peptidepure/**)",
+      "Read(//e/projects/Web/scott''''s project/peptidepure/**)"
+    ],
+    "additionalDirectories": [
+      "e:\\projects\\Web\\scott''s project\\peptidepure",
+      "e:\\projects\\Web\\scott''s project\\peptidepure\\public"
+    ]
+  }
+}

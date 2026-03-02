@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { getContent } from '@/lib/content';
 
 export const metadata: Metadata = {
   title: 'PeptidePure™ — Clinician Peptide Platform',
@@ -15,6 +16,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const footerContent = getContent<any>('footer');
+
   return (
     <html lang="en">
       <head>
@@ -28,7 +31,7 @@ export default function RootLayout({
       <body>
         <Header />
         <main className="pt-16">{children}</main>
-        <Footer />
+        <Footer content={footerContent} />
       </body>
     </html>
   );

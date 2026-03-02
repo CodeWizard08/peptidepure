@@ -203,3 +203,29 @@ body {
 .ring-rotate {
   animation: rotateSlow 22s linear infinite;
 }
+
+/* Admin page — hide site header/footer */
+/* COA placeholder when image not loaded */
+.coa-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.coa-placeholder::after {
+  content: 'COA Image';
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-light);
+}
+
+body:has(#admin-root) header {
+  display: none !important;
+}
+body:has(#admin-root) main {
+  padding-top: 0 !important;
+}
+body:has(#admin-root) footer {
+  display: none !important;
+}

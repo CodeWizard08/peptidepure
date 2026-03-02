@@ -1,0 +1,136 @@
+{
+  "trustBar": [
+    { "icon": "✦", "text": "U.S.A. cGMP-Compliant Facilities" },
+    { "icon": "✦", "text": "ISO 9001-Certified" },
+    { "icon": "✦", "text": ">99% Purity — Multi-Lab Verified" },
+    { "icon": "✦", "text": "FDA-Registered 503A / 503B Partners" },
+    { "icon": "✦", "text": "Batch-Level COA Traceability" },
+    { "icon": "✦", "text": "MD-Owned & Operated" },
+    { "icon": "✦", "text": "Clinician Use Only™" },
+    { "icon": "✦", "text": "Free Shipping Over $125" }
+  ],
+  "stats": {
+    "sectionLabel": "Market Context",
+    "heading": "Peptides Are the Future of Medicine 3.0",
+    "items": [
+      { "stat": "7,000+", "label": "Natural Peptides", "sub": "Identified in biological systems" },
+      { "stat": "60+", "label": "FDA-Approved", "sub": "Peptide-based medications on market" },
+      { "stat": "$150B", "label": "Global Market by 2028", "sub": "Growing at 8%+ annually" },
+      { "stat": "10–100×", "label": "Targeting Precision", "sub": "vs. conventional pharmaceuticals" }
+    ],
+    "functionCards": [
+      { "icon": "⚖️", "title": "Hormonal Regulation", "desc": "GLP-1s and growth hormone peptides coordinate metabolism, body composition, and homeostasis." },
+      { "icon": "🛡️", "title": "Immune Defense", "desc": "Antimicrobial peptides provide natural defense and coordinate adaptive immune responses." },
+      { "icon": "🧠", "title": "Neurotransmission", "desc": "Neuropeptides regulate mood, pain perception, appetite, and cognitive performance." },
+      { "icon": "📡", "title": "Cellular Signaling", "desc": "Signaling peptides trigger cascades that allow cells to respond to environmental changes." }
+    ]
+  },
+  "threeSteps": {
+    "sectionLabel": "Getting Started",
+    "heading": "Three Steps to Clinical-Grade Peptides",
+    "subtitle": "Designed exclusively for licensed clinicians and qualified research professionals.",
+    "steps": [
+      {
+        "step": "01",
+        "title": "Create Account",
+        "desc": "Register with your professional NPI number. Access is limited to licensed healthcare professionals — MD, DO, PA-C, NP, ND, DC, and qualified researchers.",
+        "ctaLabel": "Create Account",
+        "ctaHref": "/account"
+      },
+      {
+        "step": "02",
+        "title": "Enroll in Clinical Study Framework",
+        "desc": "Join our observational research framework — giving your clinic legal, study-aligned access to protocols under 45 CFR 46.",
+        "ctaLabel": "How It Works",
+        "ctaHref": "/how-it-works"
+      },
+      {
+        "step": "03",
+        "title": "Pick Your Protocol Package",
+        "desc": "Select from curated starter bundles or individual compounds. Reorder monthly — aligned with your protocol cadence and participant demand.",
+        "ctaLabel": "Browse Peptides",
+        "ctaHref": "/peptides"
+      }
+    ]
+  },
+  "usaResearch": {
+    "sectionLabel": "Our Approach",
+    "heading": "USA Peptide Research",
+    "tagline": "Simple dosing. Proven protocols.",
+    "description": "The most in-demand, best-studied peptides — delivered in the right milligram strengths with streamlined, clinician-friendly protocols. No confusion. No wasted time. No losing money chasing hype. Just better outcomes for patients and a better system for providers.",
+    "bulletPoints": [
+      "Protocol packages: GLP-based programs, GH secretagogues, mitochondrial support",
+      "Individual compounds available as needed for your clinic",
+      "Education library: reconstitution guides, dosing references, peer-reviewed literature",
+      "Professional community with regulatory updates and emerging compound coverage"
+    ],
+    "ctaLabel": "Learn More",
+    "ctaHref": "/how-it-works",
+    "image": "/images/research.png",
+    "imageAlt": "PeptidePure vials — Retatrutide, BPC-157 TB500, CJC-1295 Ipamorelin, Tirzepatide, Epithalon",
+    "badgeStat": "99%+",
+    "badgeLabel": "Purity Verified",
+    "compoundPills": ["Retatrutide", "BPC-157", "Tirzepatide", "Epithalon"]
+  },
+  "whyDifferent": {
+    "sectionLabel": "Why PeptidePure™",
+    "heading": "Built for Clinicians",
+    "subtitle": "Stop chasing the gray market. Practice medicine the right way — with verified compounds, structured protocols, and institutional-grade documentation.",
+    "features": [
+      {
+        "title": "3rd Party COAs",
+        "desc": "Multi-lab testing with batch-level documentation. Your label. Your logo. \"Clinician Use Only™\" — no gray-market red flags.",
+        "stat": "Multi-Lab Verified"
+      },
+      {
+        "title": ">99% Purity",
+        "desc": "Sourced exclusively from ISO 9001-certified, cGMP-compliant manufacturers with FDA-registered 503A/503B facilities.",
+        "stat": "ISO 9001 · cGMP"
+      },
+      {
+        "title": "Fast Shipping",
+        "desc": "U.S.A.-based fulfillment. Secure packaging with tracking. Free on orders over $125. Mon–Fri dispatch.",
+        "stat": "Free Over $125"
+      }
+    ]
+  },
+  "freeShipping": {
+    "badgeLabel": "Fulfillment",
+    "heading": "Free Shipping",
+    "headingHighlight": "On Orders $125+",
+    "description": "U.S.A.-based fulfillment built for busy clinical practices — secure packaging, real-time tracking, and fast Mon–Fri dispatch so your protocols never miss a beat.",
+    "metrics": [
+      { "value": "$0", "label": "Shipping", "sub": "over $125" },
+      { "value": "2–3", "label": "Business Days", "sub": "typical delivery" },
+      { "value": "48h", "label": "Processing", "sub": "weekday cutoff" }
+    ],
+    "featureCards": [
+      { "title": "USA-Based", "sub": "Domestic fulfillment only — no international delays" },
+      { "title": "Secure Packaging", "sub": "Clinical-grade materials that protect compound integrity" },
+      { "title": "Full Tracking", "sub": "Real-time updates from dispatch to your door" },
+      { "title": "Mon–Fri Dispatch", "sub": "Orders placed by noon ship same business day" }
+    ],
+    "complianceCard": {
+      "title": "Clinician-First Logistics",
+      "desc": "Every shipment includes batch documentation — COA on file, discreet clinical labeling, cold-chain compliant where required."
+    },
+    "primaryCtaLabel": "Browse Peptides →",
+    "primaryCtaHref": "/peptides",
+    "secondaryCtaLabel": "How It Works",
+    "secondaryCtaHref": "/how-it-works"
+  },
+  "finalCta": {
+    "badgeLabel": "Verified Clinicians Only",
+    "heading": "Ready to Practice Peptide Medicine",
+    "headingHighlight": "the Right Way?",
+    "description": "Join hundreds of licensed clinicians using PeptidePure™ to source verified compounds, access structured protocols, and operate within a compliant clinical framework.",
+    "primaryCtaLabel": "Create Account →",
+    "primaryCtaHref": "/account",
+    "secondaryCtaLabel": "Talk to Our Team",
+    "secondaryCtaHref": "/contact"
+  },
+  "complianceNotice": {
+    "heading": "Research, Education, and Compliance Notice",
+    "text": "Peptide Pure is a clinician-facing platform focused on education, protocol development, and observational research support. Information presented on this site reflects emerging scientific literature, mechanistic hypotheses, and real-world observational data. It is not intended to promote, market, or recommend any drug, biologic, or therapeutic intervention. Peptide Pure does not manufacture, label, or market drugs and does not represent any investigational compound as safe, effective, or equivalent to FDA-approved products. References to compounds, mechanisms, or pathways are provided solely for professional education and research discussion."
+  }
+}

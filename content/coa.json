@@ -1,0 +1,37 @@
+{
+  "hero": {
+    "sectionLabel": "Quality Assurance",
+    "heading": "Certificates of Analysis",
+    "subtitle": "Every compound we supply is independently verified. Multi-lab testing ensures batch-level accuracy, identity confirmation, and purity above 99%."
+  },
+  "qualityBadges": [
+    { "label": "Purity Guaranteed", "value": ">99%" },
+    { "label": "Testing Labs", "value": "Multi-Lab" },
+    { "label": "Compliance", "value": "cGMP / ISO 9001" },
+    { "label": "Traceability", "value": "Batch-Level" }
+  ],
+  "gridHeading": "Available COAs",
+  "filterLabel": "Filter by Peptide",
+  "sortLabel": "Sort by Date",
+  "records": [
+    { "compound": "Ipamorelin, CJC-1295 no DAC", "peptide": "Ipamorelin / CJC-1295", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-001", "date": "2024-11-15", "image": "/coa/ps-2024-001.png" },
+    { "compound": "MOTS-c 10mg", "peptide": "MOTS-c", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-002", "date": "2024-11-10", "image": "/coa/ps-2024-002.png" },
+    { "compound": "Ipamorelin CJC-1295 no DAC", "peptide": "Ipamorelin / CJC-1295", "lab": "Freedom Peptides", "purity": ">99%", "batch": "FP-2024-001", "date": "2024-10-28", "image": "/coa/fp-2024-001.png" },
+    { "compound": "Ipamorelin CJC-1295 no DAC", "peptide": "Ipamorelin / CJC-1295", "lab": "Freedom Peptides", "purity": ">99%", "batch": "FP-2024-002", "date": "2024-10-20", "image": "/coa/fp-2024-002.png" },
+    { "compound": "Retatrutide", "peptide": "Retatrutide", "lab": "Freedom Peptides", "purity": ">99%", "batch": "FP-2024-003", "date": "2024-10-15", "image": "/coa/fp-2024-003.png" },
+    { "compound": "Retatrutide", "peptide": "Retatrutide", "lab": "Freedom Peptides", "purity": ">99%", "batch": "FP-2024-004", "date": "2024-10-08", "image": "/coa/fp-2024-004.png" },
+    { "compound": "BPC-157 (Bopaon) Arginate Salt 5mg", "peptide": "BPC-157", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-005", "date": "2024-09-25", "image": "/coa/ps-2024-005.png" },
+    { "compound": "BPC-157 (Bopaon) Arginate Salt 5mg", "peptide": "BPC-157", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-006", "date": "2024-09-18", "image": "/coa/ps-2024-006.png" },
+    { "compound": "Retatrutide 10mg", "peptide": "Retatrutide", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-007", "date": "2024-09-10", "image": "/coa/ps-2024-007.png" },
+    { "compound": "Retatrutide 10mg", "peptide": "Retatrutide", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-008", "date": "2024-09-02", "image": "/coa/ps-2024-008.png" },
+    { "compound": "Semax 10mg", "peptide": "Semax", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-009", "date": "2024-08-28", "image": "/coa/ps-2024-009.png" },
+    { "compound": "Retatrutide 10mg", "peptide": "Retatrutide", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-010", "date": "2024-08-20", "image": "/coa/ps-2024-010.png" },
+    { "compound": "Tirzepatide 10mg", "peptide": "Tirzepatide", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-011", "date": "2024-08-12", "image": "/coa/ps-2024-011.png" },
+    { "compound": "Tirzepatide 5mg", "peptide": "Tirzepatide", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-012", "date": "2024-08-05", "image": "/coa/ps-2024-012.png" },
+    { "compound": "NAD+ (Nadide) 500mg", "peptide": "NAD+", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-013", "date": "2024-07-28", "image": "/coa/ps-2024-013.png" },
+    { "compound": "Retatrutide 10mg", "peptide": "Retatrutide", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-014", "date": "2024-07-15", "image": "/coa/ps-2024-014.png" },
+    { "compound": "BPC-157 x Thymosin A4", "peptide": "BPC-157", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-015", "date": "2024-07-08", "image": "/coa/ps-2024-015.png" },
+    { "compound": "GHK-Copper 32mg", "peptide": "GHK-Copper", "lab": "Peptide Sciences", "purity": ">99%", "batch": "PS-2024-016", "date": "2024-06-30", "image": "/coa/ps-2024-016.png" }
+  ],
+  "footerText": "Additional COAs available upon request for verified account holders."
+}

@@ -1,0 +1,102 @@
+{
+  "hero": {
+    "sectionLabel": "Browse Catalog",
+    "heading": "All Peptides & Protocols",
+    "subtitle": "Clinical-grade compounds available exclusively to verified healthcare professionals and qualified researchers."
+  },
+  "categories": [
+    {
+      "name": "Metabolic / Weight Loss Peptides",
+      "subtitle": "Endocrine System",
+      "color": "#C8952C",
+      "items": ["AOD-9604", "Cagrilintide", "Cagrilintide + Semaglutide", "GLP-1 (SEMA)", "GLP-1 / GIP (TIRZ)", "GLP-1 / GIP / G (RETA)", "Mazdutide", "Melanotan II", "SLU-PP-332", "Survodutide"]
+    },
+    {
+      "name": "MSK / Tissue Repair Peptides",
+      "subtitle": "Musculoskeletal System",
+      "color": "#2563EB",
+      "items": ["ARA-290", "BPC-157", "BPC-157 / TB-500", "Follistatin", "Thymosin Beta-4 (TB-500)", "Glow (BPC-157 / GHK-Cu / TB-500)", "KLOW (TB-500 / BPC-157 / GHK-Cu / KPV)"]
+    },
+    {
+      "name": "Longevity Peptides + Mitochondrial Support",
+      "subtitle": "Cellular Aging, Neuroprotection, Energy Systems",
+      "color": "#059669",
+      "items": ["5-Amino-1MQ", "Cerebrolysin", "Epithalon", "FOXO4-DRI", "GHK-Cu", "Glutathione", "MOTS-c", "NAD+", "Pinealon", "SS-31 (Elamipeptide)"]
+    },
+    {
+      "name": "Growth Hormone / GH Receptor Peptides",
+      "subtitle": "Endocrine & Muscular System",
+      "color": "#7C3AED",
+      "items": ["CJC-1295 / Ipamorelin", "GHRP-2", "Hexarelin", "IGF-1 LR3", "Ipamorelin", "PEO-MGF", "Sermorelin", "Tesamorelin", "Tesamorelin / Ipamorelin"]
+    },
+    {
+      "name": "Immune / Antimicrobial Peptides",
+      "subtitle": "Immune & Inflammatory Regulation",
+      "color": "#DC2626",
+      "items": ["KPV", "LL-37", "Thymosin Alpha-1"]
+    },
+    {
+      "name": "Cognitive & Mood Peptides / Compounds",
+      "subtitle": "Neuroendocrine & Neurotransmitter Support",
+      "color": "#0891B2",
+      "items": ["Oxytocin", "PT-141 (Bremelanotide)", "Selank", "Semax"]
+    }
+  ],
+  "customBadge": "✦ Custom Formulations Available",
+  "starterPackages": [
+    {
+      "name": "$5,000 Starter Package",
+      "price": "$5,000",
+      "wholesale": "~$5,479",
+      "retail": "~$25,000+",
+      "tier": "Entry Level",
+      "desc": "Entry-level bundle for new clinicians",
+      "focus": "Weight loss (Tirzepatide & Retatrutide) + Longevity/Repair (MOTS-c, GHK-Cu, BPC-157, Epithalon)",
+      "detail": "Enough vials for initial patient trials or small stocking.",
+      "bonus": "1 free Tirzepatide 15mg",
+      "highlight": false
+    },
+    {
+      "name": "$10,000 Starter Package",
+      "price": "$10,000",
+      "wholesale": "~$10,958",
+      "retail": "~$50,000+",
+      "tier": "Growth Tier",
+      "desc": "Mid-tier bundle for growing clinics",
+      "focus": "Higher volume in weight loss, mitochondrial health, longevity, and tissue repair",
+      "detail": "Scales up for ongoing patient treatments.",
+      "bonus": "1 free Tirzepatide 15mg + 1 free Retatrutide 15mg",
+      "highlight": false
+    },
+    {
+      "name": "$20,000 Starter Package",
+      "price": "$20,000",
+      "wholesale": "~$21,916",
+      "retail": "~$100,000+",
+      "tier": "Most Popular",
+      "desc": "High-volume bundle for established clinics",
+      "focus": "Bulk supply in metabolic optimization, longevity, and repair",
+      "detail": "Substantial stock for multiple patients.",
+      "bonus": "2 free Tirzepatide 15mg + 2 free Retatrutide 15mg",
+      "highlight": true
+    }
+  ],
+  "protocols": {
+    "heading": "Essential Protocols",
+    "subtitle": "Clinics may also purchase bundle packages with flexible vial ratios based on clinical focus.",
+    "items": [
+      {
+        "name": "Soft-Tissue Repair & Regenerative Support Protocol",
+        "tags": ["All Peptides", "Metabolism / Weight Loss", "Package", "Popular Peptides", "Protocol Packages"]
+      },
+      {
+        "name": "Metabolic Health & Body Composition Comparison Protocol",
+        "tags": ["All Peptides", "Metabolism / Weight Loss", "Package", "Popular Peptides", "Protocol Packages"]
+      },
+      {
+        "name": "Aesthetic & Tissue Regeneration Comparison Protocol",
+        "tags": ["All Peptides", "Package", "Popular Peptides", "Protocol Packages"]
+      }
+    ]
+  }
+}

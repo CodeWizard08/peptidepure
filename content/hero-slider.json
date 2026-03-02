@@ -1,0 +1,37 @@
+{
+  "duration": 8000,
+  "slides": [
+    {
+      "video": "/images/videos/1.mp4",
+      "image": "/images/product-line-up.webp",
+      "tag": "For Clinicians",
+      "heading": "For Clinicians",
+      "subtitle": "White Label Solutions for Practitioners Researchers & Wellness Brands",
+      "description": "Bulk Orders and Customization Available"
+    },
+    {
+      "video": "/images/videos/2.mp4",
+      "image": "/images/oral-peptides.png",
+      "tag": "Capsules",
+      "heading": "Peptide Capsules",
+      "subtitle": "Not all peptides require injection",
+      "description": "BPC-157 · KPV · Selank · Semax · GLP-1 / GIP Analogs"
+    },
+    {
+      "video": "/images/videos/3.mp4",
+      "image": "/images/pepti.jpg",
+      "tag": "Custom",
+      "heading": "Custom products",
+      "subtitle": "Diversify your product line",
+      "description": "Nasal Sprays (rapid neuro-absorption) Topical Patches (steady transdermal delivery) Oral Pouches (sublingual, fast-dissolving)"
+    },
+    {
+      "video": "/images/videos/4.mp4",
+      "image": "/images/HERO-BANNER-1.webp",
+      "tag": "Peptides",
+      "heading": "Peptides",
+      "subtitle": "Our mission: low cost, high purity, fully compliant",
+      "description": "Peptide Pure supports licensed clinicians and investigators through compliant sourcing, protocol education, and IRB-aligned observational research exploring emerging compounds and wellness strategies."
+    }
+  ]
+}

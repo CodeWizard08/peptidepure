@@ -1,0 +1,63 @@
+{
+  "hero": {
+    "sectionLabel": "Who We Are",
+    "heading": "About Peptide Pure™",
+    "subtitle": "A dual-entity structure providing clinicians with verified peptide sourcing and an organized research framework."
+  },
+  "structure": {
+    "sectionLabel": "Our Structure",
+    "heading": "Clinical-Grade Sourcing Within a Research Framework",
+    "description": "Peptide-based medicine requires more than compound access — it requires documentation, standardized protocols, and a defensible clinical framework. Peptide Pure™ operates through a dual-entity model that separates research oversight from sourcing and logistics.",
+    "researchEntity": {
+      "title": "Research Entity — 501(c)(3)",
+      "description": "The nonprofit research entity oversees structured, observational clinical studies focused on regenerative and peptide-based protocols.",
+      "items": [
+        "Structured observational clinical studies under 45 CFR 46",
+        "Standardized data collection, follow-up, and outcome tracking",
+        "Ethical oversight and protocol documentation",
+        "Study-aligned framework for participating clinics",
+        "Supports evidence generation for peptide-based interventions"
+      ]
+    },
+    "peptidePure": {
+      "title": "Peptide Pure — LLC",
+      "description": "The operational entity responsible for sourcing, quality verification, and distribution of research-grade peptides to enrolled clinics.",
+      "items": [
+        "MD-owned sourcing and operations platform",
+        "Peptides manufactured under ISO 9001 and cGMP-compliant systems",
+        "Purity verification (>99%) with batch-level documentation",
+        "Multi-lab testing, Certificates of Analysis, and full traceability",
+        "Secure logistics, fulfillment, and inventory management",
+        "Standardized clinic onboarding and protocol support"
+      ]
+    }
+  },
+  "clinicalContext": {
+    "heading": "Clinical Context",
+    "intro": "Clinicians working with peptides currently face limited options:",
+    "problems": [
+      "Unverified sourcing with inconsistent quality documentation",
+      "Lack of a structured research framework for clinical use"
+    ],
+    "solution": "This dual-entity model addresses both gaps.",
+    "conclusion": "The research entity provides the framework and oversight. Peptide Pure™ handles sourcing, verification, and logistics — giving clinicians a compliant pathway for peptide-based protocols."
+  },
+  "principles": {
+    "sectionLabel": "Our Principles",
+    "heading": "Operational Standards",
+    "items": [
+      { "icon": "🎯", "title": "Precision", "desc": "Accurate milligram strengths, verified compounds, and protocol-specific formulations." },
+      { "icon": "🔒", "title": "Integrity", "desc": "Full documentation, batch traceability, and transparent sourcing at every step." },
+      { "icon": "⚖️", "title": "Compliance", "desc": "Aligned with 45 CFR 46, FDA guidance, and applicable state medical practice standards." },
+      { "icon": "🤝", "title": "Clinician-Led", "desc": "MD-owned and operated — structured by clinicians for use in clinical settings." }
+    ]
+  },
+  "cta": {
+    "heading": "Clinician Enrollment",
+    "subtitle": "Verified clinicians can access the full catalog, protocol documentation, and clinical study enrollment.",
+    "primaryCtaLabel": "Create Account",
+    "primaryCtaHref": "/peptides",
+    "secondaryCtaLabel": "Contact Us",
+    "secondaryCtaHref": "/contact"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "hero": {
+    "sectionLabel": "Get In Touch",
+    "heading": "Contact Us",
+    "subtitle": "Our team is available Monday–Friday, 9AM–4PM PST. We typically respond within one business day."
+  },
+  "sidebar": {
+    "sectionLabel": "Reach Us",
+    "heading": "We're Here to Help",
+    "description": "Whether you need help with account setup, protocol questions, or ordering — our team of peptide specialists is ready to assist licensed clinicians.",
+    "contactItems": [
+      { "title": "Phone", "detail": "T: 805-427-2246", "sub": "Mon–Fri: 9AM – 4PM PST" },
+      { "title": "Email", "detail": "info@peptidepure.com", "sub": "We respond within 1 business day" },
+      { "title": "Shipping Days", "detail": "Mon–Fri", "sub": "Except U.S. Holidays" }
+    ],
+    "accessNote": "PeptidePure™ is a clinician-only platform. To request account access, please provide your NPI number and professional credentials in the form."
+  },
+  "form": {
+    "heading": "Send a Message",
+    "submitLabel": "Send Message →",
+    "disclaimer": "By submitting this form, you confirm that you are a licensed healthcare professional.",
+    "credentialOptions": ["MD", "DO", "PA-C", "NP", "ND", "DC", "Qualified Researcher"],
+    "subjectOptions": ["Account Setup", "Protocol Questions", "Order Inquiry", "COA Request", "Billing / Payments", "Technical Support", "Other"]
+  },
+  "successMessage": {
+    "heading": "Message Sent!",
+    "text": "Thank you for reaching out. A member of our team will contact you within one business day."
+  }
+}

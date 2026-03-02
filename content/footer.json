@@ -1,0 +1,30 @@
+{
+  "brandDescription": "A clinician-facing platform focused on peptide education, protocol development, and observational research support — built for providers who demand precision.",
+  "trustBadges": ["cGMP", "ISO 9001", ">99% Purity", "503A/503B"],
+  "quickLinks": [
+    { "label": "Contact Us", "href": "/contact" },
+    { "label": "Our Company", "href": "/our-company" },
+    { "label": "Buy Peptides", "href": "/peptides" },
+    { "label": "How It Works", "href": "/how-it-works" },
+    { "label": "COA Library", "href": "/coa" }
+  ],
+  "legalLinks": [
+    { "label": "Privacy Policy", "href": "/privacy" },
+    { "label": "Terms of Use", "href": "/terms" },
+    { "label": "Shipping & Payments", "href": "/shipping" },
+    { "label": "Refunds & Returns", "href": "/refunds" },
+    { "label": "Accessibility Statement", "href": "/accessibility" }
+  ],
+  "contactItems": [
+    { "label": "Phone", "value": "805-427-2246", "sub": "Mon–Fri  ·  9AM – 4PM PST", "href": "tel:8054272246" },
+    { "label": "Email", "value": "info@peptidepure.com", "sub": "Replies within 1 business day", "href": "mailto:info@peptidepure.com" },
+    { "label": "Shipping Days", "value": "Mon–Fri", "sub": "Except U.S. Holidays", "href": null }
+  ],
+  "disclaimer": "Peptide Pure does not provide medical advice, prescribe treatment, or direct patient care. All clinical decisions, dosing, administration, and patient management remain the sole responsibility of the licensed clinician. Compounds made available through this platform are not FDA-approved drugs unless explicitly stated and may be used in accordance with applicable federal and state laws, institutional policies, and clinical-study requirements. Information presented on this site is for professional and educational purposes only and is not intended to replace independent clinical judgment.",
+  "copyright": "© 2025 Peptidepure.com · All Rights Reserved",
+  "bottomLinks": [
+    { "label": "Privacy", "href": "/privacy" },
+    { "label": "Terms", "href": "/terms" },
+    { "label": "Accessibility", "href": "/accessibility" }
+  ]
+}
