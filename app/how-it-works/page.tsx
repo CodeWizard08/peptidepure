@@ -21,8 +21,8 @@ const solutionIcons = [
   </svg>,
 ];
 
-export default function HowItWorksPage() {
-  const content = getContent<any>('how-it-works');
+export default async function HowItWorksPage() {
+  const content = await getContent<any>('how-it-works');
 
   return (
     <>

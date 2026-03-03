@@ -8,9 +8,9 @@ import FreeShippingSection from '@/components/home/FreeShippingSection';
 import FinalCTA from '@/components/home/FinalCTA';
 import { getContent } from '@/lib/content';
 
-export default function HomePage() {
-  const content = getContent<any>('home');
-  const heroContent = getContent<any>('hero-slider');
+export default async function HomePage() {
+  const content = await getContent<any>('home');
+  const heroContent = await getContent<any>('hero-slider');
 
   return (
     <>

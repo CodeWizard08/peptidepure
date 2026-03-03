@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const data = getContent(page);
+    const data = await getContent(page);
     return NextResponse.json(data);
   } catch {
     return NextResponse.json({ error: 'Content not found' }, { status: 404 });
@@ -37,9 +37,11 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    writeContent(page, body);
+    await writeContent(page, body);
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: 'Write failed' }, { status: 500 });
+  } catch (err) {
+    console.error('Content write error:', err);
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: 'Write failed', detail: message }, { status: 500 });
   }
 }

@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
 
-export default function PeptidesPage() {
-  const content = getContent<any>('peptides');
+export default async function PeptidesPage() {
+  const content = await getContent<any>('peptides');
 
   return (
     <>

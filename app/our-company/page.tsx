@@ -3,8 +3,8 @@ import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
 import CTASection from '@/components/sections/CTASection';
 
-export default function OurCompanyPage() {
-  const content = getContent<any>('our-company');
+export default async function OurCompanyPage() {
+  const content = await getContent<any>('our-company');
 
   return (
     <>

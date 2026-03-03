@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   keywords: 'peptides, clinician platform, peptide research, BPC-157, Tirzepatide, peptide protocols',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const footerContent = getContent<any>('footer');
+  const footerContent = await getContent<any>('footer');
 
   return (
     <html lang="en">
