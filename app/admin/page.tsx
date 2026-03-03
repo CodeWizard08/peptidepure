@@ -326,8 +326,8 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    fetchContent(activePage);
-  }, [activePage, fetchContent]);
+    if (authenticated) fetchContent(activePage);
+  }, [activePage, authenticated, fetchContent]);
 
   useEffect(() => {
     if (toast) {
