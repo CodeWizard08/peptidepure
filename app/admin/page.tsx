@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-const ADMIN_PASSWORD = 'peptidepure2026';
-
 const PAGES = [
   { key: 'home', label: 'Home' },
   { key: 'hero-slider', label: 'Hero Slider' },
@@ -284,15 +282,34 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true);
-      setPasswordError(false);
-    } else {
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        setAuthenticated(true);
+        setPasswordError(false);
+      } else {
+        setPasswordError(true);
+      }
+    } catch {
       setPasswordError(true);
     }
   };
+
+  // Check if already authenticated (session cookie persists across reloads)
+  useEffect(() => {
+    fetch('/api/admin/login')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated) setAuthenticated(true);
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchContent = useCallback(async (page: string) => {
     setLoading(true);

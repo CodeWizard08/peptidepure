@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getContent, writeContent } from '@/lib/content';
+import { isAuthenticated } from '@/lib/admin-auth';
 
 const VALID_PAGES = [
   'home', 'hero-slider', 'peptides', 'how-it-works',
@@ -7,8 +8,8 @@ const VALID_PAGES = [
 ];
 
 export async function GET(request: NextRequest) {
-  if (process.env.NODE_ENV !== 'development') {
-    return NextResponse.json({ error: 'Not available' }, { status: 403 });
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const page = request.nextUrl.searchParams.get('page');
@@ -25,8 +26,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  if (process.env.NODE_ENV !== 'development') {
-    return NextResponse.json({ error: 'Not available' }, { status: 403 });
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const page = request.nextUrl.searchParams.get('page');
