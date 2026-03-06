@@ -4,12 +4,16 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import HexLogo from '@/components/ui/HexLogo';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cartCount] = useState(0);
+  const [user, setUser] = useState<User | null>(null);
 
+  const supabase = createClient();
   const pathname = usePathname();
   const isHome = pathname === '/';
   // Glass mode: transparent header overlaying the hero, switches to solid on scroll
@@ -19,6 +23,22 @@ export default function Header() {
     const handleScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+    return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const navLinks = [
@@ -87,7 +107,7 @@ export default function Header() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              Sign In
+              {user ? (user.user_metadata?.full_name?.split(' ')[0] || 'Account') : 'Sign In'}
             </Link>
             <Link
               href="/cart"
@@ -138,7 +158,7 @@ export default function Header() {
             ))}
             <div className="pt-3 flex gap-2">
               <Link href="/account" className="btn-outline text-sm flex-1 justify-center" onClick={() => setMobileOpen(false)}>
-                Sign In
+                {user ? 'Account' : 'Sign In'}
               </Link>
               <Link href="/peptides" className="btn-primary text-sm flex-1 justify-center" onClick={() => setMobileOpen(false)}>
                 Get Started

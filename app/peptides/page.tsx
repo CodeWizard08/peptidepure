@@ -1,9 +1,51 @@
 import Link from 'next/link';
 import { getContent } from '@/lib/content';
+import { createClient } from '@/lib/supabase/server';
 import PageHero from '@/components/sections/PageHero';
 
+// Category display config (color + subtitle for sidebar)
+const CATEGORY_CONFIG: Record<string, { color: string; subtitle: string }> = {
+  'Metabolic / Weight Loss': { color: '#C8952C', subtitle: 'Endocrine System' },
+  'MSK / Tissue Repair': { color: '#2563EB', subtitle: 'Musculoskeletal System' },
+  'Longevity / Mitochondrial': { color: '#059669', subtitle: 'Cellular Aging, Neuroprotection, Energy Systems' },
+  'Growth Hormone / GH Receptor': { color: '#7C3AED', subtitle: 'Endocrine & Muscular System' },
+  'Immune / Antimicrobial': { color: '#DC2626', subtitle: 'Immune & Inflammatory Regulation' },
+  'Cognitive & Mood': { color: '#0891B2', subtitle: 'Neuroendocrine & Neurotransmitter Support' },
+};
+
+type Product = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  category: string;
+  subcategory: string | null;
+  price_cents: number;
+  image_url: string | null;
+  is_active: boolean;
+  sort_order: number;
+};
+
 export default async function PeptidesPage() {
-  const content = await getContent<any>('peptides');
+  const [content, supabase] = await Promise.all([
+    getContent<any>('peptides'),
+    createClient(),
+  ]);
+
+  const { data: products } = await supabase
+    .from('products')
+    .select('id, name, slug, description, category, subcategory, price_cents, image_url, is_active, sort_order')
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true })
+    .order('name', { ascending: true });
+
+  // Group products by category for sidebar
+  const categoryMap = new Map<string, Product[]>();
+  for (const product of (products ?? []) as Product[]) {
+    const list = categoryMap.get(product.category) ?? [];
+    list.push(product);
+    categoryMap.set(product.category, list);
+  }
 
   return (
     <>
@@ -25,25 +67,28 @@ export default async function PeptidesPage() {
                   <h3 className="text-sm font-bold text-white uppercase tracking-widest">Categories</h3>
                 </div>
                 <div className="bg-white divide-y divide-gray-100">
-                  {content.categories.map((cat: any) => (
-                    <div key={cat.name} className="px-5 py-4">
-                      <p className="text-sm font-bold mb-1" style={{ color: cat.color }}>
-                        {cat.name}
-                      </p>
-                      <p className="text-xs italic mb-2" style={{ color: 'var(--text-light)' }}>
-                        ({cat.subtitle})
-                      </p>
-                      <ul className="space-y-1">
-                        {cat.items.map((item: string) => (
-                          <li key={item}>
-                            <Link href="#" className="text-xs hover:underline" style={{ color: 'var(--text-mid)' }}>
-                              {item}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                  {Array.from(categoryMap.entries()).map(([category, items]) => {
+                    const config = CATEGORY_CONFIG[category] ?? { color: 'var(--navy)', subtitle: category };
+                    return (
+                      <div key={category} className="px-5 py-4">
+                        <p className="text-sm font-bold mb-1" style={{ color: config.color }}>
+                          {category}
+                        </p>
+                        <p className="text-xs italic mb-2" style={{ color: 'var(--text-light)' }}>
+                          ({config.subtitle})
+                        </p>
+                        <ul className="space-y-1">
+                          {items.map((product) => (
+                            <li key={product.id}>
+                              <Link href={`/peptides/${product.slug}`} className="text-xs hover:underline" style={{ color: 'var(--text-mid)' }}>
+                                {product.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -96,7 +141,7 @@ export default async function PeptidesPage() {
                       </div>
                       {pkg.bonus && (
                         <p className="text-xs mt-2 pt-2 border-t" style={{ borderColor: 'var(--border)', color: 'var(--gold)' }}>
-                          🎁 Bonus: {pkg.bonus}
+                          Bonus: {pkg.bonus}
                         </p>
                       )}
                     </div>
@@ -107,12 +152,68 @@ export default async function PeptidesPage() {
                       className="w-full text-center block py-2.5 rounded-lg text-sm font-semibold transition-colors"
                       style={{ background: pkg.highlight ? 'var(--gold)' : 'var(--navy)', color: 'white' }}
                     >
-                      Login required →
+                      Login required
                     </Link>
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* Products Grid */}
+            {(products ?? []).length > 0 && (
+              <>
+                <div className="mb-6">
+                  <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--navy)' }}>All Products</h2>
+                  <p className="text-sm" style={{ color: 'var(--text-light)' }}>
+                    Clinical-grade peptides sourced for verified professionals.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-14">
+                  {(products as Product[]).map((product) => (
+                    <div
+                      key={product.id}
+                      className="bg-white rounded-2xl overflow-hidden shadow-sm card-hover flex flex-col"
+                      style={{ border: '1px solid var(--border)' }}
+                    >
+                      {/* Product image */}
+                      <div className="h-44 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0B1F3A, #1a3a6b)' }}>
+                        {product.image_url ? (
+                          <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <span className="text-white text-2xl font-bold opacity-30">PP</span>
+                        )}
+                      </div>
+                      <div className="p-5 flex flex-col flex-1">
+                        <h3 className="text-sm font-bold mb-1" style={{ color: 'var(--navy)' }}>{product.name}</h3>
+                        {product.description && (
+                          <p className="text-xs mb-3 line-clamp-2" style={{ color: 'var(--text-mid)' }}>
+                            {product.description}
+                          </p>
+                        )}
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          <span className="text-xs px-2 py-0.5 rounded-full uppercase tracking-wide font-medium" style={{ background: 'var(--off-white)', color: 'var(--text-light)' }}>
+                            {product.category}
+                          </span>
+                          {product.subcategory && (
+                            <span className="text-xs px-2 py-0.5 rounded-full uppercase tracking-wide font-medium" style={{ background: 'var(--off-white)', color: 'var(--text-light)' }}>
+                              {product.subcategory}
+                            </span>
+                          )}
+                        </div>
+                        <Link
+                          href={`/peptides/${product.slug}`}
+                          className="mt-auto text-center py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                          style={{ background: 'var(--navy)' }}
+                        >
+                          View Details
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
 
             {/* Essential Protocols */}
             <div className="mb-6">

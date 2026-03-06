@@ -229,3 +229,126 @@ body:has(#admin-root) main {
 body:has(#admin-root) footer {
   display: none !important;
 }
+
+/* Markdown prose styles for product detail pages */
+.prose-product {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--text-mid);
+}
+.prose-product h1,
+.prose-product h2,
+.prose-product h3,
+.prose-product h4 {
+  color: var(--navy);
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+  line-height: 1.3;
+}
+.prose-product h1 { font-size: 1.5rem; }
+.prose-product h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5em; }
+.prose-product h3 { font-size: 1.1rem; }
+.prose-product h4 { font-size: 1rem; color: var(--text-dark); }
+.prose-product p {
+  margin-bottom: 1.25em;
+}
+.prose-product strong {
+  color: var(--navy);
+  font-weight: 600;
+}
+.prose-product a {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-product a:hover {
+  color: var(--gold-light);
+}
+.prose-product ul,
+.prose-product ol {
+  padding-left: 1.5em;
+  margin-bottom: 1.25em;
+}
+.prose-product ul { list-style-type: disc; }
+.prose-product ol { list-style-type: decimal; }
+.prose-product li {
+  margin-bottom: 0.5em;
+  padding-left: 0.25em;
+}
+.prose-product li::marker {
+  color: var(--gold);
+}
+.prose-product blockquote {
+  border-left: 3px solid var(--gold);
+  padding: 0.75em 1.25em;
+  margin: 1.5em 0;
+  background: var(--gold-pale);
+  border-radius: 0 8px 8px 0;
+  color: var(--text-dark);
+  font-style: italic;
+}
+.prose-product blockquote p:last-child {
+  margin-bottom: 0;
+}
+.prose-product code {
+  background: var(--off-white);
+  border: 1px solid var(--border);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: var(--navy);
+}
+.prose-product pre {
+  background: var(--navy);
+  color: #e2e8f0;
+  padding: 1.25em;
+  border-radius: 12px;
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+.prose-product pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.85em;
+}
+.prose-product table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 0.875rem;
+}
+.prose-product thead th {
+  background: var(--off-white);
+  color: var(--navy);
+  font-weight: 700;
+  text-align: left;
+  padding: 0.75em 1em;
+  border-bottom: 2px solid var(--border);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.prose-product tbody td {
+  padding: 0.75em 1em;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-mid);
+}
+.prose-product tbody tr:hover {
+  background: var(--off-white);
+}
+.prose-product hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
+}
+.prose-product img {
+  border-radius: 12px;
+  margin: 1.5em 0;
+  max-width: 100%;
+}
+.prose-product > *:first-child {
+  margin-top: 0;
+}

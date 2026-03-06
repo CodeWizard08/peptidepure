@@ -1,8 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import HexLogo from '@/components/ui/HexLogo';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 // ── Icons ──────────────────────────────────────────────────────
 function EyeIcon({ open }: { open: boolean }) {
@@ -190,10 +193,18 @@ function Logo() {
 
 // ── Main Component ─────────────────────────────────────────────
 export default function AccountPage() {
+  const supabase = createClient();
+  const router = useRouter();
+
+  // Auth state
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
   // Login state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
 
   // Register state
   const [regName, setRegName] = useState('');
@@ -207,21 +218,220 @@ export default function AccountPage() {
   const [regAgree1, setRegAgree1] = useState(false);
   const [regAgree2, setRegAgree2] = useState(false);
   const [regLoading, setRegLoading] = useState(false);
+  const [regError, setRegError] = useState('');
+  const [regSuccess, setRegSuccess] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Check session on mount + subscribe to auth changes
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setAuthLoading(false);
+    };
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginError('');
     setLoginLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoginLoading(false);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    });
+
+    if (error) {
+      setLoginError(error.message);
+      setLoginLoading(false);
+    } else {
+      router.push('/');
+      router.refresh();
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setRegError('');
     setRegLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
+
+    const { data, error } = await supabase.auth.signUp({
+      email: regEmail,
+      password: regPassword,
+      options: {
+        data: {
+          full_name: regName,
+          clinic: regClinic,
+          phone: regPhone,
+          npi_number: regNpi,
+        },
+      },
+    });
+
+    if (error) {
+      setRegError(error.message);
+      setRegLoading(false);
+      return;
+    }
+
+    // Upload license file if provided
+    if (regFile && data.user) {
+      const fileExt = regFile.name.split('.').pop();
+      const filePath = `${data.user.id}/license.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('licenses')
+        .upload(filePath, regFile, { cacheControl: '3600', upsert: true });
+
+      if (uploadError) {
+        console.error('License upload failed:', uploadError.message);
+      }
+    }
+
     setRegLoading(false);
+    setRegSuccess(true);
   };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    router.refresh();
+  };
+
+  const handleResetPassword = async () => {
+    if (!loginEmail) {
+      setLoginError('Enter your email address first, then click "Lost your password?"');
+      return;
+    }
+    setLoginError('');
+    const { error } = await supabase.auth.resetPasswordForEmail(loginEmail, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/account/reset-password`,
+    });
+    if (error) {
+      setLoginError(error.message);
+    } else {
+      setLoginError('');
+      setLoginEmail('');
+      setLoginPassword('');
+      alert('Password reset email sent. Check your inbox.');
+    }
+  };
+
+  // ── Loading state ──
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--off-white)' }}>
+        <div
+          className="w-8 h-8 rounded-full animate-spin"
+          style={{ border: '3px solid var(--border)', borderTopColor: 'var(--gold)' }}
+        />
+      </div>
+    );
+  }
+
+  // ── Logged-in dashboard ──
+  if (user) {
+    return (
+      <div className="min-h-screen" style={{ background: 'var(--off-white)' }}>
+        <div className="relative z-10 flex flex-col min-h-screen">
+          <div className="text-center pt-12 pb-10 px-4">
+            <span className="section-label">Clinician Portal</span>
+            <h1
+              className="text-3xl md:text-4xl font-black mt-2"
+              style={{ color: 'var(--navy)', letterSpacing: '-0.02em' }}
+            >
+              Welcome,{' '}
+              <span style={{ color: 'var(--gold)' }}>
+                {user.user_metadata?.full_name || 'Clinician'}
+              </span>
+            </h1>
+          </div>
+          <div className="container-xl pb-20 max-w-lg mx-auto">
+            <div
+              className="rounded-3xl p-8 md:p-10"
+              style={{
+                background: 'white',
+                border: '1px solid rgba(11,31,58,0.08)',
+                boxShadow: '0 8px 40px rgba(11,31,58,0.07)',
+              }}
+            >
+              <div className="space-y-4">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
+                    Email
+                  </span>
+                  <p className="text-sm font-medium" style={{ color: 'var(--text-dark)' }}>
+                    {user.email}
+                  </p>
+                </div>
+                {user.user_metadata?.full_name && (
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
+                      Name
+                    </span>
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-dark)' }}>
+                      {user.user_metadata.full_name}
+                    </p>
+                  </div>
+                )}
+                {user.user_metadata?.clinic && (
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
+                      Clinic
+                    </span>
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-dark)' }}>
+                      {user.user_metadata.clinic}
+                    </p>
+                  </div>
+                )}
+                {user.user_metadata?.phone && (
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
+                      Phone
+                    </span>
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-dark)' }}>
+                      {user.user_metadata.phone}
+                    </p>
+                  </div>
+                )}
+                {user.user_metadata?.npi_number && (
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
+                      NPI Number
+                    </span>
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-dark)' }}>
+                      {user.user_metadata.npi_number}
+                    </p>
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={handleSignOut}
+                className="w-full mt-8 py-3.5 rounded-xl text-sm font-bold transition-all duration-200 hover:opacity-90"
+                style={{
+                  background: 'rgba(11,31,58,0.06)',
+                  color: 'var(--navy)',
+                  border: '1px solid rgba(11,31,58,0.12)',
+                }}
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -303,6 +513,19 @@ export default function AccountPage() {
                   onChange={setLoginPassword}
                 />
 
+                {loginError && (
+                  <div
+                    className="text-sm px-4 py-3 rounded-xl"
+                    style={{
+                      background: 'rgba(220,38,38,0.06)',
+                      border: '1px solid rgba(220,38,38,0.15)',
+                      color: '#DC2626',
+                    }}
+                  >
+                    {loginError}
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   disabled={loginLoading}
@@ -320,13 +543,14 @@ export default function AccountPage() {
                 </button>
 
                 <p className="text-center text-xs" style={{ color: 'var(--text-light)' }}>
-                  <a
-                    href="#"
+                  <button
+                    type="button"
+                    onClick={handleResetPassword}
                     className="underline transition-colors hover:opacity-80"
                     style={{ color: 'var(--gold)' }}
                   >
                     Lost your password?
-                  </a>
+                  </button>
                 </p>
               </form>
 
@@ -379,6 +603,24 @@ export default function AccountPage() {
                 </p>
               </div>
 
+              {regSuccess ? (
+                <div className="text-center py-12">
+                  <div
+                    className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+                    style={{ background: 'rgba(16,185,129,0.1)' }}
+                  >
+                    <svg className="w-8 h-8" style={{ color: '#10B981' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--navy)' }}>
+                    Registration Successful
+                  </h3>
+                  <p className="text-sm" style={{ color: 'var(--text-light)' }}>
+                    Please check your email to verify your account.
+                  </p>
+                </div>
+              ) : (
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field label="Full Name" placeholder="Full Name" icon={<UserIcon />} value={regName} onChange={setRegName} />
@@ -393,6 +635,19 @@ export default function AccountPage() {
                 </div>
 
                 <Field label="NPI Number" placeholder="NPI Number" icon={<IdIcon />} value={regNpi} onChange={setRegNpi} />
+
+                {regError && (
+                  <div
+                    className="text-sm px-4 py-3 rounded-xl"
+                    style={{
+                      background: 'rgba(220,38,38,0.06)',
+                      border: '1px solid rgba(220,38,38,0.15)',
+                      color: '#DC2626',
+                    }}
+                  >
+                    {regError}
+                  </div>
+                )}
 
                 {/* File upload */}
                 <div>
@@ -495,6 +750,7 @@ export default function AccountPage() {
                   {regLoading ? 'Submitting…' : 'Register'}
                 </button>
               </form>
+              )}
             </div>
 
           </div>
