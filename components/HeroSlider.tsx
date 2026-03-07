@@ -153,21 +153,31 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
 
             {/* ── Right: Product image ── */}
             <div className="hidden lg:flex justify-center items-center">
-              <div className="relative w-full" style={{ maxWidth: '520px' }}>
+              <div className="relative w-full" style={{ maxWidth: '520px', height: '450px' }}>
+                {/* Decorative border ring */}
                 <div
-                  className="relative overflow-hidden rounded-2xl"
-                  style={{ height: '400px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(200,149,44,0.18)', boxShadow: '0 32px 80px rgba(0,0,0,0.45)' }}
-                >
-                  {slides.map((s, i) => (
-                    <div key={i} className="absolute transition-opacity duration-700 rounded-2xl" style={{ inset: '20px', opacity: i === current ? 1 : 0 }}>
-                      <Image src={s.image} alt={s.tag} fill className="object-contain object-center" sizes="480px" priority={i === 0} />
-                    </div>
-                  ))}
-                </div>
-
+                  className="absolute inset-0 rounded-3xl pointer-events-none"
+                  style={{
+                    border: '2px solid rgba(200,149,44,0.35)',
+                    boxShadow: 'inset 0 0 30px rgba(200,149,44,0.08), 0 0 40px rgba(200,149,44,0.06)',
+                  }}
+                />
                 {/* Corner accents */}
-                <div className="absolute top-0 left-0 w-6 h-6 pointer-events-none" style={{ borderTop: '2px solid var(--gold)', borderLeft: '2px solid var(--gold)', borderRadius: '14px 0 0 0', opacity: 0.5 }} />
-                <div className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none" style={{ borderBottom: '2px solid var(--gold)', borderRight: '2px solid var(--gold)', borderRadius: '0 0 14px 0', opacity: 0.5 }} />
+                <div className="absolute -top-1 -left-1 w-8 h-8 pointer-events-none" style={{ borderTop: '3px solid var(--gold)', borderLeft: '3px solid var(--gold)', borderRadius: '16px 0 0 0' }} />
+                <div className="absolute -top-1 -right-1 w-8 h-8 pointer-events-none" style={{ borderTop: '3px solid var(--gold)', borderRight: '3px solid var(--gold)', borderRadius: '0 16px 0 0' }} />
+                <div className="absolute -bottom-1 -left-1 w-8 h-8 pointer-events-none" style={{ borderBottom: '3px solid var(--gold)', borderLeft: '3px solid var(--gold)', borderRadius: '0 0 0 16px' }} />
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 pointer-events-none" style={{ borderBottom: '3px solid var(--gold)', borderRight: '3px solid var(--gold)', borderRadius: '0 0 16px 0' }} />
+                {/* Inner glow background */}
+                <div
+                  className="absolute inset-0 rounded-3xl pointer-events-none"
+                  style={{ background: 'radial-gradient(ellipse at center, rgba(200,149,44,0.06) 0%, transparent 70%)' }}
+                />
+                {/* Product images */}
+                {slides.map((s, i) => (
+                  <div key={i} className="absolute inset-4 transition-opacity duration-700 rounded-2xl overflow-hidden" style={{ opacity: i === current ? 1 : 0 }}>
+                    <Image src={s.image} alt={s.tag} fill className="object-contain object-center drop-shadow-2xl" sizes="480px" priority={i === 0} />
+                  </div>
+                ))}
               </div>
             </div>
 
