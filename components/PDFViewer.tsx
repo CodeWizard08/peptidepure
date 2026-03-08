@@ -53,7 +53,7 @@ export default function PDFViewer({ src }: PDFViewerProps) {
           container.appendChild(canvas);
 
           const ctx = canvas.getContext('2d')!;
-          await page.render({ canvasContext: ctx, viewport }).promise;
+          await page.render({ canvasContext: ctx, canvas, viewport } as any).promise;
         }
       } catch (err) {
         if (!cancelled) {
