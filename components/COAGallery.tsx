@@ -5,6 +5,7 @@ import { formatDate } from '@/lib/format';
 import dynamic from 'next/dynamic';
 
 const PDFViewer = dynamic(() => import('./PDFViewer'), { ssr: false });
+const PDFThumbnail = dynamic(() => import('./PDFThumbnail'), { ssr: false });
 
 interface COARecord {
   compound: string;
@@ -183,20 +184,12 @@ export default function COAGallery({ content }: { content: COAContent }) {
                   className="bg-white rounded-2xl overflow-hidden shadow-sm card-hover text-left transition-shadow hover:shadow-md"
                   style={{ border: '1px solid var(--border)' }}
                 >
-                  {/* PDF thumbnail area */}
+                  {/* PDF thumbnail preview */}
                   <div
-                    className="relative aspect-4/3 overflow-hidden flex flex-col items-center justify-center gap-3"
+                    className="relative aspect-4/3 overflow-hidden"
                     style={{ background: '#f5f0eb' }}
                   >
-                    {/* PDF icon */}
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--navy)' }}>
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M14 2v6h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M9 15h6M9 11h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--navy)', opacity: 0.6 }}>
-                      PDF Document
-                    </span>
+                    <PDFThumbnail src={coa.pdf} />
                     {/* Purity badge */}
                     <span
                       className="absolute top-3 right-3 text-xs px-2 py-1 rounded-md font-semibold"
