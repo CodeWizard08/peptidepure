@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { formatDate } from '@/lib/format';
+import dynamic from 'next/dynamic';
+
+const PDFViewer = dynamic(() => import('./PDFViewer'), { ssr: false });
 
 interface COARecord {
   compound: string;
@@ -10,7 +13,7 @@ interface COARecord {
   purity: string;
   batch: string;
   date: string;
-  image: string;
+  pdf: string;
 }
 
 interface COAContent {
@@ -53,6 +56,10 @@ export default function COAGallery({ content }: { content: COAContent }) {
     if (!lightbox) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setLightbox(null);
+      // Block Ctrl+S (save) and Ctrl+P (print)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p')) {
+        e.preventDefault();
+      }
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
@@ -176,19 +183,20 @@ export default function COAGallery({ content }: { content: COAContent }) {
                   className="bg-white rounded-2xl overflow-hidden shadow-sm card-hover text-left transition-shadow hover:shadow-md"
                   style={{ border: '1px solid var(--border)' }}
                 >
-                  {/* Image area */}
-                  <div className="relative aspect-[4/3] overflow-hidden" style={{ background: '#f5f0eb' }}>
-                    <img
-                      src={coa.image}
-                      alt={`COA for ${coa.compound} — ${coa.batch}`}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        // Show placeholder when image not found
-                        const el = e.currentTarget;
-                        el.style.display = 'none';
-                        el.parentElement!.classList.add('coa-placeholder');
-                      }}
-                    />
+                  {/* PDF thumbnail area */}
+                  <div
+                    className="relative aspect-4/3 overflow-hidden flex flex-col items-center justify-center gap-3"
+                    style={{ background: '#f5f0eb' }}
+                  >
+                    {/* PDF icon */}
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--navy)' }}>
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M14 2v6h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M9 15h6M9 11h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--navy)', opacity: 0.6 }}>
+                      PDF Document
+                    </span>
                     {/* Purity badge */}
                     <span
                       className="absolute top-3 right-3 text-xs px-2 py-1 rounded-md font-semibold"
@@ -247,62 +255,47 @@ export default function COAGallery({ content }: { content: COAContent }) {
         </div>
       </section>
 
-      {/* Lightbox */}
+      {/* Full-screen PDF Lightbox */}
       {lightbox && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(11,31,58,0.9)' }}
-          onClick={() => setLightbox(null)}
+          className="fixed inset-0 z-50 flex flex-col"
+          style={{ background: 'rgba(11,31,58,0.95)' }}
+          onContextMenu={(e) => e.preventDefault()}
         >
+          {/* Top bar */}
           <div
-            className="relative max-w-4xl w-full max-h-[90vh] flex flex-col rounded-2xl overflow-hidden"
-            style={{ background: 'white' }}
-            onClick={(e) => e.stopPropagation()}
+            className="shrink-0 flex items-center justify-between px-5 py-3"
+            style={{ background: 'var(--navy)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}
           >
-            {/* Close button */}
-            <button
-              onClick={() => setLightbox(null)}
-              className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full text-white text-lg font-bold transition-colors"
-              style={{ background: 'rgba(11,31,58,0.7)' }}
-              aria-label="Close"
-            >
-              ✕
-            </button>
-
-            {/* Image */}
-            <div
-              className="flex-1 min-h-0 flex items-center justify-center overflow-auto"
-              style={{ background: '#f5f0eb' }}
-            >
-              <img
-                src={lightbox.image}
-                alt={`COA for ${lightbox.compound} — ${lightbox.batch}`}
-                className="max-w-full max-h-[70vh] object-contain"
-                onError={(e) => {
-                  const el = e.currentTarget;
-                  el.style.display = 'none';
-                  el.parentElement!.classList.add('coa-placeholder');
-                }}
-              />
-            </div>
-
-            {/* Caption */}
-            <div className="p-5 flex items-center justify-between" style={{ borderTop: '1px solid var(--border)' }}>
-              <div>
-                <h3 className="text-sm font-bold" style={{ color: 'var(--navy)' }}>
-                  {lightbox.compound}
-                </h3>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-light)' }}>
-                  {lightbox.lab} · {lightbox.batch} · {formatDate(lightbox.date)}
-                </p>
-              </div>
+            <div className="flex items-center gap-4 min-w-0">
+              <h3 className="text-sm font-bold text-white truncate">
+                {lightbox.compound}
+              </h3>
+              <span className="hidden sm:inline text-xs text-gray-400 truncate">
+                {lightbox.lab} · {lightbox.batch} · {formatDate(lightbox.date)}
+              </span>
               <span
-                className="text-xs px-3 py-1.5 rounded-full font-semibold"
-                style={{ background: 'var(--gold-pale)', color: 'var(--gold)', border: '1px solid rgba(200,149,44,0.3)' }}
+                className="hidden sm:inline text-xs px-2.5 py-1 rounded-full font-semibold shrink-0"
+                style={{ background: 'rgba(200,149,44,0.15)', color: 'var(--gold)', border: '1px solid rgba(200,149,44,0.3)' }}
               >
                 {lightbox.purity}
               </span>
             </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setLightbox(null)}
+                className="w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-colors text-white"
+                style={{ background: 'rgba(255,255,255,0.1)' }}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          {/* PDF viewer — renders as canvas images, no native PDF controls */}
+          <div className="flex-1 min-h-0">
+            <PDFViewer src={lightbox.pdf} />
           </div>
         </div>
       )}
