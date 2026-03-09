@@ -17,6 +17,13 @@ interface COARecord {
   pdf: string;
 }
 
+interface SummaryEntry {
+  compound: string;
+  lab: string;
+  date: string;
+  purity: number;
+}
+
 interface COAContent {
   hero: { sectionLabel: string; heading: string; subtitle: string };
   qualityBadges: { label: string; value: string }[];
@@ -24,6 +31,7 @@ interface COAContent {
   filterLabel: string;
   sortLabel: string;
   records: COARecord[];
+  summaryChart?: SummaryEntry[];
   footerText: string;
 }
 
@@ -110,6 +118,69 @@ export default function COAGallery({ content }: { content: COAContent }) {
           </div>
         </div>
       </section>
+
+      {/* Purity Summation Chart */}
+      {content.summaryChart && content.summaryChart.length > 0 && (
+        <section className="py-16" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div className="container-xl">
+            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--navy)' }}>
+              Purity Summary
+            </h2>
+            <p className="text-sm mb-8" style={{ color: 'var(--text-light)' }}>
+              Independent lab results across all tested compounds
+            </p>
+
+            <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid var(--border)' }}>
+              <table className="w-full text-sm" style={{ minWidth: 540 }}>
+                <thead>
+                  <tr style={{ background: 'var(--navy)' }}>
+                    <th className="text-left px-4 py-3 font-semibold text-white">Compound</th>
+                    <th className="text-left px-4 py-3 font-semibold text-white">Lab</th>
+                    <th className="text-left px-4 py-3 font-semibold text-white">Date Tested</th>
+                    <th className="text-right px-4 py-3 font-semibold" style={{ color: 'var(--gold-light)' }}>Purity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {content.summaryChart.map((row, i) => (
+                    <tr
+                      key={i}
+                      style={{
+                        background: i % 2 === 0 ? 'white' : 'var(--off-white)',
+                        borderTop: '1px solid var(--border)',
+                      }}
+                    >
+                      <td className="px-4 py-3 font-medium" style={{ color: 'var(--navy)' }}>
+                        {row.compound}
+                      </td>
+                      <td className="px-4 py-3" style={{ color: 'var(--text-mid)' }}>
+                        {row.lab}
+                      </td>
+                      <td className="px-4 py-3" style={{ color: 'var(--text-mid)' }}>
+                        {formatDate(row.date)}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-3">
+                          <div
+                            className="hidden sm:block h-2 rounded-full"
+                            style={{
+                              width: `${Math.max((row.purity - 99) * 100, 8)}px`,
+                              background: row.purity >= 99.9 ? '#16a34a' : row.purity >= 99.5 ? 'var(--gold)' : '#f59e0b',
+                              maxWidth: 100,
+                            }}
+                          />
+                          <span className="font-bold tabular-nums" style={{ color: 'var(--navy)' }}>
+                            {row.purity.toFixed(3)}%
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Filter bar + Grid */}
       <section className="py-16">

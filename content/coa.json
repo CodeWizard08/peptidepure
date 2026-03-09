@@ -14,11 +14,29 @@
   "filterLabel": "Filter by Peptide",
   "sortLabel": "Sort by Date",
   "records": [
-    { "compound": "AOD-9604", "peptide": "AOD-9604", "lab": "Third-Party Lab", "purity": ">99%", "batch": "AOD-2602090001", "date": "2025-02-09", "pdf": "/coa/AOD2602090001.pdf" },
-    { "compound": "Forever Young Labs Blend", "peptide": "Forever Young Labs", "lab": "Forever Young Labs", "purity": ">99%", "batch": "FD-012126", "date": "2025-01-21", "pdf": "/coa/Freedom 012126.pdf" },
-    { "compound": "Freedom Diagnostics COA", "peptide": "Forever Young Labs", "lab": "Forever Young Labs", "purity": ">99%", "batch": "FD-COA-001", "date": "2025-01-15", "pdf": "/coa/Freedom Diagnostics COA.pdf" },
-    { "compound": "Forever Young Labs", "peptide": "Forever Young Labs", "lab": "Forever Young Labs", "purity": ">99%", "batch": "FD-12262025", "date": "2025-12-26", "pdf": "/coa/Freedom Diagnostics 12262025 pic.pdf" },
-    { "compound": "MZ BioLabs COA", "peptide": "MZ BioLabs", "lab": "MZ BioLabs", "purity": ">99%", "batch": "MZB-001", "date": "2025-01-10", "pdf": "/coa/MZBIOLABS.pdf" }
+    { "compound": "AOD-9604", "peptide": "Freedom Diagnostics", "lab": "Freedom Diagnostics", "purity": "99.525%", "batch": "AOD-2602090001", "date": "2026-02-09", "pdf": "/coa/AOD2602090001.pdf" },
+    { "compound": "Freedom Diagnostics — Tirzepatide & NAD+", "peptide": "Freedom Diagnostics", "lab": "Freedom Diagnostics", "purity": ">99%", "batch": "FD-2601140248", "date": "2026-01-14", "pdf": "/coa/Freedom 012126.pdf" },
+    { "compound": "Forever Young Pharmacy COA", "peptide": "Forever Young Pharmacy", "lab": "Forever Young Pharmacy", "purity": ">99%", "batch": "FYP-COA-001", "date": "2025-08-22", "pdf": "/coa/Freedom Diagnostics COA.pdf" },
+    { "compound": "Freedom Diagnostics — Multi-Compound Panel", "peptide": "Freedom Diagnostics", "lab": "Freedom Diagnostics", "purity": ">99%", "batch": "FD-2512260087", "date": "2025-12-26", "pdf": "/coa/Freedom Diagnostics 12262025 pic.pdf" },
+    { "compound": "MZ BioLabs — Tirzepatide", "peptide": "MZ BioLabs", "lab": "MZ BioLabs", "purity": "99.97%", "batch": "25-1117", "date": "2025-12-12", "pdf": "/coa/MZBIOLABS.pdf" }
+  ],
+  "summaryChart": [
+    { "compound": "AOD-9604", "lab": "Freedom Diagnostics", "date": "2026-02-09", "purity": 99.525 },
+    { "compound": "Tirzepatide 30mg", "lab": "Freedom Diagnostics", "date": "2026-01-14", "purity": 99.905 },
+    { "compound": "NAD+ 1000mg", "lab": "Freedom Diagnostics", "date": "2026-01-14", "purity": 99.922 },
+    { "compound": "Glutathione 1500mg", "lab": "Freedom Diagnostics", "date": "2025-12-26", "purity": 99.836 },
+    { "compound": "Epithalon 50mg", "lab": "Freedom Diagnostics", "date": "2025-12-26", "purity": 99.953 },
+    { "compound": "GHK-Cu / BPC-157", "lab": "Freedom Diagnostics", "date": "2025-12-26", "purity": 99.632 },
+    { "compound": "GHK-Cu / KPV / BPC-157 / TB-4", "lab": "Freedom Diagnostics", "date": "2025-12-26", "purity": 99.763 },
+    { "compound": "Selank 10mg", "lab": "Freedom Diagnostics", "date": "2025-12-26", "purity": 99.750 },
+    { "compound": "N-Acetyl Selank Amidate", "lab": "Freedom Diagnostics", "date": "2025-12-26", "purity": 99.917 },
+    { "compound": "SS-31 10mg", "lab": "Freedom Diagnostics", "date": "2025-12-26", "purity": 99.682 },
+    { "compound": "PT-141 10mg", "lab": "Freedom Diagnostics", "date": "2025-12-26", "purity": 99.959 },
+    { "compound": "DSIP 10mg", "lab": "Freedom Diagnostics", "date": "2025-12-26", "purity": 99.250 },
+    { "compound": "BPC-157 / TB-500 / GHK-Cu / KPV", "lab": "Forever Young Pharmacy", "date": "2025-08-22", "purity": 99.600 },
+    { "compound": "NAD+ 1000mg", "lab": "Forever Young Pharmacy", "date": "2025-08-22", "purity": 99.900 },
+    { "compound": "Tirzepatide 60mg", "lab": "MZ BioLabs", "date": "2025-12-12", "purity": 99.970 },
+    { "compound": "Tirzepatide 10mg", "lab": "MZ BioLabs", "date": "2025-12-12", "purity": 99.970 }
   ],
   "footerText": "Additional COAs available upon request for verified account holders."
 }
