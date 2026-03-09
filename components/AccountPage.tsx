@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import HexLogo from '@/components/ui/HexLogo';
 import { createClient } from '@/lib/supabase/client';
 import { formatCents, formatOrderNumber, formatDate } from '@/lib/format';
 import type { User } from '@supabase/supabase-js';
@@ -183,12 +182,8 @@ function PasswordField({
 // ── Logo ───────────────────────────────────────────────────────
 function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2.5">
-      <HexLogo width={28} height={32} />
-      <span className="font-black text-xl tracking-tight" style={{ color: 'var(--navy)' }}>
-        PEPTIDE<span style={{ color: 'var(--gold)' }}>PURE</span>
-        <span className="text-xs font-normal align-super ml-0.5" style={{ color: 'var(--text-light)' }}>™</span>
-      </span>
+    <Link href="/" className="flex items-center">
+      <img src="/logo.webp" alt="PeptidePure™" style={{ height: '32px', width: 'auto' }} />
     </Link>
   );
 }

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import HexLogo from '@/components/ui/HexLogo';
 
 interface FooterContent {
   brandDescription: string;
@@ -40,12 +39,8 @@ export default function Footer({ content }: { content: FooterContent }) {
           {/* ── Brand column (wider) */}
           <div className="col-span-12 md:col-span-4 lg:col-span-4 flex flex-col gap-4">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 w-fit">
-              <HexLogo variant="white" width={30} height={34} />
-              <span className="font-bold text-xl tracking-tight leading-none">
-                PEPTIDE<span style={{ color: 'var(--gold)' }}>PURE</span>
-                <sup className="text-xs font-normal ml-0.5 text-gray-400">™</sup>
-              </span>
+            <Link href="/" className="flex items-center w-fit">
+              <img src="/logo.webp" alt="PeptidePure™" style={{ height: '34px', width: 'auto' }} />
             </Link>
 
             <p className="text-sm text-gray-400 leading-relaxed max-w-xs">

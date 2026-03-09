@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import HexLogo from '@/components/ui/HexLogo';
 import { createClient } from '@/lib/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import type { User } from '@supabase/supabase-js';
@@ -70,15 +69,8 @@ export default function Header() {
       <div className="container-xl">
         <div className="flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <HexLogo width={32} height={36} />
-            <span
-              className="font-bold text-xl tracking-tight transition-colors duration-300"
-              style={{ color: glass ? 'white' : 'var(--navy)' }}
-            >
-              PEPTIDE<span style={{ color: 'var(--gold)' }}>PURE</span>
-              <sup className="text-xs font-normal ml-0.5" style={{ color: glass ? 'rgba(255,255,255,0.5)' : '#9CA3AF' }}>™</sup>
-            </span>
+          <Link href="/" className="flex items-center shrink-0">
+            <img src="/logo.webp" alt="PeptidePure™" style={{ height: '36px', width: 'auto' }} />
           </Link>
 
           {/* Desktop Nav */}

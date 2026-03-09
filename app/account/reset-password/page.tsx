@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import HexLogo from '@/components/ui/HexLogo';
 
 export default function ResetPasswordPage() {
   const supabase = createClient();
@@ -55,12 +54,8 @@ export default function ResetPasswordPage() {
         }}
       >
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2.5 mb-6">
-            <HexLogo width={28} height={32} />
-            <span className="font-black text-xl tracking-tight" style={{ color: 'var(--navy)' }}>
-              PEPTIDE<span style={{ color: 'var(--gold)' }}>PURE</span>
-              <span className="text-xs font-normal align-super ml-0.5" style={{ color: 'var(--text-light)' }}>™</span>
-            </span>
+          <Link href="/" className="inline-flex mb-6">
+            <img src="/logo.webp" alt="PeptidePure™" style={{ height: '32px', width: 'auto' }} />
           </Link>
           <h1 className="text-2xl font-black" style={{ color: 'var(--navy)', letterSpacing: '-0.02em' }}>
             Reset Password
