@@ -150,25 +150,33 @@ export default async function HowItWorksPage() {
         <div className="container-xl relative">
 
           {/* Section heading */}
-          <h2 className="text-3xl md:text-4xl font-bold mb-14" style={{ color: 'var(--navy)' }}>
-            The Solution Providers Need:
-          </h2>
+          <div className="mb-14">
+            <span className="section-label block mb-3">Why Clinicians Choose Us</span>
+            <h2 className="text-3xl md:text-5xl font-bold leading-tight" style={{ color: 'var(--navy)' }}>
+              The Solution{' '}
+              <span style={{ color: 'var(--gold)' }}>Providers Need</span>
+            </h2>
+          </div>
 
           {/* ── 3 feature columns */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             {content.solutionFeatures.map((item: { title: string; desc: string }, i: number) => (
-              <div key={i} className="text-center">
+              <div
+                key={i}
+                className="bg-white rounded-2xl p-7 shadow-sm"
+                style={{ border: '1px solid rgba(200,149,44,0.18)', borderTop: '3px solid var(--gold)' }}
+              >
                 <div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
+                  className="w-14 h-14 rounded-xl flex items-center justify-center mb-5"
                   style={{
-                    background: 'rgba(200,149,44,0.10)',
+                    background: 'rgba(200,149,44,0.08)',
                     border: '1.5px solid rgba(200,149,44,0.28)',
                     color: 'var(--gold)',
                   }}
                 >
                   {solutionIcons[i]}
                 </div>
-                <h3 className="font-bold text-lg mb-3" style={{ color: 'var(--navy)' }}>{item.title}</h3>
+                <h3 className="font-bold text-base mb-2.5" style={{ color: 'var(--navy)' }}>{item.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-mid)' }}>{item.desc}</p>
               </div>
             ))}
@@ -178,19 +186,24 @@ export default async function HowItWorksPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
 
             {/* Pricing card */}
-            <div className="rounded-2xl overflow-hidden shadow-lg" style={{ background: 'var(--navy)' }}>
-              <div className="px-6 pt-6 pb-3">
+            <div className="rounded-2xl overflow-hidden shadow-xl" style={{ background: 'var(--navy)' }}>
+              {/* Card header bar */}
+              <div
+                className="px-6 py-4 flex items-center gap-3"
+                style={{ background: 'rgba(200,149,44,0.12)', borderBottom: '1px solid rgba(200,149,44,0.18)' }}
+              >
+                <div style={{ width: '0.3rem', height: '1.2rem', borderRadius: '9999px', background: 'var(--gold)', flexShrink: 0 }} />
                 <span className="text-xs font-bold tracking-[0.15em] uppercase" style={{ color: 'var(--gold)' }}>
                   {content.pricing.label}
                 </span>
               </div>
               <table className="w-full">
                 <thead>
-                  <tr style={{ background: 'rgba(200,149,44,0.12)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-300">{content.pricing.columns.protocol}</th>
-                    <th className="px-3 py-3 text-xs font-semibold" style={{ color: 'var(--gold)' }}>{content.pricing.columns.pp}</th>
-                    <th className="px-3 py-3 text-xs font-semibold text-gray-400">{content.pricing.columns.gray}</th>
-                    <th className="px-3 py-3 text-xs font-semibold text-gray-400">{content.pricing.columns.retail}</th>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                    <th className="text-left px-5 py-3.5 text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.4)' }}>{content.pricing.columns.protocol}</th>
+                    <th className="px-3 py-3.5 text-xs font-bold" style={{ color: 'var(--gold)' }}>{content.pricing.columns.pp}</th>
+                    <th className="px-3 py-3.5 text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.3)' }}>{content.pricing.columns.gray}</th>
+                    <th className="px-3 py-3.5 text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.3)' }}>{content.pricing.columns.retail}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -199,13 +212,13 @@ export default async function HowItWorksPage() {
                       key={i}
                       style={{
                         borderTop: '1px solid rgba(255,255,255,0.05)',
-                        background: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
+                        background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent',
                       }}
                     >
-                      <td className="px-5 py-3.5 text-xs text-gray-300">{row.protocol}</td>
+                      <td className="px-5 py-3.5 text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>{row.protocol}</td>
                       <td className="px-3 py-3.5 text-xs text-center font-bold" style={{ color: 'var(--gold)' }}>{row.pp}</td>
-                      <td className="px-3 py-3.5 text-xs text-center text-gray-500">{row.gray}</td>
-                      <td className="px-3 py-3.5 text-xs text-center text-gray-500">{row.retail}</td>
+                      <td className="px-3 py-3.5 text-xs text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>{row.gray}</td>
+                      <td className="px-3 py-3.5 text-xs text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>{row.retail}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -215,25 +228,35 @@ export default async function HowItWorksPage() {
             {/* Market stats */}
             <div>
               <span className="section-label block mb-8">{content.relevanceStats.sectionLabel}</span>
-              <div className="space-y-8">
+              <div>
                 {content.relevanceStats.items.map((item: { stat: string; label: string; desc: string }, i: number) => (
-                  <div key={i} className="flex gap-6 items-start">
-                    <div className="shrink-0 min-w-25">
+                  <div
+                    key={i}
+                    className="flex gap-5 items-start py-6"
+                    style={{ borderTop: '1px solid rgba(11,31,58,0.1)' }}
+                  >
+                    <div className="shrink-0" style={{ minWidth: '6rem' }}>
                       <div
                         className="font-black leading-none"
-                        style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: 'var(--navy)', letterSpacing: '-0.02em' }}
+                        style={{ fontSize: 'clamp(1.9rem, 3.2vw, 2.6rem)', color: 'var(--navy)', letterSpacing: '-0.03em' }}
                       >
                         {item.stat}
                       </div>
-                      <div className="text-sm font-semibold mt-1" style={{ color: 'var(--navy)' }}>
+                      <div className="text-xs font-semibold mt-1 uppercase tracking-wider" style={{ color: 'var(--gold)' }}>
                         {item.label}
                       </div>
                     </div>
-                    <p className="text-sm leading-relaxed pt-1" style={{ color: 'var(--text-mid)' }}>
+                    {/* Vertical divider */}
+                    <div
+                      className="shrink-0 self-stretch"
+                      style={{ width: '1px', background: 'rgba(200,149,44,0.35)', borderRadius: '9999px' }}
+                    />
+                    <p className="text-sm leading-relaxed pt-0.5" style={{ color: 'var(--text-mid)' }}>
                       {item.desc}
                     </p>
                   </div>
                 ))}
+                <div style={{ borderTop: '1px solid rgba(11,31,58,0.1)' }} />
               </div>
             </div>
 
@@ -242,7 +265,17 @@ export default async function HowItWorksPage() {
       </section>
 
       {/* Review. Register. Implement. */}
-      <section className="py-20">
+      <section className="py-20 relative overflow-hidden" style={{ background: 'var(--off-white)' }}>
+        <style>{`
+          .how-step { position: relative; background: #ffffff; transition: background 0.4s ease; overflow: hidden; }
+          .how-step::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--gold) 0%, rgba(200,149,44,0.3) 60%, transparent 100%); transform: scaleX(0); transform-origin: left; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+          .how-step:hover::before { transform: scaleX(1); }
+          .how-step:hover { background: var(--gold-pale); }
+          .how-step:hover .how-step-icon { border-color: rgba(200,149,44,0.55) !important; background: rgba(200,149,44,0.08) !important; }
+          .how-step:hover .how-step-desc { color: var(--text-mid) !important; }
+          .how-step:hover .how-step-ghost { color: rgba(200,149,44,0.07) !important; }
+        `}</style>
+
         <div className="container-xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--navy)' }}>
@@ -251,24 +284,102 @@ export default async function HowItWorksPage() {
             <p className="text-sm mt-3" style={{ color: 'var(--text-light)' }}>
               {content.steps.subtitle}
             </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {content.steps.items.map((item: { step: string; icon: string; title: string; desc: string }, i: number) => (
-              <div
-                key={i}
-                className="p-8 rounded-2xl text-center"
-                style={{ background: 'var(--navy)', border: '1px solid rgba(200,149,44,0.2)' }}
-              >
-                <div className="text-3xl mb-4">{item.icon}</div>
-                <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--gold)' }}>
-                  Step {item.step}
+            </div>
+
+            {/* Steps grid — 1px gap acts as hairline dividers */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '1px',
+              background: 'rgba(11,31,58,0.1)',
+              border: '1px solid rgba(11,31,58,0.1)',
+              borderRadius: '1rem',
+              overflow: 'hidden',
+            }}>
+              {content.steps.items.map((item: { step: string; icon: string; title: string; desc: string }, i: number) => (
+                <div key={i} className="how-step" style={{ padding: '3rem 2.75rem 2.75rem' }}>
+
+                  {/* Step number + trailing line */}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: '0.6rem',
+                    fontSize: '0.62rem', letterSpacing: '0.22em', textTransform: 'uppercase',
+                    color: 'var(--gold)', marginBottom: '2rem',
+                  }}>
+                    Step {String(i + 1).padStart(2, '0')}
+                    <span style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(200,149,44,0.3), transparent)' }} />
+                  </div>
+
+                  {/* Icon box */}
+                  <div
+                    className="how-step-icon"
+                    style={{
+                      width: '52px', height: '52px',
+                      border: '1px solid rgba(200,149,44,0.3)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      marginBottom: '2.25rem',
+                      transition: 'border-color 0.3s, background 0.3s',
+                    }}
+                  >
+                    {i === 0 && (
+                      <svg viewBox="0 0 24 24" style={{ width: '24px', stroke: 'var(--gold)', fill: 'none', strokeWidth: 1.4, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                      </svg>
+                    )}
+                    {i === 1 && (
+                      <svg viewBox="0 0 24 24" style={{ width: '24px', stroke: 'var(--gold)', fill: 'none', strokeWidth: 1.4, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+                        <path d="M9 12l2 2 4-4" /><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                      </svg>
+                    )}
+                    {i === 2 && (
+                      <svg viewBox="0 0 24 24" style={{ width: '24px', stroke: 'var(--gold)', fill: 'none', strokeWidth: 1.4, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
+                      </svg>
+                    )}
+                  </div>
+
+                  {/* Title */}
+                  <h3 style={{
+                    fontSize: '1.65rem', fontWeight: 600,
+                    color: 'var(--navy)', marginBottom: '1.25rem', lineHeight: 1.2,
+                  }}>
+                    {item.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p
+                    className="how-step-desc"
+                    style={{ fontSize: '0.875rem', lineHeight: 1.75, color: 'var(--text-light)', transition: 'color 0.3s' }}
+                  >
+                    {item.desc}
+                  </p>
+
+                  {/* Ghost number */}
+                  <div
+                    className="how-step-ghost"
+                    style={{
+                      position: 'absolute', bottom: '1.25rem', right: '1.75rem',
+                      fontSize: '6rem', fontWeight: 300,
+                      color: 'rgba(11,31,58,0.04)', lineHeight: 1,
+                      pointerEvents: 'none', userSelect: 'none',
+                      transition: 'color 0.3s',
+                    }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </div>
+
+                  {/* Connector dots (between cards only) */}
+                  {i < content.steps.items.length - 1 && (
+                    <div style={{ position: 'absolute', top: '50%', right: '-1px', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 2, pointerEvents: 'none' }}>
+                      {[0, 1, 2].map(d => (
+                        <span key={d} style={{ display: 'block', width: '3px', height: '3px', background: 'var(--gold)', borderRadius: '50%', opacity: 0.5 }} />
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <h3 className="text-lg font-bold text-white mb-3">{item.title}</h3>
-                <p className="text-sm leading-relaxed text-gray-300">{item.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
+
           </div>
-        </div>
       </section>
 
       <CTASection

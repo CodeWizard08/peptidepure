@@ -1,0 +1,69 @@
+{
+  "hero": {
+    "sectionLabel": "Policies",
+    "heading": "Refunds & Returns",
+    "subtitle": "Our return, refund, and exchange policies for research-grade products."
+  },
+  "intro": "At Peptide Pure™, we are committed to quality and accuracy. Due to the sensitive, research-grade nature of our products, all orders are subject to strict quality control and handling standards. Please review this policy carefully before placing an order.",
+  "sections": [
+    {
+      "title": "Return Policy",
+      "text": "Returns are accepted only under the following circumstances:",
+      "items": [
+        "You received an incorrect item",
+        "The product arrived damaged or defective",
+        "Your order was incomplete or missing items"
+      ]
+    },
+    {
+      "title": "To Be Eligible for a Return",
+      "items": [
+        "You must contact us within 7 days of delivery",
+        "Items must be unused, unopened, and in their original packaging",
+        "Valid proof of purchase is required (order number or receipt)"
+      ],
+      "extra": "Due to the nature of our products, opened, used, or tampered items are not eligible for return under any circumstances."
+    },
+    {
+      "title": "Refund Policy",
+      "text": "Once an approved return is received and inspected, you will be notified of the approval or denial of your refund.",
+      "items": [
+        "Approved refunds are issued to the original payment method",
+        "Refunds are typically processed within 5–10 business days",
+        "Processing times may vary depending on your bank or payment provider"
+      ]
+    },
+    {
+      "title": "Non-Refundable Situations",
+      "text": "Refunds will not be issued for:",
+      "items": [
+        "Change of mind after purchase",
+        "Shipping delays, carrier issues, or customs delays",
+        "Final-sale or explicitly non-returnable items"
+      ]
+    },
+    {
+      "title": "Exchanges",
+      "text": "We do not offer direct exchanges.",
+      "extra": "If you received an incorrect product due to our error, a verified replacement will be shipped at no additional cost after confirmation."
+    },
+    {
+      "title": "Return Shipping",
+      "items": [
+        "If the return is due to our error (incorrect or defective item), a prepaid return label will be provided",
+        "For all other approved returns, the customer is responsible for return shipping costs"
+      ]
+    },
+    {
+      "title": "How to Request a Return or Refund",
+      "text": "To initiate a return or refund request:",
+      "items": [
+        "Email info@peptidepure.com",
+        "Include your order number and a clear description of the issue",
+        "Attach photos if the item arrived damaged or incorrect",
+        "Wait for confirmation and return instructions from our support team"
+      ],
+      "extra": "Unauthorized returns will not be accepted."
+    }
+  ]
+}

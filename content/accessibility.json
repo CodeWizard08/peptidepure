@@ -1,0 +1,43 @@
+{
+  "hero": {
+    "sectionLabel": "Legal",
+    "heading": "Accessibility Statement",
+    "subtitle": "Our commitment to digital accessibility for all users."
+  },
+  "intro": "Peptide Pure is committed to ensuring digital accessibility for all users, regardless of ability or technology. We continually work to improve the usability and accessibility of our website and strive to conform to the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA wherever reasonably possible.",
+  "sections": [
+    {
+      "title": "Our Commitment",
+      "text": "We aim to provide a website that allows all visitors to:",
+      "items": [
+        "Navigate content easily and intuitively",
+        "Clearly understand information and instructions",
+        "Complete forms and interact with site features",
+        "Access content across devices, browsers, and assistive technologies"
+      ]
+    },
+    {
+      "title": "Accessibility Features",
+      "text": "Our website includes, and continues to expand, features such as:",
+      "items": [
+        "Clear, consistent navigation and heading structure",
+        "Keyboard-accessible menus and forms",
+        "Text alternatives for non-text content",
+        "Sufficient color contrast for readability",
+        "Responsive design with scalable text"
+      ]
+    },
+    {
+      "title": "Ongoing Improvements",
+      "text": "Accessibility is an ongoing process. We regularly evaluate our site using automated tools and manual reviews, and we prioritize identified issues as part of continuous improvement. Feedback from users and accessibility professionals is welcomed and encouraged."
+    },
+    {
+      "title": "Need Assistance?",
+      "text": "If you experience difficulty accessing any part of our website, please contact us. We will make reasonable efforts to provide the requested information or service in an accessible format."
+    },
+    {
+      "title": "Legal Notice",
+      "text": "While Peptide Pure strives to meet WCAG 2.1 Level AA standards, some third-party content or integrations may not yet be fully accessible. We continue to review and enhance our accessibility practices to ensure equal access for all visitors."
+    }
+  ]
+}

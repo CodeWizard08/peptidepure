@@ -5,13 +5,15 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import HexLogo from '@/components/ui/HexLogo';
 import { createClient } from '@/lib/supabase/client';
+import { useCart } from '@/contexts/CartContext';
 import type { User } from '@supabase/supabase-js';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [cartCount] = useState(0);
+  const [formsOpen, setFormsOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const { cartCount, cartTotal } = useCart();
 
   const supabase = createClient();
   const pathname = usePathname();
@@ -93,6 +95,55 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            {/* Forms dropdown — logged-in users only */}
+            {user && (
+              <div
+                className="relative"
+                onMouseEnter={() => setFormsOpen(true)}
+                onMouseLeave={() => setFormsOpen(false)}
+              >
+                <button
+                  className={`px-3.5 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center gap-1 ${
+                    glass ? 'hover:bg-white/10' : 'hover:bg-gray-50'
+                  }`}
+                  style={{ color: glass ? 'rgba(255,255,255,0.82)' : 'var(--text-dark)' }}
+                >
+                  Forms
+                  <svg
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${formsOpen ? 'rotate-180' : ''}`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {formsOpen && (
+                  <div
+                    className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-xl py-1.5 z-50"
+                    style={{ border: '1px solid var(--border)', minWidth: '13rem' }}
+                  >
+                    {[
+                      { label: 'IRB — Baseline', href: '/forms/baseline' },
+                      { label: 'IRB — Treatment Log', href: '/forms/treatment-log' },
+                      { label: 'IRB — AE / SAE Report', href: '/forms/ae-sae-report' },
+                    ].map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                        style={{ color: 'var(--text-dark)' }}
+                        onClick={() => setFormsOpen(false)}
+                      >
+                        <span
+                          className="w-1.5 h-1.5 rounded-full shrink-0"
+                          style={{ background: 'var(--gold)' }}
+                        />
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
 
           {/* Right actions */}
@@ -119,7 +170,15 @@ export default function Header() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              ${cartCount.toFixed(2)}
+              {cartCount > 0 && (
+                <span
+                  className="absolute -top-1 -right-1 flex items-center justify-center rounded-full text-[10px] font-bold text-white"
+                  style={{ background: 'var(--gold)', minWidth: '18px', height: '18px' }}
+                >
+                  {cartCount}
+                </span>
+              )}
+              ${(cartTotal / 100).toFixed(2)}
             </Link>
             <Link href="/peptides" className="btn-primary text-sm py-2 px-4">
               Get Started
@@ -156,6 +215,28 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            {user && (
+              <div className="pt-1">
+                <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--gold)' }}>
+                  Forms
+                </div>
+                {[
+                  { label: 'IRB — Baseline', href: '/forms/baseline' },
+                  { label: 'IRB — Treatment Log', href: '/forms/treatment-log' },
+                  { label: 'IRB — AE / SAE Report', href: '/forms/ae-sae-report' },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="block px-3 py-2.5 rounded-md text-sm font-medium hover:bg-gray-50"
+                    style={{ color: 'var(--text-dark)' }}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
             <div className="pt-3 flex gap-2">
               <Link href="/account" className="btn-outline text-sm flex-1 justify-center" onClick={() => setMobileOpen(false)}>
                 {user ? 'Account' : 'Sign In'}

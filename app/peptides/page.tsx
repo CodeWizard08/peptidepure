@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getContent } from '@/lib/content';
 import { createClient } from '@/lib/supabase/server';
+import { formatCents } from '@/lib/format';
 import PageHero from '@/components/sections/PageHero';
 
 const PRODUCTS_PER_PAGE = 9;
@@ -42,6 +43,9 @@ export default async function PeptidesPage({
     getContent<any>('peptides'),
     createClient(),
   ]);
+
+  // Check auth for starter package CTA
+  const { data: { user } } = await supabase.auth.getUser();
 
   // Sidebar query — all products for category grouping
   const { data: allProducts } = await supabase
@@ -178,11 +182,11 @@ export default async function PeptidesPage({
                   </div>
                   <div className="px-6 pb-5">
                     <Link
-                      href="/account"
+                      href={user ? '/contact' : '/account'}
                       className="w-full text-center block py-2.5 rounded-lg text-sm font-semibold transition-colors"
                       style={{ background: pkg.highlight ? 'var(--gold)' : 'var(--navy)', color: 'white' }}
                     >
-                      Login required
+                      {user ? 'Request Package' : 'Login Required'}
                     </Link>
                   </div>
                 </div>
@@ -247,11 +251,11 @@ export default async function PeptidesPage({
                       style={{ border: '1px solid var(--border)' }}
                     >
                       <div className="h-44 flex items-center justify-center relative" style={{ background: 'linear-gradient(135deg, #0B1F3A, #1a3a6b)' }}>
-                        {product.image_url ? (
-                          <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
-                        ) : (
-                          <span className="text-white text-2xl font-bold opacity-20">PP</span>
-                        )}
+                        <img
+                          src={product.image_url || '/images/oral-peptides.png'}
+                          alt={product.name}
+                          className="h-full w-full object-cover"
+                        />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                       </div>
                       <div className="p-5 flex flex-col flex-1">
@@ -271,6 +275,11 @@ export default async function PeptidesPage({
                             </span>
                           )}
                         </div>
+                        {user && product.price_cents > 0 && (
+                          <p className="text-sm font-bold mb-3" style={{ color: 'var(--gold)' }}>
+                            {formatCents(product.price_cents)}
+                          </p>
+                        )}
                         <span
                           className="mt-auto text-center py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity group-hover:opacity-90"
                           style={{ background: 'var(--navy)' }}

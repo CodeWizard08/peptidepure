@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Providers from '@/components/Providers';
 import { getContent } from '@/lib/content';
 
 export const metadata: Metadata = {
@@ -29,9 +30,11 @@ export default async function RootLayout({
         />
       </head>
       <body>
-        <Header />
-        <main className="pt-16">{children}</main>
-        <Footer content={footerContent} />
+        <Providers>
+          <Header />
+          <main className="pt-18.25">{children}</main>
+          <Footer content={footerContent} />
+        </Providers>
       </body>
     </html>
   );

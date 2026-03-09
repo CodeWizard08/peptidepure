@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import AddToCartButton from '@/components/AddToCartButton';
 
 const CATEGORY_CONFIG: Record<string, { color: string; label: string }> = {
   'Metabolic / Weight Loss': { color: '#C8952C', label: 'Metabolic / Weight Loss' },
@@ -106,16 +107,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 className="rounded-2xl overflow-hidden flex items-center justify-center aspect-square shadow-lg"
                 style={{ background: 'linear-gradient(145deg, #0B1F3A 0%, #1a3a6b 60%, #243f6e 100%)' }}
               >
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
-                ) : (
-                  <div className="text-center space-y-3">
-                    <div className="w-24 h-24 mx-auto rounded-2xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
-                      <span className="text-white text-3xl font-bold opacity-30">PP</span>
-                    </div>
-                    <p className="text-white/30 text-xs uppercase tracking-widest">Product Image</p>
-                  </div>
-                )}
+                <img
+                  src={product.image_url || '/images/oral-peptides.png'}
+                  alt={product.name}
+                  className="h-full w-full object-cover"
+                />
               </div>
 
               {/* Notices below image */}
@@ -210,14 +206,15 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             )}
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-3 mb-8">
-              <Link href="/account" className="btn-primary">
-                Login to Order
-              </Link>
-              <Link href="/contact" className="btn-outline">
-                Contact Us
-              </Link>
-            </div>
+            <AddToCartButton
+              product={{
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                price_cents: product.price_cents,
+                image_url: product.image_url,
+              }}
+            />
 
             {/* Trust strip */}
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs" style={{ color: 'var(--text-light)' }}>
@@ -278,11 +275,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 style={{ border: '1px solid var(--border)' }}
               >
                 <div className="h-44 flex items-center justify-center relative" style={{ background: 'linear-gradient(135deg, #0B1F3A, #1a3a6b)' }}>
-                  {item.image_url ? (
-                    <img src={item.image_url} alt={item.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="text-white text-2xl font-bold opacity-20">PP</span>
-                  )}
+                  <img
+                    src={item.image_url || '/images/oral-peptides.png'}
+                    alt={item.name}
+                    className="h-full w-full object-cover"
+                  />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                 </div>
                 <div className="p-5 flex flex-col flex-1">

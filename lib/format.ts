@@ -5,3 +5,11 @@ export function formatDate(iso: string): string {
     year: 'numeric',
   });
 }
+
+export function formatCents(cents: number): string {
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
+export function formatOrderNumber(id: string): string {
+  return `#${id.slice(0, 8).toUpperCase()}`;
+}

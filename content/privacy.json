@@ -1,0 +1,72 @@
+{
+  "hero": {
+    "sectionLabel": "Legal",
+    "heading": "Privacy Policy",
+    "subtitle": "How we collect, use, protect, and share your personal information."
+  },
+  "intro": "At Peptide Pure, your privacy is extremely important to us. This Privacy Policy explains how we collect, use, protect, and share your personal information when you visit our website, make a purchase, or interact with us in any way.",
+  "sections": [
+    {
+      "title": "1. Information We Collect",
+      "text": "We may collect the following types of information:",
+      "items": [
+        "Personal Information: Name, email address, shipping and billing addresses, phone number, and payment details.",
+        "Account Information: If you create an account, we store login credentials and order history.",
+        "Device & Usage Data: IP address, browser type, device info, and browsing behavior.",
+        "Cookies: To enhance user experience and analyze website performance."
+      ]
+    },
+    {
+      "title": "2. How We Use Your Information",
+      "text": "We use your information to:",
+      "items": [
+        "Process and fulfill your orders",
+        "Provide customer support",
+        "Improve our website and user experience",
+        "Send order updates, marketing emails, and special offers (you can opt out anytime)",
+        "Comply with legal obligations"
+      ]
+    },
+    {
+      "title": "3. How We Share Your Information",
+      "text": "We never sell your personal data. However, we may share information with:",
+      "items": [
+        "Trusted third-party partners (e.g., payment processors, shipping services)",
+        "Analytics providers for performance monitoring",
+        "Law enforcement if legally required"
+      ]
+    },
+    {
+      "title": "4. Cookies and Tracking Technologies",
+      "text": "We use cookies and similar technologies to:",
+      "items": [
+        "Remember your preferences",
+        "Track website performance and user behavior",
+        "Provide personalized content and ads"
+      ],
+      "extra": "You can control cookie settings through your browser at any time."
+    },
+    {
+      "title": "5. Data Security",
+      "text": "We implement industry-standard security measures to protect your data. However, no method of transmission or storage is 100% secure, and we cannot guarantee absolute security."
+    },
+    {
+      "title": "6. Your Rights",
+      "text": "Depending on your location, you may have the right to:",
+      "items": [
+        "Access or update your personal information",
+        "Request deletion of your data",
+        "Opt out of marketing communications"
+      ],
+      "extra": "To exercise your rights, please contact us via our contact page."
+    },
+    {
+      "title": "7. Third-Party Links",
+      "text": "Our site may contain links to third-party websites. We are not responsible for their privacy practices and encourage you to review their policies before sharing personal data."
+    },
+    {
+      "title": "8. Changes to This Policy",
+      "text": "We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated effective date."
+    }
+  ]
+}

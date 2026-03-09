@@ -154,7 +154,7 @@ export default function COAGallery({ content }: { content: COAContent }) {
               <button
                 key={cat}
                 onClick={() => setActiveFilter(cat)}
-                className="px-4 py-2 rounded-full text-xs font-semibold transition-all"
+                className="px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer"
                 style={{
                   background: activeFilter === cat ? 'var(--navy)' : 'white',
                   color: activeFilter === cat ? 'var(--gold-light)' : 'var(--text-mid)',
@@ -277,7 +277,7 @@ export default function COAGallery({ content }: { content: COAContent }) {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setLightbox(null)}
-                className="w-9 h-9 flex items-center justify-center rounded-lg text-sm font-bold transition-colors text-white"
+                className="w-9 h-9 cursor-pointer flex items-center justify-center rounded-lg text-sm font-bold transition-colors text-white"
                 style={{ background: 'rgba(255,255,255,0.1)' }}
                 aria-label="Close"
               >

@@ -56,6 +56,7 @@ body {
   align-items: center;
   gap: 0.5rem;
   border: 2px solid var(--gold);
+  cursor: pointer;
 }
 
 .btn-primary:hover {
@@ -77,6 +78,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  cursor: pointer;
 }
 
 .btn-outline:hover {
@@ -96,6 +98,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  cursor: pointer;
 }
 
 .btn-outline-gold:hover {
@@ -351,4 +354,55 @@ body:has(#admin-root) footer {
 }
 .prose-product > *:first-child {
   margin-top: 0;
+}
+
+/* ── IRB Clinical Form inputs ── */
+.irb-form input[type="text"],
+.irb-form input[type="email"],
+.irb-form input[type="tel"],
+.irb-form input[type="date"],
+.irb-form textarea,
+.irb-form select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--text-dark);
+  background: white;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.irb-form input[type="date"] {
+  color-scheme: light;
+}
+.irb-form input:focus,
+.irb-form textarea:focus,
+.irb-form select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(200,149,44,0.12);
+}
+.irb-form input[type="radio"],
+.irb-form input[type="checkbox"] {
+  accent-color: var(--gold);
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0;
+}
+.irb-form textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+}
+.irb-form select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234A5568'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
 }

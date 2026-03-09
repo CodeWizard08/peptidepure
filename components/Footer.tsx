@@ -35,7 +35,7 @@ export default function Footer({ content }: { content: FooterContent }) {
 
       {/* Main footer body */}
       <div className="container-xl">
-        <div className="grid grid-cols-12 gap-x-10 gap-y-8  pt-14 pb-12">
+        <div className="grid grid-cols-12 gap-6 md:gap-x-10 md:gap-y-8 pt-10 md:pt-14 pb-8 md:pb-12">
 
           {/* ── Brand column (wider) */}
           <div className="col-span-12 md:col-span-4 lg:col-span-4 flex flex-col gap-4">
@@ -74,7 +74,7 @@ export default function Footer({ content }: { content: FooterContent }) {
           <div className="hidden lg:block lg:col-span-1" />
 
           {/* ── Quick Links */}
-          <div className="col-span-6 md:col-span-2 lg:col-span-2">
+          <div className="col-span-6 sm:col-span-6 md:col-span-2 lg:col-span-2">
             <ColumnHeader>Quick Links</ColumnHeader>
             <ul className="space-y-2.5 mt-3">
               {content.quickLinks.map((link) => (
@@ -92,7 +92,7 @@ export default function Footer({ content }: { content: FooterContent }) {
           </div>
 
           {/* ── Legal */}
-          <div className="col-span-6 md:col-span-2 lg:col-span-2">
+          <div className="col-span-6 sm:col-span-6 md:col-span-2 lg:col-span-2">
             <ColumnHeader>Legal</ColumnHeader>
             <ul className="space-y-2.5 mt-3">
               {content.legalLinks.map((link) => (
@@ -110,7 +110,7 @@ export default function Footer({ content }: { content: FooterContent }) {
           </div>
 
           {/* ── Support / Contact */}
-          <div className="col-span-12 md:col-span-4 lg:col-span-3">
+          <div className="col-span-12 sm:col-span-12 md:col-span-4 lg:col-span-3">
             <ColumnHeader>Support</ColumnHeader>
             <ul className="space-y-4 mt-3">
               {content.contactItems.map((item, i) => (
@@ -164,11 +164,11 @@ export default function Footer({ content }: { content: FooterContent }) {
 
       {/* Bottom bar */}
       <div style={{ background: 'rgba(0,0,0,0.25)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="container-xl py-3.5! flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-600">
+        <div className="container-xl py-3.5! flex flex-col sm:flex-row items-center justify-between gap-2.5">
+          <p className="text-xs text-gray-600 text-center sm:text-left order-2 sm:order-1">
             {content.copyright}
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 order-1 sm:order-2">
             {content.bottomLinks.map((link) => (
               <Link
                 key={link.href}

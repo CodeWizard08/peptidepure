@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import HexLogo from '@/components/ui/HexLogo';
 import { createClient } from '@/lib/supabase/client';
+import { formatCents, formatOrderNumber, formatDate } from '@/lib/format';
 import type { User } from '@supabase/supabase-js';
+import type { Order } from '@/lib/types/order';
 
 // ── Icons ──────────────────────────────────────────────────────
 function EyeIcon({ open }: { open: boolean }) {
@@ -341,96 +343,7 @@ export default function AccountPage() {
 
   // ── Logged-in dashboard ──
   if (user) {
-    return (
-      <div className="min-h-screen" style={{ background: 'var(--off-white)' }}>
-        <div className="relative z-10 flex flex-col min-h-screen">
-          <div className="text-center pt-12 pb-10 px-4">
-            <span className="section-label">Clinician Portal</span>
-            <h1
-              className="text-3xl md:text-4xl font-black mt-2"
-              style={{ color: 'var(--navy)', letterSpacing: '-0.02em' }}
-            >
-              Welcome,{' '}
-              <span style={{ color: 'var(--gold)' }}>
-                {user.user_metadata?.full_name || 'Clinician'}
-              </span>
-            </h1>
-          </div>
-          <div className="container-xl pb-20 max-w-lg mx-auto">
-            <div
-              className="rounded-3xl p-8 md:p-10"
-              style={{
-                background: 'white',
-                border: '1px solid rgba(11,31,58,0.08)',
-                boxShadow: '0 8px 40px rgba(11,31,58,0.07)',
-              }}
-            >
-              <div className="space-y-4">
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
-                    Email
-                  </span>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text-dark)' }}>
-                    {user.email}
-                  </p>
-                </div>
-                {user.user_metadata?.full_name && (
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
-                      Name
-                    </span>
-                    <p className="text-sm font-medium" style={{ color: 'var(--text-dark)' }}>
-                      {user.user_metadata.full_name}
-                    </p>
-                  </div>
-                )}
-                {user.user_metadata?.clinic && (
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
-                      Clinic
-                    </span>
-                    <p className="text-sm font-medium" style={{ color: 'var(--text-dark)' }}>
-                      {user.user_metadata.clinic}
-                    </p>
-                  </div>
-                )}
-                {user.user_metadata?.phone && (
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
-                      Phone
-                    </span>
-                    <p className="text-sm font-medium" style={{ color: 'var(--text-dark)' }}>
-                      {user.user_metadata.phone}
-                    </p>
-                  </div>
-                )}
-                {user.user_metadata?.npi_number && (
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
-                      NPI Number
-                    </span>
-                    <p className="text-sm font-medium" style={{ color: 'var(--text-dark)' }}>
-                      {user.user_metadata.npi_number}
-                    </p>
-                  </div>
-                )}
-              </div>
-              <button
-                onClick={handleSignOut}
-                className="w-full mt-8 py-3.5 rounded-xl text-sm font-bold transition-all duration-200 hover:opacity-90"
-                style={{
-                  background: 'rgba(11,31,58,0.06)',
-                  color: 'var(--navy)',
-                  border: '1px solid rgba(11,31,58,0.12)',
-                }}
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <Dashboard user={user} onSignOut={handleSignOut} />;
   }
 
   return (
@@ -767,6 +680,494 @@ export default function AccountPage() {
           </Link>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Dashboard (logged-in view) ────────────────────────────────
+const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
+  pending: { bg: 'var(--gold-pale)', color: 'var(--gold)' },
+  confirmed: { bg: '#DBEAFE', color: '#1E40AF' },
+  processing: { bg: '#E0E7FF', color: '#3730A3' },
+  shipped: { bg: '#D1FAE5', color: '#065F46' },
+  delivered: { bg: '#D1FAE5', color: '#065F46' },
+  cancelled: { bg: '#FEE2E2', color: '#991B1B' },
+};
+
+type DashboardTab = 'dashboard' | 'orders' | 'addresses' | 'account';
+
+const NAV_ITEMS: { key: DashboardTab; label: string; icon: React.ReactNode }[] = [
+  {
+    key: 'dashboard',
+    label: 'Dashboard',
+    icon: (
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'orders',
+    label: 'Orders',
+    icon: (
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+      </svg>
+    ),
+  },
+  {
+    key: 'addresses',
+    label: 'Addresses',
+    icon: (
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1m-2 0h2" />
+      </svg>
+    ),
+  },
+  {
+    key: 'account',
+    label: 'Account Details',
+    icon: (
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    ),
+  },
+];
+
+function Dashboard({ user, onSignOut }: { user: User; onSignOut: () => void }) {
+  const [tab, setTab] = useState<DashboardTab>('dashboard');
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersFetched, setOrdersFetched] = useState(false);
+  const supabase = createClient();
+
+  // Fetch orders when switching to orders or dashboard tab
+  useEffect(() => {
+    if ((tab === 'orders' || tab === 'dashboard') && !ordersFetched) {
+      setOrdersLoading(true);
+      supabase
+        .from('orders')
+        .select('*')
+        .eq('patient_id', user.id)
+        .eq('order_type', 'supplement')
+        .order('created_at', { ascending: false })
+        .then(({ data, error }) => {
+          if (error) console.error('Orders fetch error:', error);
+          setOrders((data as Order[]) ?? []);
+          setOrdersLoading(false);
+          setOrdersFetched(true);
+        });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  const meta = user.user_metadata ?? {};
+  const displayName = meta.full_name || 'Clinician';
+
+  return (
+    <div style={{ background: 'var(--off-white)' }}>
+      {/* Page header */}
+      <div className="py-8" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div className="container-xl">
+          <span className="section-label">Clinician Portal</span>
+          <h1 className="text-2xl md:text-3xl font-bold mt-1" style={{ color: 'var(--navy)' }}>
+            My Account
+          </h1>
+        </div>
+      </div>
+
+      <div className="container-xl py-10">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* ── Sidebar ── */}
+          <aside className="lg:w-64 shrink-0">
+            <nav className="space-y-1">
+              {NAV_ITEMS.map((item) => {
+                const active = tab === item.key;
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => setTab(item.key)}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-left"
+                    style={{
+                      background: active ? 'var(--gold)' : 'transparent',
+                      color: active ? 'white' : 'var(--navy)',
+                    }}
+                  >
+                    <span style={{ opacity: active ? 1 : 0.5 }}>{item.icon}</span>
+                    {item.label}
+                  </button>
+                );
+              })}
+              <div className="pt-2" style={{ borderTop: '1px solid var(--border)' }}>
+                <button
+                  onClick={onSignOut}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-left hover:bg-red-50"
+                  style={{ color: '#DC2626' }}
+                >
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ opacity: 0.7 }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Log Out
+                </button>
+              </div>
+            </nav>
+          </aside>
+
+          {/* ── Main content ── */}
+          <main className="flex-1 min-w-0">
+            {tab === 'dashboard' && (
+              <DashboardHome
+                user={user}
+                displayName={displayName}
+                orders={orders}
+                ordersLoading={ordersLoading}
+                onViewOrders={() => setTab('orders')}
+              />
+            )}
+            {tab === 'orders' && (
+              <OrdersPanel orders={orders} loading={ordersLoading} />
+            )}
+            {tab === 'addresses' && (
+              <AddressesPanel user={user} />
+            )}
+            {tab === 'account' && (
+              <AccountDetailsPanel user={user} />
+            )}
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Dashboard Home ── */
+function DashboardHome({
+  user,
+  displayName,
+  orders,
+  ordersLoading,
+  onViewOrders,
+}: {
+  user: User;
+  displayName: string;
+  orders: Order[];
+  ordersLoading: boolean;
+  onViewOrders: () => void;
+}) {
+  return (
+    <div className="space-y-6">
+      {/* Welcome */}
+      <div
+        className="rounded-2xl p-6 md:p-8"
+        style={{ background: 'white', border: '1px solid var(--border)' }}
+      >
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-mid)' }}>
+          Hello <strong style={{ color: 'var(--navy)' }}>{displayName}</strong>{' '}
+          <span style={{ color: 'var(--text-light)' }}>
+            (not {displayName}?{' '}
+            <button className="underline" style={{ color: 'var(--gold)' }}>Log out</button>)
+          </span>
+        </p>
+        <p className="text-sm mt-2" style={{ color: 'var(--text-mid)' }}>
+          From your account dashboard you can view your{' '}
+          <button onClick={onViewOrders} className="underline" style={{ color: 'var(--gold)' }}>recent orders</button>,
+          manage your shipping and billing addresses, and edit your password and account details.
+        </p>
+      </div>
+
+      {/* Quick stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          label="Total Orders"
+          value={ordersLoading ? '—' : String(orders.length)}
+          icon={
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          }
+        />
+        <StatCard
+          label="Pending"
+          value={ordersLoading ? '—' : String(orders.filter((o) => o.status === 'pending').length)}
+          icon={
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          }
+          color="var(--gold)"
+        />
+        <StatCard
+          label="Completed"
+          value={ordersLoading ? '—' : String(orders.filter((o) => o.status === 'delivered').length)}
+          icon={
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          }
+          color="#10B981"
+        />
+      </div>
+
+      {/* Recent orders */}
+      {!ordersLoading && orders.length > 0 && (
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{ background: 'white', border: '1px solid var(--border)' }}
+        >
+          <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
+            <h3 className="text-sm font-bold" style={{ color: 'var(--navy)' }}>Recent Orders</h3>
+            <button onClick={onViewOrders} className="text-xs font-medium hover:underline" style={{ color: 'var(--gold)' }}>
+              View all →
+            </button>
+          </div>
+          <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
+            {orders.slice(0, 3).map((order) => (
+              <OrderRow key={order.id} order={order} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Orders Panel ── */
+function OrdersPanel({ orders, loading }: { orders: Order[]; loading: boolean }) {
+  if (loading) {
+    return (
+      <div className="py-20 flex justify-center">
+        <div className="w-7 h-7 rounded-full animate-spin" style={{ border: '3px solid var(--border)', borderTopColor: 'var(--gold)' }} />
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div
+        className="rounded-2xl p-8 text-center"
+        style={{ background: 'white', border: '1px solid var(--border)' }}
+      >
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: 'var(--off-white)' }}>
+          <svg className="w-8 h-8" style={{ color: 'var(--text-light)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <p className="text-sm font-semibold mb-1" style={{ color: 'var(--navy)' }}>No orders yet</p>
+        <p className="text-xs mb-4" style={{ color: 'var(--text-light)' }}>
+          Your order history will appear here after your first purchase.
+        </p>
+        <Link href="/peptides" className="btn-primary text-sm">Browse Peptides</Link>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{ background: 'white', border: '1px solid var(--border)' }}
+    >
+      {/* Table header */}
+      <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 text-xs font-bold uppercase tracking-widest" style={{ background: 'var(--off-white)', color: 'var(--text-light)', borderBottom: '1px solid var(--border)' }}>
+        <div className="col-span-3">Order</div>
+        <div className="col-span-2">Date</div>
+        <div className="col-span-2">Status</div>
+        <div className="col-span-2">Items</div>
+        <div className="col-span-2 text-right">Total</div>
+        <div className="col-span-1" />
+      </div>
+      <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
+        {orders.map((order) => (
+          <OrderRow key={order.id} order={order} detailed />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Addresses Panel ── */
+function AddressesPanel({ user }: { user: User }) {
+  const meta = user.user_metadata ?? {};
+  return (
+    <div className="space-y-6">
+      <div
+        className="rounded-2xl p-6 md:p-8"
+        style={{ background: 'white', border: '1px solid var(--border)' }}
+      >
+        <p className="text-sm mb-6" style={{ color: 'var(--text-mid)' }}>
+          The following addresses will be used on the checkout page by default.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="rounded-xl p-5" style={{ background: 'var(--off-white)', border: '1px solid var(--border)' }}>
+            <h3 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-light)' }}>
+              Shipping Address
+            </h3>
+            {meta.full_name ? (
+              <div className="text-sm space-y-0.5" style={{ color: 'var(--text-mid)' }}>
+                <p className="font-semibold" style={{ color: 'var(--navy)' }}>{meta.full_name}</p>
+                {meta.clinic && <p>{meta.clinic}</p>}
+                {meta.phone && <p>{meta.phone}</p>}
+                <p>{user.email}</p>
+              </div>
+            ) : (
+              <p className="text-sm" style={{ color: 'var(--text-light)' }}>
+                No address saved yet. Your shipping address will be saved after your first order.
+              </p>
+            )}
+          </div>
+          <div className="rounded-xl p-5" style={{ background: 'var(--off-white)', border: '1px solid var(--border)' }}>
+            <h3 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-light)' }}>
+              Billing Address
+            </h3>
+            <p className="text-sm" style={{ color: 'var(--text-light)' }}>
+              Same as shipping address. Billing address will be used for invoicing.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Account Details Panel ── */
+function AccountDetailsPanel({ user }: { user: User }) {
+  const meta = user.user_metadata ?? {};
+  return (
+    <div className="space-y-6">
+      <div
+        className="rounded-2xl p-6 md:p-8"
+        style={{ background: 'white', border: '1px solid var(--border)' }}
+      >
+        <h2 className="text-lg font-bold mb-6" style={{ color: 'var(--navy)' }}>
+          Account Details
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+          <ProfileField label="Full Name" value={meta.full_name || '—'} />
+          <ProfileField label="Email" value={user.email || '—'} />
+          <ProfileField label="Clinic / Practice" value={meta.clinic || '—'} />
+          <ProfileField label="Phone" value={meta.phone || '—'} />
+          <ProfileField label="NPI Number" value={meta.npi_number || '—'} />
+          <ProfileField label="Member Since" value={formatDate(user.created_at)} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Shared components ── */
+function OrderRow({ order, detailed = false }: { order: Order; detailed?: boolean }) {
+  const statusStyle = STATUS_STYLES[order.status] ?? STATUS_STYLES.pending;
+  const itemCount = (order.items ?? []).reduce((s, i) => s + i.quantity, 0);
+
+  if (detailed) {
+    return (
+      <Link
+        href={`/order-confirmation/${order.id}`}
+        className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-6 py-4 hover:bg-gray-50/50 transition-colors items-center"
+      >
+        <div className="md:col-span-3">
+          <span className="text-sm font-bold font-mono" style={{ color: 'var(--navy)' }}>
+            {formatOrderNumber(order.id)}
+          </span>
+        </div>
+        <div className="md:col-span-2">
+          <span className="text-xs" style={{ color: 'var(--text-light)' }}>
+            {formatDate(order.created_at)}
+          </span>
+        </div>
+        <div className="md:col-span-2">
+          <span
+            className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+            style={{ background: statusStyle.bg, color: statusStyle.color }}
+          >
+            {order.status}
+          </span>
+        </div>
+        <div className="md:col-span-2">
+          <span className="text-xs" style={{ color: 'var(--text-mid)' }}>
+            {itemCount} item{itemCount !== 1 ? 's' : ''}
+          </span>
+        </div>
+        <div className="md:col-span-2 md:text-right">
+          <span className="text-sm font-bold" style={{ color: 'var(--gold)' }}>
+            {formatCents(order.total_cents)}
+          </span>
+        </div>
+        <div className="md:col-span-1 md:text-right">
+          <span className="text-xs font-medium" style={{ color: 'var(--text-light)' }}>
+            View →
+          </span>
+        </div>
+      </Link>
+    );
+  }
+
+  // Compact row for dashboard
+  return (
+    <Link
+      href={`/order-confirmation/${order.id}`}
+      className="flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors"
+    >
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <span className="text-sm font-bold font-mono" style={{ color: 'var(--navy)' }}>
+          {formatOrderNumber(order.id)}
+        </span>
+        <span
+          className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+          style={{ background: statusStyle.bg, color: statusStyle.color }}
+        >
+          {order.status}
+        </span>
+        <span className="text-xs hidden sm:inline" style={{ color: 'var(--text-light)' }}>
+          {formatDate(order.created_at)}
+        </span>
+      </div>
+      <span className="text-sm font-bold shrink-0" style={{ color: 'var(--gold)' }}>
+        {formatCents(order.total_cents)}
+      </span>
+    </Link>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  icon,
+  color = 'var(--navy)',
+}: {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+  color?: string;
+}) {
+  return (
+    <div
+      className="rounded-2xl p-5 flex items-center gap-4"
+      style={{ background: 'white', border: '1px solid var(--border)' }}
+    >
+      <div
+        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+        style={{ background: `${color}10`, color }}
+      >
+        {icon}
+      </div>
+      <div>
+        <p className="text-2xl font-bold" style={{ color }}>{value}</p>
+        <p className="text-xs" style={{ color: 'var(--text-light)' }}>{label}</p>
+      </div>
+    </div>
+  );
+}
+
+function ProfileField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
+        {label}
+      </span>
+      <p className="text-sm font-medium mt-0.5" style={{ color: 'var(--text-dark)' }}>
+        {value}
+      </p>
     </div>
   );
 }
