@@ -1,4 +1,15 @@
+import type { Metadata } from 'next';
 import HeroSlider from '@/components/HeroSlider';
+
+export const metadata: Metadata = {
+  title: 'PeptidePure™ — Clinician-Only Peptide Sourcing Platform',
+  description: 'PeptidePure™ gives licensed clinicians a smarter, cleaner path to peptide medicine. USA cGMP-compliant, >99% purity, third-party COAs, fast shipping.',
+  openGraph: {
+    title: 'PeptidePure™ — Clinician-Only Peptide Sourcing Platform',
+    description: 'USA cGMP-compliant peptides with >99% purity. Built exclusively for licensed clinicians.',
+    type: 'website',
+  },
+};
 import MarqueeTrustBar from '@/components/home/MarqueeTrustBar';
 import StatsSection from '@/components/home/StatsSection';
 import ThreeStepProcess from '@/components/home/ThreeStepProcess';

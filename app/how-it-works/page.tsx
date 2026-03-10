@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
+
+export const metadata: Metadata = {
+  title: 'How It Works — PeptidePure™',
+  description: 'Learn how PeptidePure™ works for clinicians: verify credentials, browse peptide protocols, and order with confidence. Simple 3-step process.',
+};
 import PageHero from '@/components/sections/PageHero';
 
 /* SVG icons for solutionFeatures — kept inline because JSON can't hold JSX */

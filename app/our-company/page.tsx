@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
+
+export const metadata: Metadata = {
+  title: 'Our Company — PeptidePure™',
+  description: 'Meet the team behind PeptidePure™. Our mission is to provide licensed clinicians with the highest-quality peptides sourced from USA cGMP facilities.',
+};
 import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
 import CTASection from '@/components/sections/CTASection';

@@ -28,14 +28,34 @@ export default function ContactForm({ content }: { content: any }) {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/forms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formType: 'contact', data: form }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Submission failed');
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -217,8 +237,13 @@ export default function ContactForm({ content }: { content: any }) {
                       placeholder="How can we help you?"
                     />
                   </div>
-                  <button type="submit" className="btn-primary w-full justify-center text-base py-3.5">
-                    {content.form.submitLabel}
+                  {error && (
+                    <div className="p-4 rounded-xl text-sm mb-5" style={{ background: '#FEF2F2', color: '#991B1B', border: '1px solid #FECACA' }}>
+                      {error}
+                    </div>
+                  )}
+                  <button type="submit" className="btn-primary w-full justify-center text-base py-3.5" disabled={submitting}>
+                    {submitting ? 'Sending...' : content.form.submitLabel}
                   </button>
                   <p className="text-xs text-center mt-4" style={{ color: 'var(--text-light)' }}>
                     {content.form.disclaimer}

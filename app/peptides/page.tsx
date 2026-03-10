@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Peptide Catalog — PeptidePure™',
+  description: 'Browse our full catalog of USA cGMP-compliant peptides. BPC-157, TB-500, Tirzepatide, and more — available exclusively to licensed clinicians.',
+};
 import { getContent } from '@/lib/content';
 import { createClient } from '@/lib/supabase/server';
 import { formatCents } from '@/lib/format';

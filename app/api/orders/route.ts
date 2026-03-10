@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { OrderItemJson, ShippingAddress } from '@/lib/types/order';
+import { sendEmail, sendAdminNotification, orderConfirmationHtml, newOrderAdminHtml } from '@/lib/email';
 
 type OrderItemInput = {
   productId: string;
@@ -21,6 +22,7 @@ type OrderBody = {
   };
   notes?: string;
   items: OrderItemInput[];
+  paymentMethod?: string;
 };
 
 export async function POST(request: Request) {
@@ -47,11 +49,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
-  // Fetch product prices from DB (never trust client prices)
+  // Fetch product prices and stock from DB (never trust client prices)
   const productIds = body.items.map((i) => i.productId);
   const { data: products, error: productsError } = await supabase
     .from('products')
-    .select('id, name, slug, price_cents, is_active')
+    .select('id, name, slug, price_cents, is_active, stock_quantity')
     .in('id', productIds)
     .eq('is_active', true);
 
@@ -62,9 +64,10 @@ export async function POST(request: Request) {
   // Build a map for lookup
   const productMap = new Map(products.map((p) => [p.id, p]));
 
-  // Validate all products exist and are active
+  // Validate all products exist, are active, and have sufficient stock
   for (const item of body.items) {
-    if (!productMap.has(item.productId)) {
+    const product = productMap.get(item.productId);
+    if (!product) {
       return NextResponse.json(
         { error: `Product not found or inactive: ${item.productId}` },
         { status: 400 }
@@ -72,6 +75,13 @@ export async function POST(request: Request) {
     }
     if (item.quantity < 1) {
       return NextResponse.json({ error: 'Invalid quantity' }, { status: 400 });
+    }
+    // Check stock if the column exists and is not null
+    if (product.stock_quantity != null && item.quantity > product.stock_quantity) {
+      return NextResponse.json(
+        { error: `Insufficient stock for ${product.name}. Available: ${product.stock_quantity}` },
+        { status: 400 }
+      );
     }
   }
 
@@ -112,6 +122,7 @@ export async function POST(request: Request) {
       patient_id: user.id,
       order_type: 'supplement',
       status: 'pending',
+      payment_method: body.paymentMethod || 'invoice',
       items: orderItems,
       subtotal_cents: subtotalCents,
       discount_cents: 0,
@@ -126,6 +137,23 @@ export async function POST(request: Request) {
     console.error('Order insert error:', orderError);
     return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
   }
+
+  // Send emails (fire and forget — don't block the response)
+  const emailData = {
+    id: order.id,
+    items: orderItems,
+    total_cents: totalCents,
+    shipping_address: shippingAddress,
+  };
+  sendEmail({
+    to: shippingAddress.email,
+    subject: `Order Received — ${order.id.slice(0, 8).toUpperCase()}`,
+    html: orderConfirmationHtml(emailData),
+  });
+  sendAdminNotification(
+    `New Order: $${(totalCents / 100).toFixed(2)} from ${shippingAddress.name}`,
+    newOrderAdminHtml(emailData)
+  );
 
   return NextResponse.json({ orderId: order.id }, { status: 201 });
 }

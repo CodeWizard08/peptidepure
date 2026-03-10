@@ -47,11 +47,42 @@ function Divider() {
 
 export default function TreatmentLogPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitted(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setSubmitting(true);
+    setError('');
+
+    const fd = new FormData(e.currentTarget);
+    const data: Record<string, unknown> = {};
+    fd.forEach((value, key) => {
+      if (data[key]) {
+        const existing = data[key];
+        data[key] = Array.isArray(existing) ? [...existing, value] : [existing, value];
+      } else {
+        data[key] = value;
+      }
+    });
+
+    try {
+      const res = await fetch('/api/forms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formType: 'treatment-log', data }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Submission failed');
+      }
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (submitted) {
@@ -220,8 +251,16 @@ export default function TreatmentLogPage() {
                   <input type="date" name="signatureDate" required />
                 </div>
 
+                {error && (
+                  <div className="p-4 rounded-xl text-sm" style={{ background: '#FEF2F2', color: '#991B1B', border: '1px solid #FECACA' }}>
+                    {error}
+                  </div>
+                )}
+
                 <div className="pt-2">
-                  <button type="submit" className="btn-primary">Submit</button>
+                  <button type="submit" className="btn-primary" disabled={submitting}>
+                    {submitting ? 'Submitting...' : 'Submit'}
+                  </button>
                 </div>
 
               </form>

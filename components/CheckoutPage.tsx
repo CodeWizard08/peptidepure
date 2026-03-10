@@ -75,27 +75,59 @@ export default function CheckoutPage() {
 
     setSubmitting(true);
 
+    const shippingData = {
+      name,
+      email,
+      phone: phone || undefined,
+      line1: address1,
+      line2: address2 || undefined,
+      city,
+      state,
+      zip,
+      country: 'US',
+    };
+
+    const itemsData = items.map((i) => ({
+      productId: i.productId,
+      quantity: i.quantity,
+    }));
+
     try {
+      // Credit card: redirect to Stripe Checkout
+      if (paymentMethod === 'credit_card') {
+        const res = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            shipping: shippingData,
+            notes: notes || undefined,
+            items: itemsData,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.error || 'Failed to start checkout. Please try again.');
+          setSubmitting(false);
+          return;
+        }
+
+        // Redirect to Stripe
+        clearCart();
+        window.location.href = data.sessionUrl;
+        return;
+      }
+
+      // Invoice / Wire: create order directly
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          shipping: {
-            name,
-            email,
-            phone: phone || undefined,
-            line1: address1,
-            line2: address2 || undefined,
-            city,
-            state,
-            zip,
-            country: 'US',
-          },
+          shipping: shippingData,
           notes: notes || undefined,
-          items: items.map((i) => ({
-            productId: i.productId,
-            quantity: i.quantity,
-          })),
+          items: itemsData,
+          paymentMethod,
         }),
       });
 
@@ -202,11 +234,9 @@ export default function CheckoutPage() {
                   <PaymentOption
                     value="credit_card"
                     label="Credit Card"
-                    description="Stripe integration coming soon."
+                    description="Pay securely with Visa, Mastercard, or American Express via Stripe."
                     selected={paymentMethod}
                     onChange={setPaymentMethod}
-                    disabled
-                    badge="Coming Soon"
                   />
                 </div>
               </div>
