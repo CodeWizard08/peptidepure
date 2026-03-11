@@ -19,7 +19,7 @@ interface COARecord {
 
 interface SummaryEntry {
   compound: string;
-  lab: string;
+  lab?: string;
   date: string;
   purity: number;
 }
@@ -135,7 +135,6 @@ export default function COAGallery({ content }: { content: COAContent }) {
                 <thead>
                   <tr style={{ background: 'var(--navy)' }}>
                     <th className="text-left px-4 py-3 font-semibold text-white">Compound</th>
-                    <th className="text-left px-4 py-3 font-semibold text-white">Lab</th>
                     <th className="text-left px-4 py-3 font-semibold text-white">Date Tested</th>
                     <th className="text-right px-4 py-3 font-semibold" style={{ color: 'var(--gold-light)' }}>Purity</th>
                   </tr>
@@ -151,9 +150,6 @@ export default function COAGallery({ content }: { content: COAContent }) {
                     >
                       <td className="px-4 py-3 font-medium" style={{ color: 'var(--navy)' }}>
                         {row.compound}
-                      </td>
-                      <td className="px-4 py-3" style={{ color: 'var(--text-mid)' }}>
-                        {row.lab}
                       </td>
                       <td className="px-4 py-3" style={{ color: 'var(--text-mid)' }}>
                         {formatDate(row.date)}
