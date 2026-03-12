@@ -142,62 +142,89 @@ export default async function PeptidesPage({
             </div>
 
             {/* Starter Packages */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-14">
-              {content.starterPackages.map((pkg: any) => (
-                <div
-                  key={pkg.name}
-                  className={`rounded-2xl overflow-hidden shadow-sm flex flex-col relative ${pkg.highlight ? 'ring-2' : ''}`}
-                  style={{
-                    border: pkg.highlight ? '2px solid var(--gold)' : '1px solid var(--border)',
-                    background: 'white',
-                  }}
-                >
-                  {pkg.highlight && (
-                    <div className="text-center py-1.5 text-xs font-bold uppercase tracking-widest text-white" style={{ background: 'var(--gold)' }}>
-                      Most Popular
-                    </div>
-                  )}
-                  <div className="p-6 flex-1 flex flex-col">
-                    <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--text-light)' }}>
-                      {pkg.tier}
-                    </div>
-                    <h3 className="text-xl font-bold mb-1" style={{ color: pkg.highlight ? 'var(--gold)' : 'var(--navy)' }}>
-                      {pkg.price}
-                    </h3>
-                    <p className="text-sm mb-4" style={{ color: 'var(--text-mid)' }}>{pkg.desc}</p>
-                    <div className="text-xs mb-3 p-3 rounded-lg" style={{ background: 'var(--off-white)' }}>
-                      <strong style={{ color: 'var(--navy)' }}>Focus:</strong>{' '}
-                      <span style={{ color: 'var(--text-mid)' }}>{pkg.focus}</span>
-                    </div>
-                    <p className="text-xs mb-3" style={{ color: 'var(--text-light)' }}>{pkg.detail}</p>
-                    <div className="mt-auto space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span style={{ color: 'var(--text-light)' }}>Wholesale Value:</span>
-                        <span className="line-through" style={{ color: 'var(--text-light)' }}>{pkg.wholesale}</span>
+            {user ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-14">
+                {content.starterPackages.map((pkg: any) => (
+                  <div
+                    key={pkg.name}
+                    className={`rounded-2xl overflow-hidden shadow-sm flex flex-col relative ${pkg.highlight ? 'ring-2' : ''}`}
+                    style={{
+                      border: pkg.highlight ? '2px solid var(--gold)' : '1px solid var(--border)',
+                      background: 'white',
+                    }}
+                  >
+                    {pkg.highlight && (
+                      <div className="text-center py-1.5 text-xs font-bold uppercase tracking-widest text-white" style={{ background: 'var(--gold)' }}>
+                        Most Popular
                       </div>
-                      <div className="flex justify-between text-sm font-bold">
-                        <span style={{ color: 'var(--navy)' }}>Patient Retail Value:</span>
-                        <span style={{ color: 'var(--gold)' }}>{pkg.retail}</span>
+                    )}
+                    <div className="p-6 flex-1 flex flex-col">
+                      <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--text-light)' }}>
+                        {pkg.tier}
                       </div>
-                      {pkg.bonus && (
-                        <p className="text-xs mt-2 pt-2 border-t" style={{ borderColor: 'var(--border)', color: 'var(--gold)' }}>
-                          Bonus: {pkg.bonus}
-                        </p>
-                      )}
+                      <h3 className="text-xl font-bold mb-1" style={{ color: pkg.highlight ? 'var(--gold)' : 'var(--navy)' }}>
+                        {pkg.price}
+                      </h3>
+                      <p className="text-sm mb-4" style={{ color: 'var(--text-mid)' }}>{pkg.desc}</p>
+                      <div className="text-xs mb-3 p-3 rounded-lg" style={{ background: 'var(--off-white)' }}>
+                        <strong style={{ color: 'var(--navy)' }}>Focus:</strong>{' '}
+                        <span style={{ color: 'var(--text-mid)' }}>{pkg.focus}</span>
+                      </div>
+                      <p className="text-xs mb-3" style={{ color: 'var(--text-light)' }}>{pkg.detail}</p>
+                      <div className="mt-auto space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span style={{ color: 'var(--text-light)' }}>Wholesale Value:</span>
+                          <span className="line-through" style={{ color: 'var(--text-light)' }}>{pkg.wholesale}</span>
+                        </div>
+                        <div className="flex justify-between text-sm font-bold">
+                          <span style={{ color: 'var(--navy)' }}>Patient Retail Value:</span>
+                          <span style={{ color: 'var(--gold)' }}>{pkg.retail}</span>
+                        </div>
+                        {pkg.bonus && (
+                          <p className="text-xs mt-2 pt-2 border-t" style={{ borderColor: 'var(--border)', color: 'var(--gold)' }}>
+                            Bonus: {pkg.bonus}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="px-6 pb-5">
+                      <Link
+                        href="/contact"
+                        className="w-full text-center block py-2.5 rounded-lg text-sm font-semibold transition-colors"
+                        style={{ background: pkg.highlight ? 'var(--gold)' : 'var(--navy)', color: 'white' }}
+                      >
+                        Request Package
+                      </Link>
                     </div>
                   </div>
-                  <div className="px-6 pb-5">
-                    <Link
-                      href={user ? '/contact' : '/account'}
-                      className="w-full text-center block py-2.5 rounded-lg text-sm font-semibold transition-colors"
-                      style={{ background: pkg.highlight ? 'var(--gold)' : 'var(--navy)', color: 'white' }}
-                    >
-                      {user ? 'Request Package' : 'Login Required'}
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl overflow-hidden shadow-sm mb-14" style={{ border: '1px solid var(--border)', background: 'white' }}>
+                <div className="px-6 py-5 flex items-center gap-3" style={{ background: 'var(--navy)' }}>
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <h3 className="text-sm font-bold text-white uppercase tracking-widest">Starter Packages</h3>
+                </div>
+                <div className="p-8 text-center">
+                  <p className="text-base font-semibold mb-2" style={{ color: 'var(--navy)' }}>
+                    Pricing available for verified clinicians
+                  </p>
+                  <p className="text-sm mb-6 max-w-md mx-auto" style={{ color: 'var(--text-mid)' }}>
+                    We offer tiered starter packages with volume discounts for licensed healthcare professionals. Log in or create an account to view pricing and request a package.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <Link href="/account" className="btn-primary">
+                      Log In to View Pricing
+                    </Link>
+                    <Link href="/contact" className="btn-outline">
+                      Contact Sales
                     </Link>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
 
             {/* Category filter pills */}
             {categoryMap.size > 0 && (
@@ -281,9 +308,18 @@ export default async function PeptidesPage({
                             </span>
                           )}
                         </div>
-                        {user && product.price_cents > 0 && (
-                          <p className="text-sm font-bold mb-3" style={{ color: 'var(--gold)' }}>
-                            {formatCents(product.price_cents)}
+                        {user ? (
+                          product.price_cents > 0 && (
+                            <p className="text-sm font-bold mb-3" style={{ color: 'var(--gold)' }}>
+                              {formatCents(product.price_cents)}
+                            </p>
+                          )
+                        ) : (
+                          <p className="text-xs font-medium mb-3 flex items-center gap-1.5" style={{ color: 'var(--text-light)' }}>
+                            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            Login for pricing
                           </p>
                         )}
                         <span
@@ -395,18 +431,13 @@ export default async function PeptidesPage({
                   className="bg-white rounded-2xl overflow-hidden shadow-sm card-hover flex flex-col"
                   style={{ border: '1px solid var(--border)' }}
                 >
-                  {/* Product image placeholder */}
-                  <div className="h-44 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0B1F3A, #1a3a6b)' }}>
-                    <div className="grid grid-cols-3 gap-2 p-4">
-                      {[...Array(3)].map((_, j) => (
-                        <div
-                          key={j}
-                          className="w-10 h-14 rounded-lg flex items-end justify-center pb-1"
-                          style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)' }}
-                        >
-                          <span className="text-white text-xs font-bold opacity-70">PP</span>
-                        </div>
-                      ))}
+                  <div className="h-44 flex items-center justify-center relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0B1F3A, #1a3a6b)' }}>
+                    <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '20px 20px' }} />
+                    <div className="flex flex-col items-center gap-3 relative z-10">
+                      <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="1.5" className="opacity-60">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                      </svg>
+                      <span className="text-xs font-semibold uppercase tracking-widest text-white/50">Protocol Bundle</span>
                     </div>
                   </div>
                   <div className="p-5 flex flex-col flex-1">

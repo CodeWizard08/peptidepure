@@ -4,8 +4,11 @@ import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import { formatCents } from '@/lib/format';
 
+const MIN_ORDER_CENTS = 100_000; // $1,000
+
 export default function CartPage() {
   const { items, cartTotal, updateQuantity, removeFromCart } = useCart();
+  const belowMinimum = cartTotal < MIN_ORDER_CENTS;
 
   if (items.length === 0) {
     return (
@@ -173,12 +176,41 @@ export default function CartPage() {
                       {formatCents(cartTotal)}
                     </span>
                   </div>
-                  <Link
-                    href="/checkout"
-                    className="btn-primary w-full text-center block"
-                  >
-                    Proceed to Checkout
-                  </Link>
+                  {belowMinimum ? (
+                    <div className="space-y-3">
+                      <div
+                        className="text-sm px-4 py-3 rounded-xl"
+                        style={{
+                          background: 'rgba(200,149,44,0.06)',
+                          border: '1px solid rgba(200,149,44,0.2)',
+                          color: 'var(--text-mid)',
+                        }}
+                      >
+                        <p className="font-semibold mb-1" style={{ color: 'var(--navy)' }}>
+                          $1,000 minimum order
+                        </p>
+                        <p className="text-xs leading-relaxed">
+                          Orders under $1,000 require manual processing. Please email{' '}
+                          <a href="mailto:info@peptidepure.com" className="font-semibold hover:underline" style={{ color: 'var(--gold)' }}>
+                            info@peptidepure.com
+                          </a>{' '}
+                          to place your order.
+                        </p>
+                      </div>
+                      <span
+                        className="btn-primary w-full text-center block opacity-40 pointer-events-none"
+                      >
+                        Proceed to Checkout
+                      </span>
+                    </div>
+                  ) : (
+                    <Link
+                      href="/checkout"
+                      className="btn-primary w-full text-center block"
+                    >
+                      Proceed to Checkout
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

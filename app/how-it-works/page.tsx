@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { getContent } from '@/lib/content';
+import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'How It Works — PeptidePure™',
@@ -27,6 +29,10 @@ const solutionIcons = [
 ];
 
 export default async function HowItWorksPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/account');
+
   const content = await getContent<any>('how-it-works');
 
   return (

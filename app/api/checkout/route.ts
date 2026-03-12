@@ -65,6 +65,19 @@ export async function POST(request: Request) {
     }
   }
 
+  // Enforce $1,000 minimum
+  const orderTotal = body.items.reduce((sum, item) => {
+    const product = productMap.get(item.productId)!;
+    return sum + product.price_cents * item.quantity;
+  }, 0);
+
+  if (orderTotal < 100_000) {
+    return NextResponse.json(
+      { error: 'Minimum order is $1,000. For smaller orders, please email info@peptidepure.com.' },
+      { status: 400 }
+    );
+  }
+
   // Build Stripe line items
   const lineItems = body.items.map((item) => {
     const product = productMap.get(item.productId)!;
