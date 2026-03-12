@@ -75,7 +75,7 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
+            {navLinks.filter((link) => link.href !== '/how-it-works' || user).map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -196,7 +196,7 @@ export default function Header() {
       {mobileOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
           <div className="container-xl py-4 space-y-1">
-            {navLinks.map((link) => (
+            {navLinks.filter((link) => link.href !== '/how-it-works' || user).map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
