@@ -93,8 +93,6 @@ export default async function PeptidesPage({
         sectionLabel={content.hero.sectionLabel}
         heading={content.hero.heading}
         subtitle={content.hero.subtitle}
-        centered={false}
-        compact
       />
 
       <div className="container-xl py-12">
@@ -143,7 +141,7 @@ export default async function PeptidesPage({
 
             {/* Starter Packages */}
             {user ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-14">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
                 {content.starterPackages.map((pkg: any) => (
                   <div
                     key={pkg.name}
@@ -200,7 +198,7 @@ export default async function PeptidesPage({
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl overflow-hidden shadow-sm mb-14" style={{ border: '1px solid var(--border)', background: 'white' }}>
+              <div className="rounded-2xl overflow-hidden shadow-sm mb-8" style={{ border: '1px solid var(--border)', background: 'white' }}>
                 <div className="px-6 py-5 flex items-center gap-3" style={{ background: 'var(--navy)' }}>
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
