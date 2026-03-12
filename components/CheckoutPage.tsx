@@ -8,6 +8,28 @@ import { createClient } from '@/lib/supabase/client';
 import { formatCents } from '@/lib/format';
 import type { User } from '@supabase/supabase-js';
 
+declare global {
+  interface Window {
+    Accept: {
+      dispatchData: (
+        request: {
+          authData: { clientKey: string; apiLoginID: string };
+          cardData: {
+            cardNumber: string;
+            month: string;
+            year: string;
+            cardCode: string;
+          };
+        },
+        callback: (response: {
+          opaqueData?: { dataDescriptor: string; dataValue: string };
+          messages: { resultCode: string; message: { code: string; text: string }[] };
+        }) => void
+      ) => void;
+    };
+  }
+}
+
 const US_STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
   'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
@@ -39,6 +61,13 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState('invoice');
   const [notes, setNotes] = useState('');
 
+  // Card fields
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [cardError, setCardError] = useState('');
+  const [acceptJsLoaded, setAcceptJsLoaded] = useState(false);
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
@@ -52,6 +81,26 @@ export default function CheckoutPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Load Accept.js when credit card is selected
+  useEffect(() => {
+    if (paymentMethod !== 'credit_card') return;
+
+    const isSandbox = process.env.NEXT_PUBLIC_AUTHORIZENET_ENVIRONMENT !== 'production';
+    const src = isSandbox
+      ? 'https://jstest.authorize.net/v1/Accept.js'
+      : 'https://js.authorize.net/v1/Accept.js';
+
+    if (document.querySelector(`script[src="${src}"]`)) {
+      setAcceptJsLoaded(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.onload = () => setAcceptJsLoaded(true);
+    document.head.appendChild(script);
+  }, [paymentMethod]);
+
   // Redirect if not logged in
   useEffect(() => {
     if (!authLoading && !user) {
@@ -59,16 +108,25 @@ export default function CheckoutPage() {
     }
   }, [authLoading, user, router]);
 
-  // Redirect if cart is empty (after initial load)
+  // Redirect if cart is empty
   useEffect(() => {
     if (!authLoading && items.length === 0) {
       router.push('/cart');
     }
   }, [authLoading, items.length, router]);
 
+  const formatCardNumber = (v: string) =>
+    v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+
+  const formatExpiry = (v: string) => {
+    const digits = v.replace(/\D/g, '').slice(0, 4);
+    return digits.length >= 3 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setCardError('');
 
     if (!name || !email || !address1 || !city || !state || !zip) {
       setError('Please fill in all required shipping fields.');
@@ -79,8 +137,6 @@ export default function CheckoutPage() {
       setError('Minimum order is $1,000. For smaller orders, please email info@peptidepure.com.');
       return;
     }
-
-    setSubmitting(true);
 
     const shippingData = {
       name,
@@ -99,34 +155,79 @@ export default function CheckoutPage() {
       quantity: i.quantity,
     }));
 
-    try {
-      // Credit card: redirect to Stripe Checkout
-      if (paymentMethod === 'credit_card') {
-        const res = await fetch('/api/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            shipping: shippingData,
-            notes: notes || undefined,
-            items: itemsData,
-          }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          setError(data.error || 'Failed to start checkout. Please try again.');
-          setSubmitting(false);
-          return;
-        }
-
-        // Redirect to Stripe
-        clearCart();
-        window.location.href = data.sessionUrl;
+    // Credit card: tokenize with Accept.js then charge
+    if (paymentMethod === 'credit_card') {
+      if (!acceptJsLoaded || !window.Accept) {
+        setCardError('Payment processor not loaded. Please wait a moment and try again.');
         return;
       }
 
-      // Invoice / Wire: create order directly
+      const rawCard = cardNumber.replace(/\s/g, '');
+      const [expMonth, expYear] = expiry.split('/');
+      if (!rawCard || rawCard.length < 15 || !expMonth || !expYear || !cvv) {
+        setCardError('Please complete all card fields.');
+        return;
+      }
+
+      setSubmitting(true);
+
+      window.Accept.dispatchData(
+        {
+          authData: {
+            clientKey: process.env.NEXT_PUBLIC_AUTHORIZENET_CLIENT_KEY!,
+            apiLoginID: process.env.NEXT_PUBLIC_AUTHORIZENET_API_LOGIN_ID!,
+          },
+          cardData: {
+            cardNumber: rawCard,
+            month: expMonth.trim(),
+            year: expYear.trim(),
+            cardCode: cvv,
+          },
+        },
+        async (response) => {
+          if (response.messages.resultCode !== 'Ok' || !response.opaqueData) {
+            setCardError(response.messages.message[0]?.text ?? 'Card error. Please try again.');
+            setSubmitting(false);
+            return;
+          }
+
+          try {
+            const res = await fetch('/api/checkout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                shipping: shippingData,
+                notes: notes || undefined,
+                items: itemsData,
+                payment: {
+                  dataDescriptor: response.opaqueData.dataDescriptor,
+                  dataValue: response.opaqueData.dataValue,
+                },
+              }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+              setError(data.error || 'Payment failed. Please try again.');
+              setSubmitting(false);
+              return;
+            }
+
+            clearCart();
+            router.push(`/order-confirmation/${data.orderId}`);
+          } catch {
+            setError('Network error. Please try again.');
+            setSubmitting(false);
+          }
+        }
+      );
+      return;
+    }
+
+    // Invoice / Wire: create order directly
+    setSubmitting(true);
+    try {
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -241,11 +342,110 @@ export default function CheckoutPage() {
                   <PaymentOption
                     value="credit_card"
                     label="Credit Card"
-                    description="Pay securely with Visa, Mastercard, or American Express via Stripe."
+                    description="Pay securely with Visa, Mastercard, or American Express via Authorize.net."
                     selected={paymentMethod}
                     onChange={setPaymentMethod}
                   />
                 </div>
+
+                {/* Credit Card Fields */}
+                {paymentMethod === 'credit_card' && (
+                  <div
+                    className="mt-6 p-5 rounded-xl space-y-4"
+                    style={{
+                      background: 'rgba(11,31,58,0.02)',
+                      border: '1px solid rgba(11,31,58,0.08)',
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-light)' }}>
+                        Card Details
+                      </span>
+                      <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-light)' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Secured by Authorize.net
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-light)' }}>
+                        Card Number
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                        placeholder="1234 5678 9012 3456"
+                        autoComplete="cc-number"
+                        className="w-full py-3 px-4 text-sm rounded-xl focus:outline-none"
+                        style={{
+                          background: 'white',
+                          border: cardError ? '1px solid #DC2626' : '1px solid rgba(11,31,58,0.1)',
+                          color: 'var(--text-dark)',
+                        }}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-light)' }}>
+                          Expiry
+                        </label>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={expiry}
+                          onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                          placeholder="MM/YY"
+                          autoComplete="cc-exp"
+                          className="w-full py-3 px-4 text-sm rounded-xl focus:outline-none"
+                          style={{
+                            background: 'white',
+                            border: cardError ? '1px solid #DC2626' : '1px solid rgba(11,31,58,0.1)',
+                            color: 'var(--text-dark)',
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-light)' }}>
+                          CVV
+                        </label>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={cvv}
+                          onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                          placeholder="CVV"
+                          autoComplete="cc-csc"
+                          className="w-full py-3 px-4 text-sm rounded-xl focus:outline-none"
+                          style={{
+                            background: 'white',
+                            border: cardError ? '1px solid #DC2626' : '1px solid rgba(11,31,58,0.1)',
+                            color: 'var(--text-dark)',
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {cardError && (
+                      <div
+                        className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg"
+                        style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="12" y1="8" x2="12" y2="12" />
+                          <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        {cardError}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Order Notes */}
@@ -375,11 +575,11 @@ export default function CheckoutPage() {
 
                     <button
                       type="submit"
-                      disabled={submitting || cartTotal < MIN_ORDER_CENTS}
+                      disabled={submitting || cartTotal < MIN_ORDER_CENTS || (paymentMethod === 'credit_card' && !acceptJsLoaded)}
                       className="btn-primary w-full text-center mt-5"
                       style={(submitting || cartTotal < MIN_ORDER_CENTS) ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
                     >
-                      {submitting ? 'Placing Order…' : 'Place Order'}
+                      {submitting ? 'Processing…' : 'Place Order'}
                     </button>
 
                     <Link

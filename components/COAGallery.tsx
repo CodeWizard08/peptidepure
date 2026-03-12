@@ -130,9 +130,9 @@ export default function COAGallery({ content }: { content: COAContent }) {
               Independent lab results across all tested compounds
             </p>
 
-            <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid var(--border)' }}>
+            <div className="overflow-auto rounded-xl" style={{ border: '1px solid var(--border)', maxHeight: 480 }}>
               <table className="w-full text-sm" style={{ minWidth: 540 }}>
-                <thead>
+                <thead className="sticky top-0 z-10">
                   <tr style={{ background: 'var(--navy)' }}>
                     <th className="text-left px-4 py-3 font-semibold text-white">Compound</th>
                     <th className="text-left px-4 py-3 font-semibold text-white">Date Tested</th>

@@ -14,6 +14,7 @@
   "filterLabel": "Filter by Peptide",
   "sortLabel": "Sort by Date",
   "records": [
+    { "compound": "Krause Analytical — MOTS-c, Melanotan II, NAD+ & PT-141", "peptide": "Krause Analytical", "lab": "Krause Analytical", "purity": ">99%", "batch": "131767–131770", "date": "2026-01-20", "pdf": "/coa/Krause 01202026.pdf" },
     { "compound": "Freedom Diagnostics — AOD-9604, Tirzepatide & NAD+", "peptide": "Freedom Diagnostics", "lab": "Freedom Diagnostics", "purity": ">99%", "batch": "FD-2601140248", "date": "2026-01-14", "pdf": "/coa/Freedom 012126.pdf" },
     { "compound": "Freedom Diagnostics — AOD-9604", "peptide": "Freedom Diagnostics", "lab": "Freedom Diagnostics", "purity": "99.525%", "batch": "AOD-2602090001", "date": "2026-02-09", "pdf": "/coa/AOD2602090001.pdf" },
     { "compound": "Freedom Diagnostics — Multi-Compound Panel", "peptide": "Freedom Diagnostics", "lab": "Freedom Diagnostics", "purity": ">99%", "batch": "FD-2512260087", "date": "2025-12-26", "pdf": "/coa/Freedom Diagnostics 12262025 pic.pdf" },
@@ -21,6 +22,10 @@
     { "compound": "MZ BioLabs — Multi-Compound Panel", "peptide": "MZ BioLabs", "lab": "MZ BioLabs", "purity": "99.97%", "batch": "25-1117", "date": "2025-12-12", "pdf": "/coa/MZBIOLABS.pdf" }
   ],
   "summaryChart": [
+    { "compound": "MOTS-c 10mg", "date": "2026-01-20", "purity": 99.950 },
+    { "compound": "Melanotan II 10mg", "date": "2026-01-20", "purity": 99.710 },
+    { "compound": "NAD+ 1000mg", "date": "2026-01-20", "purity": 99.930 },
+    { "compound": "PT-141 10mg", "date": "2026-01-20", "purity": 99.950 },
     { "compound": "AOD-9604 5mg", "date": "2026-02-09", "purity": 99.525 },
     { "compound": "Tirzepatide 30mg", "date": "2026-01-14", "purity": 99.905 },
     { "compound": "NAD+ 1000mg", "date": "2026-01-14", "purity": 99.922 },
