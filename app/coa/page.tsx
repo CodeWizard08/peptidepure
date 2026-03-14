@@ -1,6 +1,14 @@
+import dynamic from 'next/dynamic';
 import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
-import COAGallery from '@/components/COAGallery';
+
+const COAGallery = dynamic(() => import('@/components/COAGallery'), {
+  loading: () => (
+    <div className="flex items-center justify-center py-32">
+      <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--gold)' }} />
+    </div>
+  ),
+});
 
 export const metadata: Metadata = {
   title: 'Certificates of Analysis',

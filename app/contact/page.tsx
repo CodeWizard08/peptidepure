@@ -1,6 +1,14 @@
+import dynamic from 'next/dynamic';
 import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
-import ContactForm from '@/components/ContactForm';
+
+const ContactForm = dynamic(() => import('@/components/ContactForm'), {
+  loading: () => (
+    <div className="flex items-center justify-center py-32">
+      <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--gold)' }} />
+    </div>
+  ),
+});
 
 export const metadata: Metadata = {
   title: 'Contact Us',

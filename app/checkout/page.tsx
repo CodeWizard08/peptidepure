@@ -1,7 +1,14 @@
+import dynamic from 'next/dynamic';
 import PageHero from '@/components/sections/PageHero';
-import CheckoutPage from '@/components/CheckoutPage';
-
 import type { Metadata } from 'next';
+
+const CheckoutPage = dynamic(() => import('@/components/CheckoutPage'), {
+  loading: () => (
+    <div className="flex items-center justify-center py-32">
+      <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--gold)' }} />
+    </div>
+  ),
+});
 
 export const metadata: Metadata = {
   title: 'Checkout',
