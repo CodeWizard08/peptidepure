@@ -1,5 +1,13 @@
+import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
+
+export const metadata: Metadata = {
+  title: 'Refund Policy',
+  description:
+    'PeptidePure™ refund and return policy for peptide orders. Learn about eligibility, timelines, and how to request a refund or exchange.',
+  alternates: { canonical: '/refunds' },
+};
 
 interface PolicySection {
   title: string;

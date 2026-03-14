@@ -1,5 +1,13 @@
+import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
+
+export const metadata: Metadata = {
+  title: 'Shipping & Payment',
+  description:
+    'PeptidePure™ shipping rates, delivery timelines, and accepted payment methods. Free shipping on qualifying orders with cold-chain packaging included.',
+  alternates: { canonical: '/shipping' },
+};
 
 interface ShippingSection {
   type: string;
