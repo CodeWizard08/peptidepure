@@ -1,123 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-
-const FIELD_COLOR = 'var(--navy)';
-const LABEL_COLOR = 'var(--text-mid)';
-const REQUIRED = <span style={{ color: 'var(--gold)' }}>*</span>;
-
-function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
-  return (
-    <label className="block text-sm font-semibold mb-1.5" style={{ color: FIELD_COLOR }}>
-      {children}{required && <> {REQUIRED}</>}
-    </label>
-  );
-}
-
-function RadioGroup({ name, options, required }: { name: string; options: string[]; required?: boolean }) {
-  return (
-    <div className="space-y-2.5 mt-1">
-      {options.map((opt) => (
-        <label key={opt} className="flex items-center gap-2.5 cursor-pointer">
-          <input type="radio" name={name} value={opt} required={required} />
-          <span className="text-sm" style={{ color: LABEL_COLOR }}>{opt}</span>
-        </label>
-      ))}
-    </div>
-  );
-}
-
-function Divider() {
-  return <hr style={{ borderColor: 'var(--border)', margin: '0.5rem 0' }} />;
-}
+import {
+  FieldLabel, RadioGroup, Divider,
+  FormSuccessScreen, FormHeader, useFormSubmit,
+  LABEL_COLOR, REQUIRED,
+} from '@/components/forms/FormPrimitives';
 
 export default function AESAEReportPage() {
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setSubmitting(true);
-    setError('');
-
-    const fd = new FormData(e.currentTarget);
-    const data: Record<string, unknown> = {};
-    fd.forEach((value, key) => {
-      if (data[key]) {
-        const existing = data[key];
-        data[key] = Array.isArray(existing) ? [...existing, value] : [existing, value];
-      } else {
-        data[key] = value;
-      }
-    });
-
-    try {
-      const res = await fetch('/api/forms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ formType: 'ae-sae-report', data }),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Submission failed');
-      }
-      setSubmitted(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
-  }
+  const { submitted, submitting, error, setSubmitted, handleSubmit } = useFormSubmit('ae-sae-report');
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--off-white)' }}>
-        <div className="text-center max-w-md px-6">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-            style={{ background: 'rgba(200,149,44,0.1)', border: '2px solid var(--gold)' }}
-          >
-            <svg className="w-8 h-8" style={{ color: 'var(--gold)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--navy)' }}>Report Submitted</h2>
-          <p className="text-sm mb-8" style={{ color: 'var(--text-mid)' }}>
-            Your IRB AE / SAE Report has been received. Thank you for your prompt documentation.
-          </p>
-          <Link href="/forms/ae-sae-report" onClick={() => setSubmitted(false)} className="btn-primary">
-            Submit Another
-          </Link>
-        </div>
-      </div>
+      <FormSuccessScreen
+        title="Report Submitted"
+        message="Your IRB AE / SAE Report has been received. Thank you for your prompt documentation."
+        resetHref="/forms/ae-sae-report"
+        onReset={() => setSubmitted(false)}
+      />
     );
   }
 
   return (
     <div style={{ background: 'var(--off-white)', minHeight: '100vh' }}>
-      {/* Page header */}
-      <div className="py-12" style={{ background: 'var(--navy)' }}>
-        <div className="container-xl">
-          <div className="flex items-center gap-2 mb-3">
-            <Link
-              href="/forms/ae-sae-report"
-              className="text-xs font-semibold uppercase tracking-widest"
-              style={{ color: 'var(--gold)' }}
-            >
-              Clinical Forms
-            </Link>
-          </div>
-          <h1 className="text-3xl font-bold text-white">IRB — AE / SAE Report</h1>
-          <p className="text-sm mt-2" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            Adverse Event and Serious Adverse Event reporting for investigational peptide protocols.
-          </p>
-        </div>
-      </div>
+      <FormHeader
+        breadcrumb="Clinical Forms"
+        title="IRB — AE / SAE Report"
+        subtitle="Adverse Event and Serious Adverse Event reporting for investigational peptide protocols."
+      />
 
-      {/* Form card */}
       <div className="py-12">
         <div className="container-xl">
           <div className="mx-auto">
