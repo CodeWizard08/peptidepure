@@ -47,6 +47,7 @@ export default function Header() {
     { label: 'How It Works', href: '/how-it-works' },
     { label: 'Our Company', href: '/our-company' },
     { label: 'COA', href: '/coa' },
+    { label: 'Inventory', href: '/inventory' },
     { label: 'Contact Us', href: '/contact' },
   ];
 
@@ -75,7 +76,7 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
-            {navLinks.filter((link) => link.href !== '/how-it-works' || user).map((link) => (
+            {navLinks.filter((link) => (link.href !== '/how-it-works' && link.href !== '/inventory') || user).map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -117,6 +118,7 @@ export default function Header() {
                       { label: 'IRB — Baseline', href: '/forms/baseline' },
                       { label: 'IRB — Treatment Log', href: '/forms/treatment-log' },
                       { label: 'IRB — AE / SAE Report', href: '/forms/ae-sae-report' },
+                      { label: 'Patient Outcomes', href: '/forms/outcomes' },
                     ].map((item) => (
                       <Link
                         key={item.href}
@@ -216,6 +218,7 @@ export default function Header() {
                   { label: 'IRB — Baseline', href: '/forms/baseline' },
                   { label: 'IRB — Treatment Log', href: '/forms/treatment-log' },
                   { label: 'IRB — AE / SAE Report', href: '/forms/ae-sae-report' },
+                  { label: 'Patient Outcomes', href: '/forms/outcomes' },
                 ].map((item) => (
                   <Link
                     key={item.href}

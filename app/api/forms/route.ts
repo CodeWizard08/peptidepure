@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { FormType } from '@/lib/types/form';
 import { sendAdminNotification, formSubmissionAdminHtml } from '@/lib/email';
 
-const VALID_FORM_TYPES: FormType[] = ['baseline', 'treatment-log', 'ae-sae-report', 'contact'];
+const VALID_FORM_TYPES: FormType[] = ['baseline', 'treatment-log', 'ae-sae-report', 'outcomes', 'contact'];
 
 type FormBody = {
   formType: FormType;
@@ -31,8 +31,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // Clinical forms require authentication
-  if (body.formType !== 'contact' && !user) {
+  // Clinical forms require authentication (outcomes allows patient self-report)
+  if (body.formType !== 'contact' && body.formType !== 'outcomes' && !user) {
     return NextResponse.json({ error: 'Authentication required for clinical forms' }, { status: 401 });
   }
 
