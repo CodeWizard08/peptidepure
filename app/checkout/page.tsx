@@ -1,8 +1,12 @@
 import PageHero from '@/components/sections/PageHero';
 import CheckoutPage from '@/components/CheckoutPage';
 
-export const metadata = {
-  title: 'Checkout | PeptidePure',
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Checkout',
+  description: 'Complete your PeptidePure™ peptide order.',
+  robots: { index: false, follow: false },
 };
 
 export default function CheckoutRoute() {

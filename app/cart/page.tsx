@@ -1,8 +1,12 @@
 import PageHero from '@/components/sections/PageHero';
 import CartPage from '@/components/CartPage';
 
-export const metadata = {
-  title: 'Cart | PeptidePure',
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Cart',
+  description: 'Review your peptide order before checkout.',
+  robots: { index: false, follow: false },
 };
 
 export default function CartRoute() {

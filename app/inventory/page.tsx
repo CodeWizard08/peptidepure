@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
 
 type Status = 'ok' | 'low' | 'order' | 'out';
@@ -22,9 +23,10 @@ const STATUS_CONFIG: Record<Status, { label: string; bg: string; text: string; d
   out:   { label: 'Out of Stock',   bg: '#F3F4F6', text: '#6B7280', dot: '#9CA3AF' },
 };
 
-export const metadata = {
-  title: 'Inventory — PeptidePure™',
+export const metadata: Metadata = {
+  title: 'Inventory',
   description: 'Current peptide inventory and availability for authorized clinicians.',
+  alternates: { canonical: '/inventory' },
 };
 
 export default async function InventoryPage() {

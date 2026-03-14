@@ -4,8 +4,15 @@ import { getContent } from '@/lib/content';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: 'How It Works — PeptidePure™',
-  description: 'Learn how PeptidePure™ works for clinicians: verify credentials, browse peptide protocols, and order with confidence. Simple 3-step process.',
+  title: 'How It Works',
+  description:
+    'Learn how PeptidePure™ works for clinicians: verify credentials, browse peptide protocols, and order with confidence. Simple 3-step process.',
+  alternates: { canonical: '/how-it-works' },
+  openGraph: {
+    title: 'How It Works — PeptidePure™',
+    description:
+      'Simple 3-step process: verify credentials, browse protocols, and order with confidence.',
+  },
 };
 import PageHero from '@/components/sections/PageHero';
 

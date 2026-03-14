@@ -1,5 +1,13 @@
+import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description:
+    'Learn how PeptidePure™ collects, uses, and protects your personal information. We are committed to safeguarding clinician data and maintaining full HIPAA-aligned privacy standards.',
+  alternates: { canonical: '/privacy' },
+};
 
 interface PolicySection {
   title: string;

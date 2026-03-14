@@ -1,5 +1,13 @@
+import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
+
+export const metadata: Metadata = {
+  title: 'Accessibility',
+  description:
+    'PeptidePure™ is committed to digital accessibility. Learn about our efforts to ensure our platform is usable by all clinicians, including those with disabilities.',
+  alternates: { canonical: '/accessibility' },
+};
 
 interface PolicySection {
   title: string;
