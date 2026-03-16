@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//e/projects/Web/scott''''''''s project/**)",
+      "Bash(npx next:*)",
+      "WebFetch(domain:peptidepure.com)"
+    ]
+  }
+}

@@ -1,4 +1,33 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
 export default function IntroVideo({ content }: { content: any }) {
+  const iframeRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = iframeRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isVisible) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  // Append autoplay param when visible
+  const baseUrl = content.intro.videoUrl as string;
+  const separator = baseUrl.includes('?') ? '&' : '?';
+  const videoSrc = isVisible ? `${baseUrl}${separator}autoplay=1&muted=1` : baseUrl;
+
   return (
     <section className="py-20">
       <div className="container-xl">
@@ -18,10 +47,10 @@ export default function IntroVideo({ content }: { content: any }) {
               </p>
             ))}
           </div>
-          {/* Vimeo embed */}
-          <div className="rounded-2xl overflow-hidden shadow-xl aspect-video">
+          {/* Vimeo embed — autoplay when scrolled into view */}
+          <div ref={iframeRef} className="rounded-2xl overflow-hidden shadow-xl aspect-video">
             <iframe
-              src={content.intro.videoUrl}
+              src={videoSrc}
               className="w-full h-full"
               allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
               allowFullScreen

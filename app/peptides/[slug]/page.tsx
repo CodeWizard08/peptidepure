@@ -7,15 +7,18 @@ import ProductHero from '@/components/peptides/ProductHero';
 import RelatedProducts from '@/components/peptides/RelatedProducts';
 
 const CATEGORY_CONFIG: Record<string, { color: string; label: string }> = {
-  'Metabolic / Weight Loss': { color: '#C8952C', label: 'Metabolic / Weight Loss' },
-  'MSK / Tissue Repair': { color: '#2563EB', label: 'MSK / Tissue Repair' },
-  'Longevity / Mitochondrial': { color: '#059669', label: 'Longevity / Mitochondrial' },
-  'Growth Hormone / GH Receptor': { color: '#7C3AED', label: 'Growth Hormone / GH Receptor' },
-  'Immune / Antimicrobial': { color: '#DC2626', label: 'Immune / Antimicrobial' },
+  'Metabolism/Weight Loss': { color: '#C8952C', label: 'Metabolism/Weight Loss' },
+  'MSK/Tissue Repair': { color: '#2563EB', label: 'MSK/Tissue Repair' },
+  'Longevity & Mitochondrial': { color: '#059669', label: 'Longevity & Mitochondrial' },
+  'Growth Hormone': { color: '#7C3AED', label: 'Growth Hormone' },
+  'Immune/Antimicrobial': { color: '#DC2626', label: 'Immune/Antimicrobial' },
   'Cognitive & Mood': { color: '#0891B2', label: 'Cognitive & Mood' },
+  'Aminos & Specialty Blends': { color: '#6B7280', label: 'Aminos & Specialty Blends' },
+  'Nootropics': { color: '#8B5CF6', label: 'Nootropics' },
+  'Anti-aging Aesthetics': { color: '#EC4899', label: 'Anti-aging Aesthetics' },
 };
 
-type Product = {
+export type ProductRow = {
   id: string;
   name: string;
   slug: string;
@@ -31,6 +34,12 @@ type Product = {
   metadata: Record<string, any> | null;
 };
 
+// Derive a "base product name" from a variant name for grouping
+// e.g. "TIRZ 10mg" → "TIRZ", "Epithalon 50mg" → "Epithalon", "BPC-157/TB500 20mg" → "BPC-157/TB500"
+function getBaseProductName(name: string): string {
+  return name.replace(/\s+\d+m[cg]g?$/i, '').replace(/\s+\(Lead Time\)$/i, '').trim();
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createClient();
@@ -43,9 +52,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!product) return { title: 'Product Not Found' };
 
+  const baseName = getBaseProductName(product.name);
   return {
-    title: `${product.name} | PeptidePure`,
-    description: product.description ?? `${product.name} — clinical-grade ${product.category} peptide from PeptidePure.`,
+    title: `${baseName} | PeptidePure`,
+    description: product.description ?? `${baseName} — clinical-grade ${product.category} peptide from PeptidePure.`,
   };
 }
 
@@ -58,25 +68,56 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     .select('*')
     .eq('slug', slug)
     .eq('is_active', true)
-    .single<Product>();
+    .single<ProductRow>();
 
   if (!product) notFound();
 
+  const baseName = getBaseProductName(product.name);
+
+  // Find all strength variants of the same base product (same category, similar name)
+  const { data: allVariants } = await supabase
+    .from('products')
+    .select('id, name, slug, price_cents, sku, metadata')
+    .eq('is_active', true)
+    .eq('category', product.category)
+    .order('price_cents', { ascending: true });
+
+  // Filter to matching base name
+  const variants = (allVariants ?? []).filter(
+    (v) => getBaseProductName(v.name) === baseName
+  );
+
+  // Related products (different base name, same category)
   const { data: related } = await supabase
     .from('products')
-    .select('id, name, slug, description, image_url, category')
+    .select('id, name, slug, description, image_url, category, metadata')
     .eq('category', product.category)
     .eq('is_active', true)
     .neq('id', product.id)
     .order('sort_order', { ascending: true })
-    .limit(3);
+    .limit(20);
+
+  // Deduplicate related by base name, exclude current product variants
+  const seenBases = new Set([baseName]);
+  const dedupedRelated = (related ?? []).filter((r) => {
+    const base = getBaseProductName(r.name);
+    if (seenBases.has(base)) return false;
+    seenBases.add(base);
+    return true;
+  }).slice(0, 4);
 
   const catConfig = CATEGORY_CONFIG[product.category] ?? { color: 'var(--navy)', label: product.category };
   const meta = product.metadata ?? {};
 
   return (
     <>
-      <ProductHero product={product} catConfig={catConfig} meta={meta} />
+      <ProductHero
+        product={product}
+        baseName={baseName}
+        variants={variants}
+        catConfig={catConfig}
+        meta={meta}
+      />
 
       {/* Long Description -- Markdown */}
       {product.long_description && (
@@ -84,7 +125,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <div className="container-xl py-14">
             <div className="max-w-3xl">
               <h2 className="text-xl font-bold mb-8" style={{ color: 'var(--navy)' }}>
-                About {product.name}
+                About {baseName}
               </h2>
               <div className="prose-product">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -96,7 +137,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         </section>
       )}
 
-      <RelatedProducts products={related ?? []} />
+      <RelatedProducts products={dedupedRelated} />
 
       {/* Back link */}
       <div className="container-xl pb-14">

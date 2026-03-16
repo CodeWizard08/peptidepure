@@ -39,7 +39,7 @@
   },
   "solutionFeatures": [
     {
-      "title": "3RD Party COAs",
+      "title": "3rd Party COAs",
       "desc": "Multi-lab verification on every lot (≥99% purity, sterility). Labeling with your logo and \"Clinician Use Only\". Never the red-flag \"Not for Human or Animal Use\"."
     },
     {
@@ -62,8 +62,8 @@
     "rows": [
       { "protocol": "BPC-157 10 mg", "pp": "$44", "gray": "$50 – $65", "retail": "$150 – $225" },
       { "protocol": "BPC-157 10mg / TB500 10mg", "pp": "$88", "gray": "$200", "retail": "$300" },
-      { "protocol": "Retatrutide 30 mg (~3 month supply)", "pp": "$196", "gray": "$450 – $550", "retail": "$900 – $1,200" },
-      { "protocol": "Tirzepatide 30 mg (~1 month supply)", "pp": "$180", "gray": "$250 – $375", "retail": "$600 – $1,000" },
+      { "protocol": "RETA 30 mg (~3 month supply)", "pp": "$196", "gray": "$450 – $550", "retail": "$900 – $1,200" },
+      { "protocol": "TIRZ 30 mg (~1 month supply)", "pp": "$180", "gray": "$250 – $375", "retail": "$600 – $1,000" },
       { "protocol": "CJC-1295 5mg / Ipamorelin 5mg", "pp": "$75", "gray": "$95 – $150", "retail": "$350" }
     ]
   },

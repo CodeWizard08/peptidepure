@@ -9,7 +9,7 @@
       "name": "Metabolic / Weight Loss Peptides",
       "subtitle": "Endocrine System",
       "color": "#C8952C",
-      "items": ["AOD-9604", "Cagrilintide", "Cagrilintide + Semaglutide", "GLP-1 (SEMA)", "GLP-1 / GIP (TIRZ)", "GLP-1 / GIP / G (RETA)", "Mazdutide", "Melanotan II", "SLU-PP-332", "Survodutide"]
+      "items": ["AOD-9604", "Cagrilintide", "Cagrilintide + SEMA", "GLP-1 (SEMA)", "GLP-1 / GIP (TIRZ)", "GLP-1 / GIP / G (RETA)", "Mazdutide", "Melanotan II", "SLU-PP-332", "Survodutide"]
     },
     {
       "name": "MSK / Tissue Repair Peptides",
@@ -45,57 +45,101 @@
   "customBadge": "✦ Custom Formulations Available",
   "starterPackages": [
     {
-      "name": "$5,000 Starter Package",
+      "name": "$5,000 Foundation Bundle",
       "price": "$5,000",
       "wholesale": "~$5,479",
       "retail": "~$25,000+",
-      "tier": "Entry Level",
+      "tier": "Foundation",
       "desc": "Entry-level bundle for new clinicians",
-      "focus": "Weight loss (Tirzepatide & Retatrutide) + Longevity/Repair (MOTS-c, GHK-Cu, BPC-157, Epithalon)",
+      "focus": "Weight loss (TIRZ & RETA) + Longevity/Repair (MOTS-c, GHK-Cu, BPC-157, Epithalon)",
       "detail": "Enough vials for initial patient trials or small stocking.",
-      "bonus": "1 free Tirzepatide 15mg",
+      "bonus": "1 free TIRZ 15mg",
       "highlight": false
     },
     {
-      "name": "$10,000 Starter Package",
+      "name": "$10,000 Growth Bundle",
       "price": "$10,000",
       "wholesale": "~$10,958",
       "retail": "~$50,000+",
-      "tier": "Growth Tier",
+      "tier": "Most Popular",
       "desc": "Mid-tier bundle for growing clinics",
       "focus": "Higher volume in weight loss, mitochondrial health, longevity, and tissue repair",
       "detail": "Scales up for ongoing patient treatments.",
-      "bonus": "1 free Tirzepatide 15mg + 1 free Retatrutide 15mg",
-      "highlight": false
+      "bonus": "1 free TIRZ 15mg + 1 free RETA 15mg",
+      "highlight": true
     },
     {
-      "name": "$20,000 Starter Package",
+      "name": "$20,000 Premier Bundle",
       "price": "$20,000",
       "wholesale": "~$21,916",
       "retail": "~$100,000+",
-      "tier": "Most Popular",
+      "tier": "Best Value",
       "desc": "High-volume bundle for established clinics",
       "focus": "Bulk supply in metabolic optimization, longevity, and repair",
       "detail": "Substantial stock for multiple patients.",
-      "bonus": "2 free Tirzepatide 15mg + 2 free Retatrutide 15mg",
-      "highlight": true
+      "bonus": "2 free TIRZ 15mg + 2 free RETA 15mg",
+      "highlight": false
     }
   ],
   "protocols": {
-    "heading": "Essential Protocols",
+    "heading": "Essential Protocol Packages",
     "subtitle": "Clinics may also purchase bundle packages with flexible vial ratios based on clinical focus.",
     "items": [
       {
+        "name": "Aesthetic & Tissue Regeneration Comparison Protocol",
+        "tags": ["MSK/Tissue Repair", "Longevity", "Protocol Package"],
+        "image": "https://peptidepure.com/wp-content/uploads/2026/01/IMG_1351.jpeg",
+        "peptides": ["BPC-157 10mg", "GHK-Cu 50mg", "TB4 (TB-500) 10mg", "Glutathione 1500mg"],
+        "description": "Compare multi-peptide regenerative formulation (GLOW) vs higher-dose GHK-Cu monotherapy, with optional glutathione support."
+      },
+      {
         "name": "Soft-Tissue Repair & Regenerative Support Protocol",
-        "tags": ["All Peptides", "Metabolism / Weight Loss", "Package", "Popular Peptides", "Protocol Packages"]
+        "tags": ["MSK/Tissue Repair", "Protocol Package"],
+        "image": "https://peptidepure.com/wp-content/uploads/2026/01/BPC-TB4-COMBOS.jpeg",
+        "peptides": ["BPC-157 10mg", "TB4 (TB-500) 10mg", "BPC-157/TB500 10mg"],
+        "description": "Focused tissue repair protocol combining BPC-157 and TB-500 for musculoskeletal and soft-tissue recovery."
       },
       {
         "name": "Metabolic Health & Body Composition Comparison Protocol",
-        "tags": ["All Peptides", "Metabolism / Weight Loss", "Package", "Popular Peptides", "Protocol Packages"]
+        "tags": ["Metabolism/Weight Loss", "Protocol Package"],
+        "image": "https://peptidepure.com/wp-content/uploads/2026/01/Bundle-Vial-Mockups-4.png",
+        "peptides": ["TIRZ 10mg", "RETA 10mg", "SEMA 15mg", "AOD-9604 2mg", "MOTS-c 10mg"],
+        "description": "Compare GLP-1/GIP agonists alongside metabolic peptides for body composition optimization."
       },
       {
-        "name": "Aesthetic & Tissue Regeneration Comparison Protocol",
-        "tags": ["All Peptides", "Package", "Popular Peptides", "Protocol Packages"]
+        "name": "Lean Mass & Growth Hormone Optimization Protocol",
+        "tags": ["Growth Hormone", "Protocol Package"],
+        "image": "https://peptidepure.com/wp-content/uploads/2026/01/Bundle-Vial-Mockups-Lean-Mass-Growth-Hormone-Optimization-Protocol.png",
+        "peptides": ["CJC-1295/Ipamorelin 10mg", "Ipamorelin 5mg", "Tesamorelin 10mg", "Sermorelin 10mg"],
+        "description": "Growth hormone optimization using synergistic GHRH/GHRP combinations for lean mass and recovery."
+      },
+      {
+        "name": "Libido & Sexual Response Comparison Protocol",
+        "tags": ["Cognitive & Mood", "Protocol Package"],
+        "image": "https://peptidepure.com/wp-content/uploads/2026/01/PT141-OXY-MT2.jpeg",
+        "peptides": ["PT-141 10mg", "Oxytocin 5mg", "Melanotan-II 10mg"],
+        "description": "Compare melanocortin and neuropeptide approaches to sexual function and libido support."
+      },
+      {
+        "name": "Neuroplasticity & Circadian Optimization Protocol",
+        "tags": ["Cognitive & Mood", "Longevity", "Protocol Package"],
+        "image": "https://peptidepure.com/wp-content/uploads/2026/01/EPITHALON-50mg-NAD-1000mg.jpeg",
+        "peptides": ["Epithalon 10mg", "NAD+ 1000mg", "Selank 10mg", "Semax 10mg", "Pinealon 10mg"],
+        "description": "Neuroendocrine support for circadian rhythm, neuroplasticity, and cognitive resilience."
+      },
+      {
+        "name": "Metabolic & Mitochondrial Support Protocol",
+        "tags": ["Longevity & Mitochondrial", "Protocol Package"],
+        "image": "https://peptidepure.com/wp-content/uploads/2026/01/Bundle-Vial-Mockups-6.png",
+        "peptides": ["MOTS-c 10mg", "SS-31 10mg", "NAD+ 1000mg", "5-Amino-1MQ 5mg"],
+        "description": "Mitochondrial-targeted peptides for cellular energy, metabolic optimization, and longevity."
+      },
+      {
+        "name": "Longevity Protocol",
+        "tags": ["Longevity & Mitochondrial", "Protocol Package"],
+        "image": "https://peptidepure.com/wp-content/uploads/2026/01/EPITHALON-50mg-NAD-1000mg.jpeg",
+        "peptides": ["Epithalon 10mg", "GHK-Cu 50mg", "MOTS-c 10mg", "NAD+ 1000mg", "FOX04-DRI 5mg"],
+        "description": "Comprehensive anti-aging and longevity protocol targeting telomeres, senescence, and mitochondrial health."
       }
     ]
   }
