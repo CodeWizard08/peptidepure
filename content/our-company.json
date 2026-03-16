@@ -56,7 +56,7 @@
     "heading": "Clinician Enrollment",
     "subtitle": "Verified clinicians can access the full catalog, protocol documentation, and clinical study enrollment.",
     "primaryCtaLabel": "Create Account",
-    "primaryCtaHref": "/peptides",
+    "primaryCtaHref": "/account#register-form",
     "secondaryCtaLabel": "Contact Us",
     "secondaryCtaHref": "/contact"
   }

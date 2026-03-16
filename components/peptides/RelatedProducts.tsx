@@ -7,6 +7,7 @@ type RelatedProduct = {
   description: string | null;
   image_url: string | null;
   category: string;
+  metadata?: Record<string, any> | null;
 };
 
 export default function RelatedProducts({ products }: { products: RelatedProduct[] }) {
@@ -24,7 +25,7 @@ export default function RelatedProducts({ products }: { products: RelatedProduct
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {products.map((item) => (
           <Link
             key={item.id}

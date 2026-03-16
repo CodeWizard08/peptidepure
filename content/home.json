@@ -67,10 +67,10 @@
     "ctaLabel": "Learn More",
     "ctaHref": "/how-it-works",
     "image": "/images/research.png",
-    "imageAlt": "PeptidePure vials — Retatrutide, BPC-157 TB500, CJC-1295 Ipamorelin, Tirzepatide, Epithalon",
+    "imageAlt": "PeptidePure vials — RETA, BPC-157 TB500, CJC-1295 Ipamorelin, TIRZ, Epithalon",
     "badgeStat": "99%+",
     "badgeLabel": "Purity Verified",
-    "compoundPills": ["Retatrutide", "BPC-157", "Tirzepatide", "Epithalon"]
+    "compoundPills": ["RETA", "BPC-157", "TIRZ", "Epithalon"]
   },
   "whyDifferent": {
     "sectionLabel": "Why PeptidePure™",

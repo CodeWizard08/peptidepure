@@ -30,11 +30,11 @@
     { "product": "NAD+", "dose": "1000mg", "stock": 188, "status": "ok" },
     { "product": "Oxytocin", "dose": "50mg", "stock": 20, "status": "low" },
     { "product": "PT-141", "dose": "10mg", "stock": 48, "status": "ok" },
-    { "product": "Retatrutide", "dose": "10mg", "stock": 2, "status": "order", "notes": "10 kits on order" },
-    { "product": "Retatrutide", "dose": "15mg", "stock": 32, "status": "ok" },
-    { "product": "Retatrutide", "dose": "20mg", "stock": 39, "status": "ok" },
-    { "product": "Retatrutide", "dose": "30mg", "stock": 183, "status": "ok" },
-    { "product": "Retatrutide", "dose": "60mg", "stock": 28, "status": "ok" },
+    { "product": "RETA", "dose": "10mg", "stock": 2, "status": "order", "notes": "10 kits on order" },
+    { "product": "RETA", "dose": "15mg", "stock": 32, "status": "ok" },
+    { "product": "RETA", "dose": "20mg", "stock": 39, "status": "ok" },
+    { "product": "RETA", "dose": "30mg", "stock": 183, "status": "ok" },
+    { "product": "RETA", "dose": "60mg", "stock": 28, "status": "ok" },
     { "product": "Selank", "dose": "10mg", "stock": 30, "status": "ok", "notes": "6 kits on order" },
     { "product": "Selank Amidate", "dose": "30mg", "stock": 21, "status": "low" },
     { "product": "Semax", "dose": "10mg", "stock": 4, "status": "order", "notes": "8 kits on order — 4 units remaining" },
@@ -44,9 +44,9 @@
     { "product": "TB500", "dose": "10mg", "stock": 45, "status": "ok" },
     { "product": "Tesamorelin", "dose": "10mg", "stock": 50, "status": "ok" },
     { "product": "Thymosin Alpha-1", "dose": "10mg", "stock": 30, "status": "order", "notes": "10 kits on order" },
-    { "product": "Tirzepatide", "dose": "10mg", "stock": 45, "status": "ok" },
-    { "product": "Tirzepatide", "dose": "15mg", "stock": 50, "status": "ok" },
-    { "product": "Tirzepatide", "dose": "30mg", "stock": 240, "status": "ok" },
-    { "product": "Tirzepatide", "dose": "70mg", "stock": 39, "status": "ok" }
+    { "product": "TIRZ", "dose": "10mg", "stock": 45, "status": "ok" },
+    { "product": "TIRZ", "dose": "15mg", "stock": 50, "status": "ok" },
+    { "product": "TIRZ", "dose": "30mg", "stock": 240, "status": "ok" },
+    { "product": "TIRZ", "dose": "70mg", "stock": 39, "status": "ok" }
   ]
 }

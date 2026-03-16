@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     'clinician peptide platform',
     'peptide research',
     'BPC-157',
-    'Tirzepatide',
+    'TIRZ',
     'TB-500',
     'peptide protocols',
     'cGMP peptides',
@@ -101,7 +101,7 @@ export default async function RootLayout({
         />
         <Providers>
           <Header />
-          <main className="pt-18.25">{children}</main>
+          <main style={{ paddingTop: '64px' }}>{children}</main>
           <Footer content={footerContent} />
         </Providers>
       </body>

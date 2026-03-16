@@ -15,14 +15,20 @@ type Props = {
     price_cents: number;
     image_url: string | null;
   };
+  inventory?: string;
+  leadTimeDays?: number | null;
 };
 
-export default function AddToCartButton({ product }: Props) {
+export default function AddToCartButton({ product, inventory = 'in_stock', leadTimeDays }: Props) {
   const { addToCart } = useCart();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [showBackorderNotice, setShowBackorderNotice] = useState(false);
+
+  const isOOS = inventory === 'oos';
+  const isLeadTime = inventory === 'lead_time';
 
   const supabase = createClient();
 
@@ -52,6 +58,12 @@ export default function AddToCartButton({ product }: Props) {
     );
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
+
+    // Show backorder notice for lead time items
+    if (isLeadTime) {
+      setShowBackorderNotice(true);
+      setTimeout(() => setShowBackorderNotice(false), 5000);
+    }
   };
 
   if (loading) {
@@ -76,7 +88,38 @@ export default function AddToCartButton({ product }: Props) {
     );
   }
 
-  // Logged in
+  // Out of stock — disabled gray button
+  if (isOOS) {
+    return (
+      <div className="mb-8">
+        {/* Price */}
+        <div className="mb-4">
+          <span className="text-2xl font-bold" style={{ color: 'var(--text-light)' }}>
+            {formatCents(product.price_cents)}
+          </span>
+          <span className="text-xs ml-2" style={{ color: 'var(--text-light)' }}>per unit</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            disabled
+            className="px-6 py-3 rounded-lg text-sm font-semibold text-white cursor-not-allowed"
+            style={{ background: '#9CA3AF' }}
+          >
+            Out of Stock
+          </button>
+          <Link href="/contact" className="btn-outline">
+            Contact Us
+          </Link>
+        </div>
+        <p className="text-xs mt-2" style={{ color: 'var(--text-light)' }}>
+          This product is currently unavailable. Contact us to be notified when it&apos;s back in stock.
+        </p>
+      </div>
+    );
+  }
+
+  // Logged in — normal or lead time
   return (
     <div className="mb-8">
       {/* Price */}
@@ -137,6 +180,26 @@ export default function AddToCartButton({ product }: Props) {
           Contact Us
         </Link>
       </div>
+
+      {/* Backorder notice (auto-dismiss) */}
+      {isLeadTime && showBackorderNotice && (
+        <div
+          className="mt-3 flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-medium animate-fade-in"
+          style={{ background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' }}
+        >
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          On Backorder — {leadTimeDays ?? 21}-day lead time for this product
+        </div>
+      )}
+
+      {/* Persistent backorder label for lead time items */}
+      {isLeadTime && !showBackorderNotice && (
+        <p className="text-xs mt-2 font-medium" style={{ color: '#D97706' }}>
+          On Backorder — {leadTimeDays ?? 21}-day lead time
+        </p>
+      )}
 
       {/* View cart link after adding */}
       {added && (

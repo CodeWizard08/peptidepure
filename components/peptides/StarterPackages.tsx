@@ -24,6 +24,11 @@ export default function StarterPackages({
                 Most Popular
               </div>
             )}
+            {!pkg.highlight && pkg.tier === 'Best Value' && (
+              <div className="text-center py-1.5 text-xs font-bold uppercase tracking-widest text-white" style={{ background: 'var(--navy)' }}>
+                Best Value
+              </div>
+            )}
             <div className="p-6 flex-1 flex flex-col">
               <div className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--text-light)' }}>
                 {pkg.tier}

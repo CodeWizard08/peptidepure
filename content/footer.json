@@ -16,7 +16,7 @@
     { "label": "Accessibility Statement", "href": "/accessibility" }
   ],
   "contactItems": [
-    { "label": "Phone", "value": "805-427-2246", "sub": "Mon–Fri  ·  9AM – 4PM PST", "href": "tel:8054272246" },
+    { "label": "Phone", "value": "(858) 480-1017", "sub": "Mon–Fri  ·  9AM – 4PM PST", "href": "tel:8584801017" },
     { "label": "Email", "value": "info@peptidepure.com", "sub": "Replies within 1 business day", "href": "mailto:info@peptidepure.com" },
     { "label": "Shipping Days", "value": "Mon–Fri", "sub": "Except U.S. Holidays", "href": null }
   ],

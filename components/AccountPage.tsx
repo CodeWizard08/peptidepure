@@ -214,10 +214,13 @@ export default function AccountPage() {
   const [regDragging, setRegDragging] = useState(false);
   const [regAgree1, setRegAgree1] = useState(false);
   const [regAgree2, setRegAgree2] = useState(false);
+  const [regSignature, setRegSignature] = useState('');
+  const [isDrawing, setIsDrawing] = useState(false);
   const [regLoading, setRegLoading] = useState(false);
   const [regError, setRegError] = useState('');
   const [regSuccess, setRegSuccess] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Check session on mount + subscribe to auth changes
   useEffect(() => {
@@ -400,6 +403,22 @@ export default function AccountPage() {
                 <p className="text-sm mt-1" style={{ color: 'var(--text-light)' }}>
                   Access your verified clinician account
                 </p>
+                <div
+                  className="mt-3 flex items-start gap-2 px-3.5 py-2.5 rounded-xl text-xs leading-relaxed"
+                  style={{
+                    background: 'rgba(200,149,44,0.08)',
+                    border: '1px solid rgba(200,149,44,0.2)',
+                    color: 'var(--text-mid)',
+                  }}
+                >
+                  <svg className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--gold)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>
+                    <strong style={{ color: 'var(--navy)' }}>Previous WordPress customers:</strong>{' '}
+                    Please register a new account using the same email address. Your order history will be linked automatically.
+                  </span>
+                </div>
               </div>
 
               {/* Gold top accent */}
@@ -468,9 +487,14 @@ export default function AccountPage() {
                 <span className="text-xs" style={{ color: 'var(--text-light)' }}>New to PeptidePure?</span>
                 <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
               </div>
-              <p className="text-center text-xs" style={{ color: 'var(--text-mid)' }}>
+              <button
+                type="button"
+                className="w-full text-center text-xs underline underline-offset-2 transition-colors hover:opacity-80"
+                style={{ color: 'var(--gold)' }}
+                onClick={() => document.getElementById('register-form')?.scrollIntoView({ behavior: 'smooth' })}
+              >
                 Create an account using the registration form →
-              </p>
+              </button>
 
               {/* Trust indicators */}
               <div className="mt-8 pt-6" style={{ borderTop: '1px solid var(--border)' }}>
@@ -489,7 +513,8 @@ export default function AccountPage() {
 
             {/* ══ REGISTER ═══════════════════════════════════════ */}
             <div
-              className="rounded-3xl p-8 md:p-10 relative"
+              id="register-form"
+              className="rounded-3xl p-8 md:p-10 relative scroll-mt-28"
               style={{ background: 'white', border: '1px solid rgba(11,31,58,0.08)', boxShadow: '0 8px 40px rgba(11,31,58,0.07)' }}
             >
               {/* Card header */}
@@ -594,64 +619,208 @@ export default function AccountPage() {
                   </button>
                 </div>
 
+                {/* Signature */}
+                <div>
+                  <label className="block text-xs font-semibold mb-2" style={{ color: 'var(--navy)' }}>
+                    Signature <span style={{ color: '#DC2626' }}>*</span>
+                  </label>
+                  <div
+                    className="relative rounded-xl overflow-hidden"
+                    style={{ border: '1.5px solid rgba(11,31,58,0.15)', background: 'white' }}
+                  >
+                    <canvas
+                      ref={canvasRef}
+                      width={500}
+                      height={120}
+                      className="w-full cursor-crosshair"
+                      style={{ height: '120px', touchAction: 'none' }}
+                      onMouseDown={(e) => {
+                        setIsDrawing(true);
+                        const canvas = canvasRef.current;
+                        if (!canvas) return;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) return;
+                        const rect = canvas.getBoundingClientRect();
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        ctx.beginPath();
+                        ctx.moveTo((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+                      }}
+                      onMouseMove={(e) => {
+                        if (!isDrawing) return;
+                        const canvas = canvasRef.current;
+                        if (!canvas) return;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) return;
+                        const rect = canvas.getBoundingClientRect();
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        ctx.lineWidth = 2;
+                        ctx.lineCap = 'round';
+                        ctx.strokeStyle = 'var(--navy)';
+                        ctx.lineTo((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+                        ctx.stroke();
+                      }}
+                      onMouseUp={() => {
+                        setIsDrawing(false);
+                        if (canvasRef.current) setRegSignature(canvasRef.current.toDataURL());
+                      }}
+                      onMouseLeave={() => {
+                        if (isDrawing) {
+                          setIsDrawing(false);
+                          if (canvasRef.current) setRegSignature(canvasRef.current.toDataURL());
+                        }
+                      }}
+                      onTouchStart={(e) => {
+                        e.preventDefault();
+                        setIsDrawing(true);
+                        const canvas = canvasRef.current;
+                        if (!canvas) return;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) return;
+                        const rect = canvas.getBoundingClientRect();
+                        const touch = e.touches[0];
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        ctx.beginPath();
+                        ctx.moveTo((touch.clientX - rect.left) * scaleX, (touch.clientY - rect.top) * scaleY);
+                      }}
+                      onTouchMove={(e) => {
+                        e.preventDefault();
+                        if (!isDrawing) return;
+                        const canvas = canvasRef.current;
+                        if (!canvas) return;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) return;
+                        const rect = canvas.getBoundingClientRect();
+                        const touch = e.touches[0];
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        ctx.lineWidth = 2;
+                        ctx.lineCap = 'round';
+                        ctx.strokeStyle = 'var(--navy)';
+                        ctx.lineTo((touch.clientX - rect.left) * scaleX, (touch.clientY - rect.top) * scaleY);
+                        ctx.stroke();
+                      }}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        setIsDrawing(false);
+                        if (canvasRef.current) setRegSignature(canvasRef.current.toDataURL());
+                      }}
+                    />
+                    {!regSignature && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <span className="text-xs" style={{ color: 'var(--text-light)' }}>Draw your signature here</span>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className="text-xs mt-1.5 underline underline-offset-2 transition-colors hover:opacity-70"
+                    style={{ color: 'var(--text-light)' }}
+                    onClick={() => {
+                      const canvas = canvasRef.current;
+                      if (!canvas) return;
+                      const ctx = canvas.getContext('2d');
+                      if (!ctx) return;
+                      ctx.clearRect(0, 0, canvas.width, canvas.height);
+                      setRegSignature('');
+                    }}
+                  >
+                    Clear signature
+                  </button>
+                </div>
+
                 {/* Checkboxes */}
                 <div className="space-y-3 pt-1">
-                  {[
-                    {
-                      id: 'agree1',
-                      value: regAgree1,
-                      setter: setRegAgree1,
-                      text: 'I agree to the Peptide Pure LLC Provider Terms & Conditions (including Clinician Use Only and IRB restrictions).',
-                    },
-                    {
-                      id: 'agree2',
-                      value: regAgree2,
-                      setter: setRegAgree2,
-                      text: 'The undersigned physician/provider agrees to participate as a site participant in the IRB-approved observational registry Mortensen Medical Research Network.',
-                    },
-                  ].map(({ id, value, setter, text }) => (
-                    <label key={id} className="flex gap-3 cursor-pointer group/cb">
-                      <div
-                        className="mt-0.5 w-5 h-5 shrink-0 rounded-md flex items-center justify-center transition-all duration-200"
-                        style={{
-                          background: value ? 'var(--navy)' : 'white',
-                          border: value ? '1.5px solid var(--navy)' : '1.5px solid rgba(11,31,58,0.2)',
-                          boxShadow: value ? '0 2px 8px rgba(11,31,58,0.2)' : 'none',
-                        }}
-                        onClick={() => setter((v) => !v)}
+                  <label className="flex gap-3 cursor-pointer group/cb">
+                    <div
+                      className="mt-0.5 w-5 h-5 shrink-0 rounded-md flex items-center justify-center transition-all duration-200"
+                      style={{
+                        background: regAgree1 ? 'var(--navy)' : 'white',
+                        border: regAgree1 ? '1.5px solid var(--navy)' : '1.5px solid rgba(11,31,58,0.2)',
+                        boxShadow: regAgree1 ? '0 2px 8px rgba(11,31,58,0.2)' : 'none',
+                      }}
+                      onClick={() => setRegAgree1((v) => !v)}
+                    >
+                      {regAgree1 && (
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </div>
+                    <span
+                      className="text-xs leading-relaxed transition-colors"
+                      style={{ color: regAgree1 ? 'var(--text-dark)' : 'var(--text-mid)' }}
+                      onClick={() => setRegAgree1((v) => !v)}
+                    >
+                      I agree to the Peptide Pure LLC Provider{' '}
+                      <a
+                        href="https://peptidepure.com/terms-conditions/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline font-semibold"
+                        style={{ color: 'var(--gold)' }}
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        {value && (
-                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </div>
-                      <span
-                        className="text-xs leading-relaxed transition-colors"
-                        style={{ color: value ? 'var(--text-dark)' : 'var(--text-mid)' }}
-                        onClick={() => setter((v) => !v)}
+                        Terms &amp; Conditions
+                      </a>{' '}
+                      (including Clinician Use Only and IRB restrictions).
+                    </span>
+                  </label>
+
+                  <label className="flex gap-3 cursor-pointer group/cb">
+                    <div
+                      className="mt-0.5 w-5 h-5 shrink-0 rounded-md flex items-center justify-center transition-all duration-200"
+                      style={{
+                        background: regAgree2 ? 'var(--navy)' : 'white',
+                        border: regAgree2 ? '1.5px solid var(--navy)' : '1.5px solid rgba(11,31,58,0.2)',
+                        boxShadow: regAgree2 ? '0 2px 8px rgba(11,31,58,0.2)' : 'none',
+                      }}
+                      onClick={() => setRegAgree2((v) => !v)}
+                    >
+                      {regAgree2 && (
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </div>
+                    <span
+                      className="text-xs leading-relaxed transition-colors"
+                      style={{ color: regAgree2 ? 'var(--text-dark)' : 'var(--text-mid)' }}
+                      onClick={() => setRegAgree2((v) => !v)}
+                    >
+                      The undersigned physician/provider agrees to participate as a site participant in the{' '}
+                      <a
+                        href="https://peptidepure.com/wp-content/uploads/2025/12/IRB-Provider-Site-Participation-Agreement.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline font-semibold"
+                        style={{ color: 'var(--gold)' }}
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        {text}
-                      </span>
-                    </label>
-                  ))}
+                        IRB-approved observational registry
+                      </a>{' '}
+                      Mortensen Medical Research Network.
+                    </span>
+                  </label>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={regLoading || !regAgree1 || !regAgree2}
+                  disabled={regLoading || !regAgree1 || !regAgree2 || !regSignature}
                   className="w-full py-3.5 rounded-xl text-sm font-bold text-white transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
                   style={{
                     background:
-                      regLoading || !regAgree1 || !regAgree2
+                      regLoading || !regAgree1 || !regAgree2 || !regSignature
                         ? 'var(--text-light)'
                         : 'linear-gradient(135deg, var(--navy) 0%, #1e4080 100%)',
                     boxShadow:
-                      !regLoading && regAgree1 && regAgree2
+                      !regLoading && regAgree1 && regAgree2 && regSignature
                         ? '0 4px 20px rgba(11,31,58,0.3)'
                         : 'none',
                     letterSpacing: '0.02em',
-                    cursor: !regAgree1 || !regAgree2 ? 'not-allowed' : 'pointer',
+                    cursor: !regAgree1 || !regAgree2 || !regSignature ? 'not-allowed' : 'pointer',
                     opacity: regLoading ? 0.7 : 1,
                   }}
                 >

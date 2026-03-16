@@ -160,7 +160,7 @@ export default function COAGallery({ content }: { content: COAContent }) {
                             className="hidden sm:block h-2 rounded-full"
                             style={{
                               width: `${Math.max((row.purity - 99) * 100, 8)}px`,
-                              background: row.purity >= 99.9 ? '#16a34a' : row.purity >= 99.5 ? 'var(--gold)' : '#f59e0b',
+                              background: row.purity > 99 ? '#16a34a' : row.purity >= 99 ? 'var(--gold)' : '#f59e0b',
                               maxWidth: 100,
                             }}
                           />
