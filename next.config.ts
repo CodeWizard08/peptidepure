@@ -1,6 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'dzbvaswimmaxfvambivu.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'peptidepure.com',
+        pathname: '/wp-content/uploads/**',
+      },
+    ],
+  },
   async headers() {
     return [
       {

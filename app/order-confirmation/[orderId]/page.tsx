@@ -7,7 +7,10 @@ import type { Order, OrderItemJson, ShippingAddress } from '@/lib/types/order';
 
 export async function generateMetadata({ params }: { params: Promise<{ orderId: string }> }) {
   const { orderId } = await params;
-  return { title: `Order ${formatOrderNumber(orderId)} | PeptidePure` };
+  return {
+    title: `Order ${formatOrderNumber(orderId)} | PeptidePure`,
+    robots: { index: false, follow: false },
+  };
 }
 
 const STATUS_STYLES: Record<string, { bg: string; color: string }> = {

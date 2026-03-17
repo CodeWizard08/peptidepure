@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const supabase = await createClient();
   const { data: product } = await supabase
     .from('products')
-    .select('name, description, category')
+    .select('name, description, category, image_url, price_cents')
     .eq('slug', slug)
     .eq('is_active', true)
     .single();
@@ -53,9 +53,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!product) return { title: 'Product Not Found' };
 
   const baseName = getBaseProductName(product.name);
+  const desc = product.description ?? `${baseName} — clinical-grade ${product.category} peptide from PeptidePure.`;
+  const ogImage = product.image_url ?? 'https://peptidepure.com/wp-content/uploads/2025/05/product-line-up.webp';
+
   return {
-    title: `${baseName} | PeptidePure`,
-    description: product.description ?? `${baseName} — clinical-grade ${product.category} peptide from PeptidePure.`,
+    title: `${baseName} — ${product.category} Peptide`,
+    description: desc,
+    alternates: {
+      canonical: `/peptides/${slug}`,
+    },
+    openGraph: {
+      title: `${baseName} | PeptidePure™`,
+      description: desc,
+      url: `https://peptidepure.com/peptides/${slug}`,
+      type: 'website',
+      images: [{ url: ogImage, width: 640, height: 640, alt: `${baseName} peptide vial` }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${baseName} | PeptidePure™`,
+      description: desc,
+      images: [ogImage],
+    },
   };
 }
 
@@ -109,8 +128,53 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const catConfig = CATEGORY_CONFIG[product.category] ?? { color: 'var(--navy)', label: product.category };
   const meta = product.metadata ?? {};
 
+  // JSON-LD structured data
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description ?? `${baseName} — clinical-grade ${product.category} peptide.`,
+    image: product.image_url ?? undefined,
+    sku: product.sku ?? undefined,
+    brand: { '@type': 'Brand', name: 'PeptidePure™' },
+    category: product.category,
+    url: `https://peptidepure.com/peptides/${slug}`,
+    ...(product.price_cents > 0
+      ? {
+          offers: {
+            '@type': 'Offer',
+            price: (product.price_cents / 100).toFixed(2),
+            priceCurrency: 'USD',
+            availability:
+              meta.inventory_status === 'oos'
+                ? 'https://schema.org/OutOfStock'
+                : 'https://schema.org/InStock',
+            seller: { '@type': 'Organization', name: 'PeptidePure™' },
+          },
+        }
+      : {}),
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://peptidepure.com' },
+      { '@type': 'ListItem', position: 2, name: 'All Peptides', item: 'https://peptidepure.com/peptides' },
+      { '@type': 'ListItem', position: 3, name: baseName, item: `https://peptidepure.com/peptides/${slug}` },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <ProductHero
         product={product}
         baseName={baseName}
