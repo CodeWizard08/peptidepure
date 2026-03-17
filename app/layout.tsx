@@ -40,12 +40,21 @@ export const metadata: Metadata = {
     title: 'PeptidePure™ — Clinician Peptide Platform',
     description:
       'USA cGMP-compliant peptides with >99% purity. Built exclusively for licensed clinicians.',
+    images: [
+      {
+        url: 'https://peptidepure.com/wp-content/uploads/2025/05/product-line-up.webp',
+        width: 1200,
+        height: 630,
+        alt: 'PeptidePure™ peptide product lineup',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'PeptidePure™ — Clinician Peptide Platform',
     description:
       'USA cGMP-compliant peptides with >99% purity. Built exclusively for licensed clinicians.',
+    images: ['https://peptidepure.com/wp-content/uploads/2025/05/product-line-up.webp'],
   },
   robots: {
     index: true,
@@ -89,11 +98,13 @@ export default async function RootLayout({
               '@type': 'Organization',
               name: 'PeptidePure™',
               url: 'https://peptidepure.com',
+              logo: 'https://peptidepure.com/wp-content/uploads/2025/05/product-line-up.webp',
               description:
                 'Clinician-only peptide sourcing platform. USA cGMP-compliant peptides with >99% purity.',
               contactPoint: {
                 '@type': 'ContactPoint',
                 contactType: 'customer service',
+                telephone: '+1-858-480-1017',
                 url: 'https://peptidepure.com/contact',
               },
             }),

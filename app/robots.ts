@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin/', '/api/', '/account/', '/cart/', '/checkout/'],
+        disallow: ['/admin/', '/api/', '/account/', '/cart/', '/checkout/', '/order-confirmation/', '/forms/'],
       },
     ],
     sitemap: 'https://peptidepure.com/sitemap.xml',
