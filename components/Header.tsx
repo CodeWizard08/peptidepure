@@ -470,9 +470,7 @@ export default function Header() {
       </div>
 
       {/* Spacer for banner height so page content isn't hidden behind fixed banner */}
-      {showBanner && (
-        <div style={{ height: '36px' }} />
-      )}
+      
     </>
   );
 }
