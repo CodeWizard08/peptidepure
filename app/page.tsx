@@ -30,7 +30,7 @@ export default async function HomePage() {
     <>
       <HeroSlider content={heroContent} />
       <MarqueeTrustBar items={content.trustBar} />
-      <StatsSection content={content.stats} />
+      {/* <StatsSection content={content.stats} /> */}
       <ThreeStepProcess content={content.threeSteps} />
       <USAResearchSection content={content.usaResearch} />
       <WhyDifferentSection content={content.whyDifferent} />
