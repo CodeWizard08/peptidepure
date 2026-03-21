@@ -1,0 +1,283 @@
+{
+  "hero": {
+    "sectionLabel": "Clinical Reference",
+    "heading": "Peptide Dosing & Safety Guide",
+    "subtitle": "Standardized reconstitution and dosing protocols for commonly used clinical peptides. Accurate measurement using U-100 insulin syringes with proper storage guidelines."
+  },
+  "overview": {
+    "heading": "How to Use This Guide",
+    "body": "This comprehensive dosing resource covers reconstitution, measurement conversions, and administration protocols for common clinical peptides using U-100 insulin syringes (100 units = 1.0 mL). Always verify all calculations independently before administration."
+  },
+  "safetyPrinciples": {
+    "heading": "Key Safety Principles",
+    "items": [
+      "Always double-check your math, reconstitution calculations, and dosing — even when using AI tools or calculators. Verify every step yourself to ensure safety and accuracy.",
+      "Do not shake vials. Inject diluent slowly down the vial wall and gently swirl until dissolved.",
+      "Store mixed vials in the refrigerator (2–8°C) unless instructed otherwise. Label with date mixed and concentration.",
+      "Rotate injection sites to prevent tissue damage or lipohypertrophy. Use new sterile equipment for each injection.",
+      "Stop and contact your clinician immediately if experiencing severe symptoms: chest pain, fainting, severe headache, or unusual swelling."
+    ]
+  },
+  "reconstitutionSteps": {
+    "heading": "Universal Reconstitution Protocol",
+    "steps": [
+      { "num": "01", "title": "Prepare Workspace", "desc": "Clean your workspace and wash hands thoroughly. Gather all supplies: vial, bacteriostatic water, alcohol swabs, and insulin syringe." },
+      { "num": "02", "title": "Sterilize Vials", "desc": "Swab vial tops with alcohol and allow to dry completely before insertion." },
+      { "num": "03", "title": "Draw Diluent", "desc": "Draw the appropriate volume of bacteriostatic water into the syringe." },
+      { "num": "04", "title": "Inject Slowly", "desc": "Inject slowly down the vial wall — not directly into the powder — to avoid denaturing the peptide." },
+      { "num": "05", "title": "Swirl Gently", "desc": "Gently swirl the vial until fully dissolved. Never shake." },
+      { "num": "06", "title": "Label & Store", "desc": "Label the vial with the date mixed and final concentration. Refrigerate immediately." }
+    ]
+  },
+  "conversionRule": {
+    "heading": "U-100 Insulin Syringe Conversion",
+    "body": "U-100 insulin syringes are calibrated so that 100 units = 1.0 mL and 10 units = 0.1 mL. Each peptide's specific unit conversion depends on the final concentration achieved during reconstitution.",
+    "formula": "Dose (mcg) ÷ Concentration (mcg/mL) × 100 = Units to draw"
+  },
+  "peptides": [
+    {
+      "name": "Retatrutide",
+      "category": "Metabolic Optimization",
+      "categoryColor": "#C8952C",
+      "vial": "30 mg",
+      "diluent": "3.0 mL bacteriostatic water",
+      "concentration": "10 mg/mL",
+      "startingDose": "1.0 mg weekly",
+      "startingUnits": "10 units",
+      "notes": "Titrate slowly based on tolerability. GLP-1/GIP/glucagon triple agonist. Monitor for GI side effects especially during titration.",
+      "storage": "Refrigerate after reconstitution. Use within 28 days."
+    },
+    {
+      "name": "Tirzepatide (TIRZ)",
+      "category": "Appetite & Glycemic Support",
+      "categoryColor": "#C8952C",
+      "vial": "30 mg",
+      "diluent": "3.0 mL bacteriostatic water",
+      "concentration": "10 mg/mL",
+      "startingDose": "1.5 mg weekly",
+      "startingUnits": "15 units",
+      "notes": "Dual GLP-1/GIP agonist. Monitor for nausea; hold or reduce dose if GI symptoms are severe. Titrate every 4 weeks as tolerated.",
+      "storage": "Refrigerate after reconstitution. Use within 28 days."
+    },
+    {
+      "name": "Semaglutide (SEMA)",
+      "category": "Appetite & Glycemic Support",
+      "categoryColor": "#C8952C",
+      "vial": "15 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "7.5 mg/mL",
+      "startingDose": "0.25 mg weekly",
+      "startingUnits": "3 units",
+      "notes": "GLP-1 receptor agonist. Start low and titrate slowly. Dose escalation typically every 4 weeks.",
+      "storage": "Refrigerate after reconstitution. Use within 28 days."
+    },
+    {
+      "name": "AOD-9604",
+      "category": "Metabolic Support",
+      "categoryColor": "#C8952C",
+      "vial": "2 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "1 mg/mL",
+      "startingDose": "250–300 mcg daily",
+      "startingUnits": "25–30 units",
+      "notes": "Fragment of human growth hormone targeting fat metabolism. Often dosed in the morning on an empty stomach.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "BPC-157",
+      "category": "Tissue Recovery",
+      "categoryColor": "#2563EB",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "250–500 mcg daily",
+      "startingUnits": "5–10 units",
+      "notes": "Supports musculoskeletal and gastrointestinal healing. Can be dosed subcutaneously or intramuscularly near the injury site.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "TB-500 (Thymosin Beta-4)",
+      "category": "Tissue Recovery",
+      "categoryColor": "#2563EB",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "2–2.5 mg twice weekly",
+      "startingUnits": "40–50 units",
+      "notes": "Promotes tissue repair, reduces inflammation, and improves flexibility. Often combined with BPC-157 for synergistic effect.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "GHK-Cu (Copper Peptide)",
+      "category": "Regenerative & Longevity",
+      "categoryColor": "#059669",
+      "vial": "100 mg",
+      "diluent": "3.0 mL bacteriostatic water",
+      "concentration": "33.3 mg/mL",
+      "startingDose": "1–2 mg every 1–2 days",
+      "startingUnits": "3–6 units",
+      "notes": "Supports collagen synthesis, wound healing, and skin regeneration. May be used topically or subcutaneously.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "CJC-1295 + Ipamorelin",
+      "category": "Endocrine Signaling",
+      "categoryColor": "#7C3AED",
+      "vial": "5 mg each (combined)",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "2.5 mg/mL each",
+      "startingDose": "200–300 mcg each, nightly",
+      "startingUnits": "8–12 units",
+      "notes": "Both compounds share equal concentration at 1:1 ratio. Best dosed before sleep to align with natural GH pulse. Avoid after high-carbohydrate meals.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "Ipamorelin",
+      "category": "Endocrine Signaling",
+      "categoryColor": "#7C3AED",
+      "vial": "5 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "2.5 mg/mL",
+      "startingDose": "200–300 mcg daily",
+      "startingUnits": "8–12 units",
+      "notes": "Selective GHRP with minimal effect on cortisol or prolactin. Typically dosed 2–3× daily or before bed.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "Sermorelin",
+      "category": "Endocrine Signaling",
+      "categoryColor": "#7C3AED",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "200–500 mcg nightly",
+      "startingUnits": "4–10 units",
+      "notes": "GHRH analogue. Best dosed before sleep. Effects build over weeks — typically evaluated at 3–6 months.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "Tesamorelin",
+      "category": "Endocrine Signaling",
+      "categoryColor": "#7C3AED",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "1–2 mg daily",
+      "startingUnits": "20–40 units",
+      "notes": "FDA-approved GHRH analogue. Reduces visceral fat. Monitor IGF-1 levels during treatment.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "NAD+",
+      "category": "Longevity & Mitochondrial",
+      "categoryColor": "#059669",
+      "vial": "1000 mg",
+      "diluent": "10.0 mL bacteriostatic water",
+      "concentration": "100 mg/mL",
+      "startingDose": "100–300 mg daily",
+      "startingUnits": "1–3 units",
+      "notes": "Infuse slowly. Flush reactions (warmth, chest tightness) are common — slow infusion rate if they occur. Often given IV push or slow IV drip.",
+      "storage": "Refrigerate after reconstitution. Use within 14 days."
+    },
+    {
+      "name": "MOTS-c",
+      "category": "Longevity & Mitochondrial",
+      "categoryColor": "#059669",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "5–10 mg weekly",
+      "startingUnits": "10–20 units",
+      "notes": "Mitochondrial-derived peptide supporting metabolic homeostasis and insulin sensitivity. Often given 2–3× weekly.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "Epithalon",
+      "category": "Longevity & Mitochondrial",
+      "categoryColor": "#059669",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "5–10 mg daily",
+      "startingUnits": "10–20 units",
+      "notes": "Telomere-regulating tetrapeptide. Typical courses run 10–20 days, 1–2× per year. Often dosed in the evening.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "KPV",
+      "category": "Immune & Inflammatory",
+      "categoryColor": "#DC2626",
+      "vial": "50 mg",
+      "diluent": "5.0 mL bacteriostatic water",
+      "concentration": "10 mg/mL",
+      "startingDose": "0.5–1 mg daily",
+      "startingUnits": "5–10 units",
+      "notes": "Anti-inflammatory tripeptide. Effective for gut inflammation (IBD, colitis). Can be administered subcutaneously or orally (compounded capsule).",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "LL-37",
+      "category": "Immune & Antimicrobial",
+      "categoryColor": "#DC2626",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "100–200 mcg daily",
+      "startingUnits": "2–4 units",
+      "notes": "Human cathelicidin antimicrobial peptide. Supports innate immunity and wound healing. Monitor injection site for redness.",
+      "storage": "Refrigerate after reconstitution. Use within 21 days."
+    },
+    {
+      "name": "ARA-290",
+      "category": "Immune & Tissue Repair",
+      "categoryColor": "#DC2626",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "4 mg daily",
+      "startingUnits": "8 units",
+      "notes": "Erythropoietin-derived peptide with anti-inflammatory and neuroprotective properties. Used for neuropathic pain and inflammation.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "PT-141 (Bremelanotide)",
+      "category": "Cognitive & Mood",
+      "categoryColor": "#0891B2",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "1–2 mg as needed",
+      "startingUnits": "20–40 units",
+      "notes": "Dose 30–45 min before activity. Common side effects include nausea and flushing. Do not exceed one dose per 72 hours.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "Selank",
+      "category": "Cognitive & Mood",
+      "categoryColor": "#0891B2",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "250–500 mcg daily",
+      "startingUnits": "5–10 units",
+      "notes": "Anxiolytic nootropic with BDNF-stimulating properties. Intranasal or subcutaneous. Typically cycled 10–14 days on, 1–2 weeks off.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    },
+    {
+      "name": "Semax",
+      "category": "Cognitive & Mood",
+      "categoryColor": "#0891B2",
+      "vial": "10 mg",
+      "diluent": "2.0 mL bacteriostatic water",
+      "concentration": "5 mg/mL",
+      "startingDose": "300–900 mcg daily",
+      "startingUnits": "6–18 units",
+      "notes": "ACTH-derived nootropic. Enhances BDNF, NGF, and cognitive performance. Intranasal administration preferred. Cycle similar to Selank.",
+      "storage": "Refrigerate after reconstitution. Use within 30 days."
+    }
+  ],
+  "disclaimer": {
+    "heading": "Important Medical Disclaimer",
+    "body": "This guide is provided for educational and reference purposes only. All protocols are standardized examples and cannot substitute for individualized medical advice from a licensed clinician. Patient-specific protocols may differ from the examples provided. Always verify calculations independently. PeptidePure™ products are intended exclusively for use by licensed healthcare professionals and qualified researchers. Administration of these compounds should only occur under appropriate clinical supervision."
+  }
+}
