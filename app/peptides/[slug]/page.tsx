@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const baseName = getBaseProductName(product.name);
   const desc = product.description ?? `${baseName} — clinical-grade ${product.category} peptide from PeptidePure.`;
-  const ogImage = product.image_url ?? 'https://peptidepure.com/wp-content/uploads/2025/05/product-line-up.webp';
+  const ogImage = product.image_url ?? 'https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2025/05/product-line-up.webp';
 
   return {
     title: `${baseName} — ${product.category} Peptide`,
