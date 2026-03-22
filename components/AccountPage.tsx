@@ -792,7 +792,7 @@ export default function AccountPage() {
                     >
                       The undersigned physician/provider agrees to participate as a site participant in the{' '}
                       <a
-                        href="https://peptidepure.com/wp-content/uploads/2025/12/IRB-Provider-Site-Participation-Agreement.pdf"
+                        href="https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2025/12/IRB-Provider-Site-Participation-Agreement.pdf"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="underline font-semibold"
