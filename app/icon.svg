@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Navy background -->
+  <rect width="32" height="32" rx="6" fill="#0B1F3A"/>
+
+  <!-- Gold hexagon outline (flat-top, centered) -->
+  <!-- Points of a flat-top hexagon centered at (16,14.5), radius ~10 -->
+  <polygon
+    points="16,5 24.66,10 24.66,19 16,24 7.34,19 7.34,10"
+    fill="none"
+    stroke="url(#gold)"
+    stroke-width="2.2"
+    stroke-linejoin="round"
+  />
+
+  <!-- Magnifying glass handle -->
+  <line x1="20.5" y1="21.5" x2="25" y2="27" stroke="url(#gold)" stroke-width="2.2" stroke-linecap="round"/>
+
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5B046"/>
+      <stop offset="100%" stop-color="#C8952C"/>
+    </linearGradient>
+  </defs>
+</svg>
