@@ -3,9 +3,9 @@ import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service',
+  title: 'Terms & Conditions',
   description:
-    'Review the terms and conditions governing use of the PeptidePure™ platform. Applicable to all licensed clinicians ordering peptides through our service.',
+    'Wholesale & Clinician Platform Agreement governing use of PeptidePure™. Applicable to all licensed clinicians and wholesale buyers. Effective March 2026.',
   alternates: { canonical: '/terms' },
 };
 

@@ -1,71 +1,108 @@
 {
   "hero": {
     "sectionLabel": "Legal",
-    "heading": "Terms of Use",
-    "subtitle": "Please read these terms carefully before using our website."
+    "heading": "Terms & Conditions",
+    "subtitle": "Wholesale & Clinician Platform Agreement — Effective Date: March 2026 | Governed by California Law"
   },
-  "intro": "Welcome to Peptide Pure. By accessing or using our website (https://peptidepure.com), you agree to comply with and be bound by the following Terms of Use. If you do not agree with these terms, please do not use our website.",
+  "intro": "By accessing peptidepure.com, creating an account, or placing any order, you (\"User,\" \"Clinician,\" or \"Wholesale Buyer\") agree to be bound by these Terms and Conditions in their entirety. If you do not agree, do not use this platform. These Terms apply to all visitors, registered users, licensed clinicians, and wholesale account holders.",
   "sections": [
     {
-      "title": "1. Website Access",
-      "text": "By using our website, you confirm that:",
+      "title": "1. Acceptance of Terms",
+      "text": "By accessing peptidepure.com, creating an account, or placing any order, you agree to be bound by these Terms and Conditions in their entirety. If you do not agree, do not use this platform. These Terms apply to all visitors, registered users, licensed clinicians, and wholesale account holders."
+    },
+    {
+      "title": "2. Nature of Products & Research Use",
+      "text": "All peptides, biologics, and related compounds offered through Peptide Pure LLC are intended solely for legitimate research, observational study, and clinical use by licensed healthcare professionals. Products are NOT approved by the U.S. Food and Drug Administration (FDA) for human consumption, diagnosis, treatment, cure, or prevention of any disease or condition.",
       "items": [
-        "You are at least 18 years of age or the legal age of majority in your jurisdiction.",
-        "You are using this site for lawful purposes only.",
-        "You are not misrepresenting your identity or intent."
+        "Peptide Pure makes no therapeutic claims.",
+        "Products must not be used by consumers for personal self-administration without the supervision of a licensed medical provider."
       ]
     },
     {
-      "title": "2. Permitted Use",
-      "text": "You may use this website solely for personal or business purposes related to purchasing or learning about our products. You agree not to:",
+      "title": "3. Eligible Users & Credentialing",
+      "text": "Access to wholesale pricing and product ordering is restricted to:",
       "items": [
-        "Use the website for any fraudulent or illegal activity",
-        "Attempt to gain unauthorized access to the website or its servers",
-        "Copy, modify, distribute, or reverse-engineer any part of the website or its content"
+        "Licensed physicians, physician assistants, nurse practitioners, naturopathic doctors, and other duly licensed healthcare providers in their state of practice.",
+        "IRB-approved research sites operating under a valid observational protocol.",
+        "Authorized clinic administrators acting on behalf of a licensed provider."
+      ],
+      "extra": "Peptide Pure reserves the right to verify credentials, NPI numbers, and state licensure at any time and to deny or revoke access without notice."
+    },
+    {
+      "title": "4. IRB Participation & Compliance",
+      "text": "Clinicians who enroll in the Mortensen Medical Research Network agree to:",
+      "items": [
+        "Enroll patients under current IRB-approved informed consent.",
+        "Follow protocol MMRN-001-2025 data collection and adverse event reporting requirements.",
+        "Submit required data electronically within 14 days of each patient visit.",
+        "Accept oversight by the Institute of Regenerative and Cellular Medicine (IRCM) central IRB."
+      ],
+      "extra": "IRB participation is voluntary. Enrollment does not create an employment or agency relationship with Peptide Pure LLC or Mortensen Medical."
+    },
+    {
+      "title": "5. Orders, Pricing & Payment",
+      "text": "All prices are subject to change without notice. Orders are not binding until confirmed by Peptide Pure in writing. We reserve the right to cancel any order for any reason, including but not limited to supply constraints, compliance concerns, or suspected misuse.",
+      "items": [
+        "Payment must be received in cleared funds prior to shipment.",
+        "Peptide Pure does not guarantee availability of any product."
       ]
     },
     {
-      "title": "3. User Accounts",
-      "text": "If you create an account with us:",
+      "title": "6. Shipping, Import & Customs",
+      "text": "Buyer assumes all risk for import compliance, customs clearance, and applicable local regulations upon shipment. Peptide Pure is not liable for delays, seizures, or losses caused by customs authorities.",
+      "extra": "International and domestic regulatory requirements are the sole responsibility of the ordering provider or institution."
+    },
+    {
+      "title": "7. No Warranty; Limitation of Liability",
+      "text": "PRODUCTS ARE PROVIDED \"AS IS\" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.",
       "items": [
-        "You are responsible for maintaining the confidentiality of your login credentials",
-        "You must notify us immediately if you suspect any unauthorized use of your account",
-        "You agree to provide accurate and current information"
+        "To the maximum extent permitted by law, Peptide Pure LLC, its officers, directors, employees, and affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from use of products or this platform.",
+        "Total liability shall not exceed the amount paid for the specific order giving rise to the claim."
       ]
     },
     {
-      "title": "4. Product Use",
-      "text": "All products sold on this site are strictly intended for research, laboratory, or educational use only. They are not for human or veterinary use, and must not be used for diagnostic, therapeutic, or consumption purposes.",
-      "extra": "We reserve the right to refuse or cancel orders if we suspect misuse or violation of our product use policy."
-    },
-    {
-      "title": "5. Intellectual Property",
-      "text": "All content on this website, including logos, text, images, graphics, and software, is the property of Peptide Pure or its licensors and is protected by intellectual property laws. You may not reuse or reproduce any part of this website without prior written permission."
-    },
-    {
-      "title": "6. Disclaimers",
+      "title": "8. Indemnification",
+      "text": "User agrees to indemnify, defend, and hold harmless Peptide Pure LLC, Mortensen Medical, and their respective officers, employees, agents, and affiliates from and against any and all claims, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising from:",
       "items": [
-        "The website and its contents are provided \"as is\" and \"as available.\"",
-        "We make no warranties, express or implied, regarding the accuracy, completeness, or reliability of any information or content.",
-        "Use of our website is at your own risk."
+        "User's misuse of products.",
+        "User's violation of these Terms.",
+        "User's violation of any applicable law or third-party right.",
+        "Adverse patient outcomes arising from clinical decisions made by User."
       ]
     },
     {
-      "title": "7. Limitation of Liability",
-      "text": "Peptide Pure is not liable for any damages, direct or indirect, arising from:",
+      "title": "9. Privacy & Data Use",
+      "text": "Peptide Pure collects and processes account information, credentialing data, and order history for business operations and compliance purposes.",
       "items": [
-        "The use or inability to use the website",
-        "Errors or omissions in content",
-        "Unauthorized access to your account"
+        "Clinicians participating in observational registry protocols consent to de-identified data aggregation for research purposes in accordance with the applicable IRB protocol.",
+        "No patient-identifiable data is transmitted to Peptide Pure without express consent.",
+        "Use of the onzen.health data capture platform is subject to a separate Data Use Agreement."
       ]
     },
     {
-      "title": "8. Third-Party Links",
-      "text": "Our website may contain links to third-party websites. We are not responsible for the content, policies, or practices of those websites and encourage you to read their terms before interacting with them."
+      "title": "10. Intellectual Property",
+      "text": "All content on peptidepure.com, including text, images, product descriptions, protocols, and proprietary blends, is owned by or licensed to Peptide Pure LLC. Unauthorized reproduction, redistribution, or commercial use is prohibited without written consent."
     },
     {
-      "title": "9. Changes to Terms",
-      "text": "We may revise these Terms of Use at any time. Updated terms will be posted on this page, and your continued use of the site constitutes acceptance of those changes."
+      "title": "11. Termination",
+      "text": "Peptide Pure reserves the right to suspend or terminate any account at its sole discretion, without notice, for violation of these Terms, regulatory concerns, or business reasons. Upon termination, all outstanding obligations survive."
+    },
+    {
+      "title": "12. Governing Law & Dispute Resolution",
+      "text": "These Terms are governed by the laws of the State of California, without regard to conflict of law principles. Any dispute shall be resolved by binding arbitration in Ventura County, California, under JAMS rules, except that either party may seek injunctive relief in a court of competent jurisdiction.",
+      "extra": "Class action waiver: User waives any right to participate in class action litigation."
+    },
+    {
+      "title": "13. Modifications",
+      "text": "Peptide Pure reserves the right to update these Terms at any time. Continued use of the platform after notice of changes constitutes acceptance of the revised Terms. It is User's responsibility to review Terms periodically."
+    },
+    {
+      "title": "14. Contact",
+      "text": "Peptide Pure LLC | 101 Hodencamp Rd, Suite 103, Thousand Oaks, CA 91360",
+      "items": [
+        "Email: dr.elaine@peptidepure.com",
+        "Website: www.peptidepure.com"
+      ]
     }
   ]
 }

@@ -76,84 +76,39 @@ export default function SolutionSection({ content }: { content: any }) {
           ))}
         </div>
 
-        {/* Pricing table (left) + Market stats (right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-
-          {/* Pricing card */}
-          <div className="rounded-2xl overflow-hidden shadow-xl" style={{ background: 'var(--navy)' }}>
-            {/* Card header bar */}
-            <div
-              className="px-6 py-4 flex items-center gap-3"
-              style={{ background: 'rgba(200,149,44,0.12)', borderBottom: '1px solid rgba(200,149,44,0.18)' }}
-            >
-              <div style={{ width: '0.3rem', height: '1.2rem', borderRadius: '9999px', background: 'var(--gold)', flexShrink: 0 }} />
-              <span className="text-xs font-bold tracking-[0.15em] uppercase" style={{ color: 'var(--gold)' }}>
-                {content.pricing.label}
-              </span>
-            </div>
-            <table className="w-full">
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                  <th className="text-left px-5 py-3.5 text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.4)' }}>{content.pricing.columns.protocol}</th>
-                  <th className="px-3 py-3.5 text-xs font-bold" style={{ color: 'var(--gold)' }}>{content.pricing.columns.pp}</th>
-                  <th className="px-3 py-3.5 text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.3)' }}>{content.pricing.columns.gray}</th>
-                  <th className="px-3 py-3.5 text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.3)' }}>{content.pricing.columns.retail}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {content.pricing.rows.map((row: { protocol: string; pp: string; gray: string; retail: string }, i: number) => (
-                  <tr
-                    key={i}
-                    style={{
-                      borderTop: '1px solid rgba(255,255,255,0.05)',
-                      background: i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'transparent',
-                    }}
-                  >
-                    <td className="px-5 py-3.5 text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>{row.protocol}</td>
-                    <td className="px-3 py-3.5 text-xs text-center font-bold" style={{ color: 'var(--gold)' }}>{row.pp}</td>
-                    <td className="px-3 py-3.5 text-xs text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>{row.gray}</td>
-                    <td className="px-3 py-3.5 text-xs text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>{row.retail}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Market stats */}
-          <div>
-            <span className="section-label block mb-8">{content.relevanceStats.sectionLabel}</span>
-            <div>
-              {content.relevanceStats.items.map((item: { stat: string; label: string; desc: string }, i: number) => (
-                <div
-                  key={i}
-                  className="flex gap-5 items-start py-6"
-                  style={{ borderTop: '1px solid rgba(11,31,58,0.1)' }}
-                >
-                  <div className="shrink-0" style={{ minWidth: '6rem' }}>
-                    <div
-                      className="font-black leading-none"
-                      style={{ fontSize: 'clamp(1.9rem, 3.2vw, 2.6rem)', color: 'var(--navy)', letterSpacing: '-0.03em' }}
-                    >
-                      {item.stat}
-                    </div>
-                    <div className="text-xs font-semibold mt-1 uppercase tracking-wider" style={{ color: 'var(--gold)' }}>
-                      {item.label}
-                    </div>
-                  </div>
-                  {/* Vertical divider */}
+        {/* Market stats — full width */}
+        <div>
+          <span className="section-label block mb-8">{content.relevanceStats.sectionLabel}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16">
+            {content.relevanceStats.items.map((item: { stat: string; label: string; desc: string }, i: number) => (
+              <div
+                key={i}
+                className="flex gap-5 items-start py-6"
+                style={{ borderTop: '1px solid rgba(11,31,58,0.1)' }}
+              >
+                <div className="shrink-0" style={{ minWidth: '6rem' }}>
                   <div
-                    className="shrink-0 self-stretch"
-                    style={{ width: '1px', background: 'rgba(200,149,44,0.35)', borderRadius: '9999px' }}
-                  />
-                  <p className="text-sm leading-relaxed pt-0.5" style={{ color: 'var(--text-mid)' }}>
-                    {item.desc}
-                  </p>
+                    className="font-black leading-none"
+                    style={{ fontSize: 'clamp(1.9rem, 3.2vw, 2.6rem)', color: 'var(--navy)', letterSpacing: '-0.03em' }}
+                  >
+                    {item.stat}
+                  </div>
+                  <div className="text-xs font-semibold mt-1 uppercase tracking-wider" style={{ color: 'var(--gold)' }}>
+                    {item.label}
+                  </div>
                 </div>
-              ))}
-              <div style={{ borderTop: '1px solid rgba(11,31,58,0.1)' }} />
-            </div>
+                {/* Vertical divider */}
+                <div
+                  className="shrink-0 self-stretch"
+                  style={{ width: '1px', background: 'rgba(200,149,44,0.35)', borderRadius: '9999px' }}
+                />
+                <p className="text-sm leading-relaxed pt-0.5" style={{ color: 'var(--text-mid)' }}>
+                  {item.desc}
+                </p>
+              </div>
+            ))}
           </div>
-
+          <div style={{ borderTop: '1px solid rgba(11,31,58,0.1)' }} />
         </div>
       </div>
     </section>
