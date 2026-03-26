@@ -213,11 +213,9 @@ export default function ProductGrid({
                             <span className="text-base font-bold" style={{ color: 'var(--gold)' }}>
                               {formatCents(product.price_cents)}
                             </span>
-                            {meta?.patient_price_cents && (
-                              <span className="text-[10px]" style={{ color: 'var(--text-light)' }}>
-                                Patient: {formatCents(meta.patient_price_cents)}
-                              </span>
-                            )}
+                            <span className="text-[10px]" style={{ color: 'var(--text-light)' }}>
+                              Retail: {formatCents((meta?.patient_price_cents as number | null) ?? product.price_cents * 2)}
+                            </span>
                           </div>
                         )}
                         {meta?.volume_pricing && (
