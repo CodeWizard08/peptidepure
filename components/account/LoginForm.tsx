@@ -35,7 +35,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="rounded-3xl p-8 md:p-10 relative" style={{ background: 'white', border: '1px solid rgba(11,31,58,0.08)', boxShadow: '0 8px 40px rgba(11,31,58,0.07)' }}>
+    <div className="rounded-3xl p-8 md:p-10 relative overflow-hidden" style={{ background: 'white', border: '1px solid rgba(11,31,58,0.08)', boxShadow: '0 8px 40px rgba(11,31,58,0.07)' }}>
       <div className="absolute left-0 right-0 top-0 h-1 rounded-t-3xl" style={{ background: 'linear-gradient(to right, var(--gold), var(--gold-light), var(--gold))' }} />
 
       <div className="mb-8">
