@@ -143,21 +143,22 @@ export function useFormSubmit(formType: string) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
     setSubmitting(true);
     setError('');
 
-    const fd = new FormData(e.currentTarget);
-    const data: Record<string, unknown> = {};
-    fd.forEach((value, key) => {
-      if (data[key]) {
-        const existing = data[key];
-        data[key] = Array.isArray(existing) ? [...existing, value] : [existing, value];
-      } else {
-        data[key] = value;
-      }
-    });
-
     try {
+      const fd = new FormData(form);
+      const data: Record<string, unknown> = {};
+      fd.forEach((value, key) => {
+        if (data[key]) {
+          const existing = data[key];
+          data[key] = Array.isArray(existing) ? [...existing, value] : [existing, value];
+        } else {
+          data[key] = value;
+        }
+      });
+
       const res = await fetch('/api/forms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

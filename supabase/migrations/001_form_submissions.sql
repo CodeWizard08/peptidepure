@@ -3,7 +3,7 @@
 
 create table if not exists form_submissions (
   id uuid default gen_random_uuid() primary key,
-  form_type text not null check (form_type in ('baseline', 'treatment-log', 'ae-sae-report', 'contact')),
+  form_type text not null check (form_type in ('baseline', 'treatment-log', 'ae-sae-report', 'outcomes', 'contact')),
   data jsonb not null default '{}',
   submitted_by uuid references auth.users(id),
   provider_email text,
