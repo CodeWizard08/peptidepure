@@ -14,6 +14,7 @@
   "filterLabel": "Filter by Peptide",
   "sortLabel": "Sort by Date",
   "records": [
+    { "compound": "Vanguard Laboratory — BPC-157/TB-500, CJC-1295/Ipamorelin, Retatrutide, Tirzepatide, TB-500, MOTS-C, Melanotan, PT-141, NAD+, ARA-290", "peptide": "Vanguard Laboratory", "lab": "Vanguard Laboratory", "purity": ">99%", "batch": "V260112-13 001–011", "date": "2026-01-29", "pdf": "/coa/V260112-Vanguard.pdf" },
     { "compound": "Krause Analytical — MOTS-c, Melanotan II, NAD+ & PT-141", "peptide": "Krause Analytical", "lab": "Krause Analytical", "purity": ">99%", "batch": "131767–131770", "date": "2026-01-20", "pdf": "/coa/Krause 01202026.pdf" },
     { "compound": "Freedom Diagnostics — AOD-9604, TIRZ & NAD+", "peptide": "Freedom Diagnostics", "lab": "Freedom Diagnostics", "purity": ">99%", "batch": "FD-2601140248", "date": "2026-01-14", "pdf": "/coa/Freedom 012126.pdf" },
     { "compound": "Freedom Diagnostics — AOD-9604", "peptide": "Freedom Diagnostics", "lab": "Freedom Diagnostics", "purity": "99.525%", "batch": "AOD-2602090001", "date": "2026-02-09", "pdf": "/coa/AOD2602090001.pdf" },
@@ -22,6 +23,17 @@
     { "compound": "MZ BioLabs — Multi-Compound Panel", "peptide": "MZ BioLabs", "lab": "MZ BioLabs", "purity": "99.97%", "batch": "25-1117", "date": "2025-12-12", "pdf": "/coa/MZBIOLABS.pdf" }
   ],
   "summaryChart": [
+    { "compound": "BPC-157/TB-500 10mg/10mg", "date": "2026-01-29", "purity": 99.50 },
+    { "compound": "CJC-1295/Ipamorelin 5mg/5mg", "date": "2026-01-29", "purity": 99.50 },
+    { "compound": "Retatrutide 30mg", "date": "2026-01-29", "purity": 99.80 },
+    { "compound": "Tirzepatide 30mg", "date": "2026-01-29", "purity": 99.80 },
+    { "compound": "Retatrutide 20mg", "date": "2026-01-29", "purity": 99.80 },
+    { "compound": "TB-500 10mg", "date": "2026-01-29", "purity": 99.19 },
+    { "compound": "MOTS-C 10mg", "date": "2026-01-29", "purity": 99.02 },
+    { "compound": "Melanotan 10mg", "date": "2026-01-29", "purity": 99.67 },
+    { "compound": "PT-141 10mg", "date": "2026-01-29", "purity": 99.49 },
+    { "compound": "NAD+ 1000mg", "date": "2026-01-29", "purity": 98.71 },
+    { "compound": "ARA-290 10mg", "date": "2026-01-29", "purity": 99.04 },
     { "compound": "MOTS-c 10mg", "date": "2026-01-20", "purity": 99.950 },
     { "compound": "Melanotan II 10mg", "date": "2026-01-20", "purity": 99.710 },
     { "compound": "NAD+ 1000mg", "date": "2026-01-20", "purity": 99.930 },
