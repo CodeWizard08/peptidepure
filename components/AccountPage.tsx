@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import Dashboard from '@/components/account/Dashboard';
@@ -12,6 +12,8 @@ import RegisterForm from '@/components/account/RegisterForm';
 export default function AccountPage() {
   const supabase = createClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const authError = searchParams.get('error');
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
@@ -64,6 +66,11 @@ export default function AccountPage() {
         </div>
 
         <div className="flex-1 container-xl pb-20">
+          {authError === 'auth_callback_failed' && (
+            <div className="mb-6 px-4 py-3 rounded-xl text-sm" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)', color: '#DC2626' }}>
+              This link has expired or is invalid. Please request a new password reset link.
+            </div>
+          )}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             <LoginForm />
             <RegisterForm />

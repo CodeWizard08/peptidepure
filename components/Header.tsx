@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useCart } from '@/contexts/CartContext';
@@ -11,6 +11,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [formsOpen, setFormsOpen] = useState(false);
+  const formsCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mobileFormsOpen, setMobileFormsOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -135,8 +136,13 @@ export default function Header() {
               {user && (
                 <div
                   className="relative"
-                  onMouseEnter={() => setFormsOpen(true)}
-                  onMouseLeave={() => setFormsOpen(false)}
+                  onMouseEnter={() => {
+                    if (formsCloseTimer.current) clearTimeout(formsCloseTimer.current);
+                    setFormsOpen(true);
+                  }}
+                  onMouseLeave={() => {
+                    formsCloseTimer.current = setTimeout(() => setFormsOpen(false), 150);
+                  }}
                 >
                   <button
                     className={`px-3.5 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center gap-1 ${
