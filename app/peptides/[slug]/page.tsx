@@ -58,7 +58,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     return true;
   }).slice(0, 4);
 
-  const catConfig = CATEGORY_CONFIG[product.category] ?? { color: 'var(--navy)', label: product.category };
+  const rawCatConfig = CATEGORY_CONFIG[product.category] ?? { color: 'var(--navy)', subtitle: product.category };
+  const catConfig = { ...rawCatConfig, label: rawCatConfig.label ?? product.category };
   const meta = product.metadata ?? {};
 
   return <ProductDetailBody product={product} baseName={baseName} variants={variants} catConfig={catConfig} meta={meta} slug={slug} dedupedRelated={dedupedRelated} />;

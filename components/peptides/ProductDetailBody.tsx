@@ -9,11 +9,11 @@ import type { ProductRow } from '@/lib/peptideConfig';
 interface Props {
   product: ProductRow;
   baseName: string;
-  variants: { id: string; name: string; slug: string; price_cents: number; sku?: string | null; metadata?: Record<string, unknown> | null }[];
-  catConfig: { color: string; label?: string };
+  variants: { id: string; name: string; slug: string; price_cents: number; sku: string | null; metadata: Record<string, unknown> | null }[];
+  catConfig: { color: string; label: string };
   meta: Record<string, unknown>;
   slug: string;
-  dedupedRelated: { id: string; name: string; slug: string; description?: string | null; image_url?: string | null; category: string; metadata?: Record<string, unknown> | null }[];
+  dedupedRelated: { id: string; name: string; slug: string; description: string | null; image_url: string | null; category: string; metadata?: Record<string, unknown> | null }[];
 }
 
 export default function ProductDetailBody({ product, baseName, variants, catConfig, meta, slug, dedupedRelated }: Props) {
