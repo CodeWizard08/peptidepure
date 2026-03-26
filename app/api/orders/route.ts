@@ -151,6 +151,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
   }
 
+  // Decrement stock (same as checkout route)
+  for (const item of body.items) {
+    await supabase.rpc('decrement_stock', {
+      p_product_id: item.productId,
+      p_quantity: item.quantity,
+    });
+  }
+
   // Send emails (fire and forget — don't block the response)
   const emailData = {
     id: order.id,

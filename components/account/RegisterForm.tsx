@@ -33,6 +33,15 @@ export default function RegisterForm() {
     if (!regName.trim() || !regClinic.trim() || !regNpi.trim() || !regCredential) {
       setRegError('Please fill in all required fields.'); setRegLoading(false); return;
     }
+    if (regPassword.length < 8) {
+      setRegError('Password must be at least 8 characters.'); setRegLoading(false); return;
+    }
+    if (!/^\d{10}$/.test(regNpi.trim())) {
+      setRegError('NPI Number must be exactly 10 digits.'); setRegLoading(false); return;
+    }
+    if (regFile && regFile.size > 10 * 1024 * 1024) {
+      setRegError('License file must be under 10 MB.'); setRegLoading(false); return;
+    }
     const { data, error } = await supabase.auth.signUp({
       email: regEmail, password: regPassword,
       options: { data: { full_name: regName, clinic: regClinic, phone: regPhone, npi_number: regNpi, credential: regCredential } },

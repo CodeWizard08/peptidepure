@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 import { getContent } from '@/lib/content';
 import InventoryTable from '@/components/InventoryTable';
 
@@ -24,6 +26,10 @@ export const metadata: Metadata = {
 };
 
 export default async function InventoryPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/account');
+
   const data = await getContent('inventory') as InventoryData;
   const { lastUpdated, inventory } = data;
 

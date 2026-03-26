@@ -132,6 +132,10 @@ export default function CheckoutPage() {
       setError('Please fill in all required shipping fields.');
       return;
     }
+    if (!/^\d{5}(-\d{4})?$/.test(zip.trim())) {
+      setError('Please enter a valid ZIP code (e.g. 90210 or 90210-1234).');
+      return;
+    }
 
     if (cartTotal < MIN_ORDER_CENTS) {
       setError('Minimum order is $1,000. For smaller orders, please email info@peptidepure.com.');
@@ -164,8 +168,16 @@ export default function CheckoutPage() {
 
       const rawCard = cardNumber.replace(/\s/g, '');
       const [expMonth, expYear] = expiry.split('/');
-      if (!rawCard || rawCard.length < 15 || !expMonth || !expYear || !cvv) {
+      if (!rawCard || rawCard.length < 15 || !expMonth || !expYear || cvv.length < 3) {
         setCardError('Please complete all card fields.');
+        return;
+      }
+      const monthNum = parseInt(expMonth, 10);
+      const fullYear = expYear.length === 2 ? 2000 + parseInt(expYear, 10) : parseInt(expYear, 10);
+      const now = new Date();
+      if (monthNum < 1 || monthNum > 12 || fullYear < now.getFullYear() ||
+          (fullYear === now.getFullYear() && monthNum < now.getMonth() + 1)) {
+        setCardError('Card expiry date is invalid or the card has expired.');
         return;
       }
 
