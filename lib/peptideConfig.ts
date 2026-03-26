@@ -1,4 +1,4 @@
-export const CATEGORY_CONFIG: Record<string, { color: string; label?: string; subtitle?: string }> = {
+export const CATEGORY_CONFIG: Record<string, { color: string; label?: string; subtitle: string }> = {
   'Metabolism/Weight Loss':         { color: '#C8952C', label: 'Metabolism/Weight Loss',         subtitle: 'Endocrine System' },
   'MSK/Tissue Repair':              { color: '#2563EB', label: 'MSK/Tissue Repair',              subtitle: 'Musculoskeletal System' },
   'Longevity & Mitochondrial':      { color: '#059669', label: 'Longevity & Mitochondrial',      subtitle: 'Cellular Aging, Neuroprotection, Energy Systems' },
