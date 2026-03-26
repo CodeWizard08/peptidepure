@@ -44,7 +44,7 @@ export default function ProductHero({
 }) {
   const inventory = (meta.inventory as string) ?? 'in_stock';
   const leadTimeDays = meta.lead_time_days as number | null;
-  const patientPrice = meta.patient_price_cents as number | null;
+  const patientPrice = (meta.patient_price_cents as number | null) ?? product.price_cents * 2;
   const volumePricing = meta.volume_pricing as Record<string, number> | null;
   const brand = (meta.brand as string) ?? 'peptidepure';
   const strength = meta.strength as string | undefined;
@@ -275,7 +275,7 @@ export default function ProductHero({
                   {strength && <SpecCell label="Strength" value={strength} />}
                   {amount && <SpecCell label="Volume / Qty" value={amount} />}
                   {form && <SpecCell label="Form" value={form} />}
-                  {patientPrice && <SpecCell label="Suggested Patient Price" value={formatCents(patientPrice)} />}
+                  {product.price_cents > 0 && <SpecCell label="Suggested Retail Price" value={formatCents(patientPrice)} />}
                 </div>
               </div>
             )}
