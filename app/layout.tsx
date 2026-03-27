@@ -3,6 +3,7 @@ import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
+import ChatWidget from '@/components/ChatWidget';
 import { getContent } from '@/lib/content';
 
 export const viewport: Viewport = {
@@ -114,6 +115,7 @@ export default async function RootLayout({
           <Header />
           <main style={{ paddingTop: 'var(--nav-h)' }}>{children}</main>
           <Footer content={footerContent} />
+          <ChatWidget />
         </Providers>
       </body>
     </html>
