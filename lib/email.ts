@@ -10,8 +10,8 @@ function getResend(): Resend | null {
   return resend;
 }
 
-const FROM_EMAIL = process.env.FROM_EMAIL || 'PeptidePure <noreply@peptidepure.com>';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'orders@peptidepure.com';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'PeptidePure <info@peptidepure.com>';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'info@peptidepure.com';
 
 type EmailOptions = {
   to: string;
@@ -91,7 +91,7 @@ export function orderConfirmationHtml(order: {
         </p>
 
         <p style="font-size:12px;color:#9ca3af;margin-top:24px">
-          Questions? Reply to this email or contact us at support@peptidepure.com
+          Questions? Reply to this email or contact us at info@peptidepure.com
         </p>
       </div>
     </div>

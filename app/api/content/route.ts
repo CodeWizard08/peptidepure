@@ -5,6 +5,8 @@ import { isAuthenticated } from '@/lib/admin-auth';
 const VALID_PAGES = [
   'home', 'hero-slider', 'peptides', 'how-it-works',
   'our-company', 'coa', 'contact', 'footer',
+  'inventory', 'privacy', 'terms', 'shipping', 'refunds',
+  'accessibility', 'peptide-dosing-safety',
 ];
 
 export async function GET(request: NextRequest) {

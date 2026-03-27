@@ -180,12 +180,12 @@ CREATE TABLE IF NOT EXISTS public.form_submissions (
   updated_at     timestamptz DEFAULT now()
 );
 
--- Ensure the check constraint includes ALL five form types
+-- Ensure the check constraint includes ALL six form types
 ALTER TABLE public.form_submissions
   DROP CONSTRAINT IF EXISTS form_submissions_form_type_check;
 ALTER TABLE public.form_submissions
   ADD CONSTRAINT form_submissions_form_type_check
-  CHECK (form_type IN ('baseline', 'treatment-log', 'ae-sae-report', 'outcomes', 'contact'));
+  CHECK (form_type IN ('baseline', 'treatment-log', 'ae-sae-report', 'outcomes', 'contact', 'soap_capture'));
 
 CREATE INDEX IF NOT EXISTS idx_form_submissions_type ON form_submissions(form_type);
 CREATE INDEX IF NOT EXISTS idx_form_submissions_user ON form_submissions(submitted_by);

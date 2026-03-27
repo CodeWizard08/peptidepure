@@ -52,7 +52,7 @@ export default function RegisterForm() {
     if (regFile && data.user) {
       const fileExt = regFile.name.split('.').pop();
       const { error: uploadError } = await supabase.storage.from('licenses').upload(`${data.user.id}/license.${fileExt}`, regFile, { cacheControl: '3600', upsert: true });
-      if (uploadError) warnings.push('License document could not be uploaded — please email it to support@peptidepure.com.');
+      if (uploadError) warnings.push('License document could not be uploaded — please email it to info@peptidepure.com.');
     }
     if (regSignature && data.user) {
       try {

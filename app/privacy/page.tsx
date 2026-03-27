@@ -29,6 +29,13 @@ export default async function PrivacyPage() {
 
       <section className="py-16">
         <div className="container-xl max-w-3xl">
+          {/* Effective date */}
+          {content.effectiveDate && (
+            <p className="text-xs font-semibold uppercase tracking-widest mb-6" style={{ color: 'var(--gold)' }}>
+              {content.effectiveDate}
+            </p>
+          )}
+
           {/* Intro */}
           <p className="text-base leading-relaxed mb-10" style={{ color: 'var(--text-mid)' }}>
             {content.intro}
