@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -125,7 +126,7 @@ export default function Header() {
           <div className="flex items-center justify-between" style={{ height: '64px' }}>
             {/* Logo */}
             <Link href="/" className="flex items-center shrink-0">
-              <img src="/logo.webp" alt="PeptidePure™" className="h-8 md:h-9 w-auto" />
+              <Image src="/logo.webp" alt="PeptidePure™" width={140} height={36} priority style={{ height: '36px', width: 'auto' }} />
             </Link>
 
             {/* Desktop Nav */}

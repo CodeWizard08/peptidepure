@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function ProtocolsSection({ content }: { content: any }) {
   return (
@@ -20,10 +21,12 @@ export default function ProtocolsSection({ content }: { content: any }) {
             {/* Image */}
             <div className="h-48 flex items-center justify-center relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0B1F3A, #1a3a6b)' }}>
               {protocol.image ? (
-                <img
+                <Image
                   src={protocol.image}
                   alt={protocol.name}
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover"
                 />
               ) : (
                 <>

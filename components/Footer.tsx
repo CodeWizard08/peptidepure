@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface FooterContent {
   brandDescription: string;
@@ -40,7 +41,7 @@ export default function Footer({ content }: { content: FooterContent }) {
           <div className="col-span-12 md:col-span-4 lg:col-span-4 flex flex-col gap-4">
             {/* Logo */}
             <Link href="/" className="flex items-center w-fit">
-              <img src="/logo.webp" alt="PeptidePure™" style={{ height: '34px', width: 'auto' }} />
+              <Image src="/logo.webp" alt="PeptidePure™" width={140} height={34} style={{ height: '34px', width: 'auto' }} />
             </Link>
 
             <p className="text-sm text-gray-400 leading-relaxed max-w-xs">

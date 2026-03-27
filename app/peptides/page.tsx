@@ -12,7 +12,11 @@ export const metadata: Metadata = {
   title: 'Peptide Catalog',
   description: 'Browse our full catalog of USA cGMP-compliant peptides. BPC-157, TB-500, TIRZ, and more — available exclusively to licensed clinicians.',
   alternates: { canonical: '/peptides' },
-  openGraph: { title: 'Peptide Catalog — PeptidePure™', description: 'Browse USA cGMP-compliant peptides: BPC-157, TB-500, TIRZ, and more. Exclusively for licensed clinicians.' },
+  openGraph: {
+    title: 'Peptide Catalog — PeptidePure™',
+    description: 'Browse USA cGMP-compliant peptides: BPC-157, TB-500, TIRZ, and more. Exclusively for licensed clinicians.',
+    images: [{ url: 'https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2025/05/product-line-up.webp', width: 1200, height: 630 }],
+  },
 };
 
 export default async function PeptidesPage({

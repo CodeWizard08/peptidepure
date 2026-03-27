@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatCents } from '@/lib/format';
 
 type Product = {
@@ -141,10 +142,12 @@ export default function ProductGrid({
                   {/* Image / header area */}
                   <div className="h-40 flex items-center justify-center relative" style={{ background: 'linear-gradient(135deg, #0B1F3A, #1a3a6b)' }}>
                     {product.image_url ? (
-                      <img
+                      <Image
                         src={product.image_url}
                         alt={product.name}
-                        className="h-full w-full object-cover"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover"
                       />
                     ) : (
                       <div className="flex flex-col items-center gap-2 relative z-10">
