@@ -39,7 +39,7 @@ function NotesInput({ initial, onSave, disabled }: { initial: string; onSave: (v
   );
 }
 
-export default function AdminOrdersPanel() {
+export default function AdminOrdersPanel({ embedded = false }: { embedded?: boolean }) {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<Order[]>([]);
   const [total, setTotal] = useState(0);
@@ -83,19 +83,27 @@ export default function AdminOrdersPanel() {
   const totalPages = Math.ceil(total / 20);
 
   return (
-    <div style={{ background: 'var(--off-white)', minHeight: '100vh' }}>
-      <div className="py-8" style={{ background: 'var(--navy)' }}>
-        <div className="container-xl">
-          <div className="flex items-center gap-3 mb-2">
-            <Link href="/admin" className="text-xs font-semibold uppercase tracking-widest hover:underline" style={{ color: 'var(--gold)' }}>Admin</Link>
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>/</span>
-            <span className="text-xs font-semibold uppercase tracking-widest text-white">Orders</span>
+    <div style={{ background: 'var(--off-white)', minHeight: embedded ? undefined : '100vh' }}>
+      {!embedded && (
+        <div className="py-8" style={{ background: 'var(--navy)' }}>
+          <div className="container-xl">
+            <div className="flex items-center gap-3 mb-2">
+              <Link href="/admin" className="text-xs font-semibold uppercase tracking-widest hover:underline" style={{ color: 'var(--gold)' }}>Admin</Link>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>/</span>
+              <span className="text-xs font-semibold uppercase tracking-widest text-white">Orders</span>
+            </div>
+            <h1 className="text-2xl font-bold text-white">Order Management</h1>
+            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{total} total order{total !== 1 ? 's' : ''}</p>
           </div>
-          <h1 className="text-2xl font-bold text-white">Order Management</h1>
-          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{total} total order{total !== 1 ? 's' : ''}</p>
         </div>
-      </div>
-      <div className="container-xl py-6">
+      )}
+      {embedded && (
+        <div className="px-8 pt-8 pb-2">
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>Orders</h2>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-mid)' }}>{total} total order{total !== 1 ? 's' : ''}</p>
+        </div>
+      )}
+      <div className={embedded ? 'px-8 py-4' : 'container-xl py-6'}>
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <input
             type="text"
@@ -112,7 +120,7 @@ export default function AdminOrdersPanel() {
           ))}
         </div>
       </div>
-      <div className="container-xl pb-12">
+      <div className={embedded ? 'px-8 pb-12' : 'container-xl pb-12'}>
         {loading ? (
           <div className="py-20 flex justify-center"><div className="w-8 h-8 rounded-full animate-spin" style={{ border: '3px solid var(--border)', borderTopColor: 'var(--gold)' }} /></div>
         ) : filteredOrders.length === 0 ? (
