@@ -56,7 +56,7 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
   return (
     <section
       className="relative overflow-hidden select-none"
-      style={{ height: '100vh', minHeight: '640px', marginTop: '-64px' }}
+      style={{ height: '100vh', minHeight: '640px', marginTop: 'calc(-1 * var(--nav-h))' }}
     >
       {/* Background videos */}
       {slides.map((s, i) => (

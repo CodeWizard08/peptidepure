@@ -24,12 +24,20 @@ export default function Header() {
   const isHome = pathname === '/';
   const glass = isHome && !scrolled;
 
-  // Restore banner dismissed state from sessionStorage
+  // Restore banner dismissed state from sessionStorage and sync --nav-h immediately
   useEffect(() => {
-    if (sessionStorage.getItem('pp_banner_dismissed') === '1') {
+    const dismissed = sessionStorage.getItem('pp_banner_dismissed') === '1';
+    if (dismissed) {
       setBannerDismissed(true);
+      document.documentElement.style.setProperty('--nav-h', '64px');
     }
+    // if not dismissed, CSS default (100px) is already correct
   }, []);
+
+  // Keep --nav-h in sync whenever banner is dismissed mid-session
+  useEffect(() => {
+    document.documentElement.style.setProperty('--nav-h', showBanner ? '100px' : '64px');
+  }, [showBanner]);
 
   const dismissBanner = useCallback(() => {
     setBannerDismissed(true);
@@ -93,6 +101,7 @@ export default function Header() {
     { label: 'IRB — Treatment Log', href: '/forms/treatment-log' },
     { label: 'IRB — AE / SAE Report', href: '/forms/ae-sae-report' },
     { label: 'Patient Outcomes', href: '/forms/outcomes' },
+    { label: 'SOAP Data Capture', href: '/forms/soap-capture' },
   ];
 
   return (
@@ -261,7 +270,7 @@ export default function Header() {
                     }}
                   />
                   <span
-                    className="block h-0.5 rounded-full transition-all duration-300 my-[3px]"
+                    className="block h-0.5 rounded-full transition-all duration-300 my-0.75"
                     style={{
                       background: glass && !mobileOpen ? 'white' : '#374151',
                       opacity: mobileOpen ? 0 : 1,
@@ -385,7 +394,7 @@ export default function Header() {
                 <div
                   className="overflow-hidden transition-all duration-300"
                   style={{
-                    maxHeight: mobileFormsOpen ? '300px' : '0',
+                    maxHeight: mobileFormsOpen ? '400px' : '0',
                     opacity: mobileFormsOpen ? 1 : 0,
                   }}
                 >

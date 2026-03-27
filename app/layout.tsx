@@ -112,7 +112,7 @@ export default async function RootLayout({
         />
         <Providers>
           <Header />
-          <main style={{ paddingTop: '64px' }}>{children}</main>
+          <main style={{ paddingTop: 'var(--nav-h)' }}>{children}</main>
           <Footer content={footerContent} />
         </Providers>
       </body>
