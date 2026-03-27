@@ -13,18 +13,20 @@ type FormSubmission = {
 const FILTER_TABS = [
   { key: 'all', label: 'All' },
   { key: 'baseline', label: 'Baseline' },
-  { key: 'treatment_log', label: 'Treatment Log' },
-  { key: 'ae_sae', label: 'AE/SAE Report' },
+  { key: 'treatment-log', label: 'Treatment Log' },
+  { key: 'ae-sae-report', label: 'AE/SAE Report' },
   { key: 'outcomes', label: 'Outcomes' },
   { key: 'contact', label: 'Contact' },
+  { key: 'soap_capture', label: 'SOAP Capture' },
 ];
 
 const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
   baseline: { bg: '#DBEAFE', text: '#1E40AF' },
-  treatment_log: { bg: '#E0E7FF', text: '#3730A3' },
-  ae_sae: { bg: '#FEE2E2', text: '#991B1B' },
+  'treatment-log': { bg: '#E0E7FF', text: '#3730A3' },
+  'ae-sae-report': { bg: '#FEE2E2', text: '#991B1B' },
   outcomes: { bg: '#D1FAE5', text: '#065F46' },
   contact: { bg: '#FEF3C7', text: '#92400E' },
+  soap_capture: { bg: '#F3E8FF', text: '#6B21A8' },
 };
 
 const fmtDate = (iso: string) =>

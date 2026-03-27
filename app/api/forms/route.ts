@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { FormType } from '@/lib/types/form';
 import { sendAdminNotification, formSubmissionAdminHtml } from '@/lib/email';
 
-const VALID_FORM_TYPES: FormType[] = ['baseline', 'treatment-log', 'ae-sae-report', 'outcomes', 'contact'];
+const VALID_FORM_TYPES: FormType[] = ['baseline', 'treatment-log', 'ae-sae-report', 'outcomes', 'contact', 'soap_capture'];
 
 type FormBody = {
   formType: FormType;

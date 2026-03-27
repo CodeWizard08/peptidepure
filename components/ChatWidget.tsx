@@ -90,6 +90,10 @@ export default function ChatWidget() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setLoggedIn(!!data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setLoggedIn(!!session?.user);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
