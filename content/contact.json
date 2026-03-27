@@ -10,7 +10,9 @@
     "description": "Whether you need help with account setup, protocol questions, or ordering — our team of peptide specialists is ready to assist licensed clinicians.",
     "contactItems": [
       { "title": "Phone", "detail": "T: (858) 480-1017", "sub": "Mon–Fri: 9AM – 4PM PST" },
-      { "title": "Email", "detail": "info@peptidepure.com", "sub": "We respond within 1 business day" },
+      { "title": "General Inquiries", "detail": "info@peptidepure.com", "sub": "We respond within 1 business day" },
+      { "title": "Account & Onboarding", "detail": "pamela@peptidepure.com", "sub": "Pamela — Clinician Relations" },
+      { "title": "Clinical & Protocol Questions", "detail": "dr.elaine@peptidepure.com", "sub": "Dr. Elaine — Medical Director" },
       { "title": "Shipping Days", "detail": "Mon–Fri", "sub": "Except U.S. Holidays" }
     ],
     "accessNote": "PeptidePure™ is a clinician-only platform. To request account access, please provide your NPI number and professional credentials in the form."

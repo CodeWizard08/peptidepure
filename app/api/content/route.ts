@@ -6,7 +6,7 @@ const VALID_PAGES = [
   'home', 'hero-slider', 'peptides', 'how-it-works',
   'our-company', 'coa', 'contact', 'footer',
   'inventory', 'privacy', 'terms', 'shipping', 'refunds',
-  'accessibility', 'peptide-dosing-safety',
+  'accessibility', 'peptide-dosing-safety', 'how-to-get-started',
 ];
 
 export async function GET(request: NextRequest) {

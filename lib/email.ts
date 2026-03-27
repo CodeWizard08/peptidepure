@@ -118,6 +118,44 @@ export function newOrderAdminHtml(order: {
   `;
 }
 
+export function formConfirmationHtml(formType: string, providerName?: string): string {
+  const typeLabel = formType.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const name = providerName || 'Clinician';
+
+  const formMessages: Record<string, string> = {
+    contact: 'A member of our team will respond within one business day.',
+    baseline: 'Your IRB Baseline Assessment has been received and recorded in the Mortensen Medical Research Network registry.',
+    'treatment-log': 'Your IRB Treatment Log has been received and recorded.',
+    'ae-sae-report': 'Your AE/SAE Report has been received. Our medical team will review it promptly. For urgent adverse events, contact dr.elaine@peptidepure.com directly.',
+    outcomes: 'Your Patient Outcomes Report has been received and recorded.',
+    soap_capture: 'Your SOAP capture record has been saved to the database.',
+  };
+
+  const message = formMessages[formType] || 'Your form submission has been received.';
+
+  return `
+    <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px">
+      <div style="background:#0B1F3A;padding:24px;border-radius:12px 12px 0 0;text-align:center">
+        <h1 style="color:#fff;margin:0;font-size:20px">PeptidePure™</h1>
+        <p style="color:#C8952C;margin:4px 0 0;font-size:13px">Submission Confirmation</p>
+      </div>
+      <div style="background:#fff;padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
+        <p style="color:#0B1F3A;font-size:15px;font-weight:600">Thank you, ${name}.</p>
+        <p style="color:#6b7280;font-size:14px;margin:4px 0 16px">
+          We have received your <strong style="color:#0B1F3A">${typeLabel}</strong> submission.
+        </p>
+        <p style="color:#374151;font-size:14px;line-height:1.6">${message}</p>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0" />
+        <p style="font-size:12px;color:#9ca3af">
+          Questions? Contact us at
+          <a href="mailto:info@peptidepure.com" style="color:#C8952C">info@peptidepure.com</a>
+          or call (858) 480-1017, Mon–Fri 9AM–4PM PST.
+        </p>
+      </div>
+    </div>
+  `;
+}
+
 export function formSubmissionAdminHtml(formType: string, data: Record<string, unknown>): string {
   const entries = Object.entries(data)
     .map(([key, val]) => {

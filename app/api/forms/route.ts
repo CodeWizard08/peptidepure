@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { FormType } from '@/lib/types/form';
-import { sendAdminNotification, formSubmissionAdminHtml } from '@/lib/email';
+import { sendAdminNotification, sendEmail, formSubmissionAdminHtml, formConfirmationHtml } from '@/lib/email';
 
 const VALID_FORM_TYPES: FormType[] = ['baseline', 'treatment-log', 'ae-sae-report', 'outcomes', 'contact', 'soap_capture'];
 
@@ -70,6 +70,19 @@ export async function POST(request: Request) {
     `New ${typeLabel} Submission`,
     formSubmissionAdminHtml(body.formType, body.data)
   );
+
+  // Send confirmation to the submitting clinician (skip for SOAP internal capture)
+  if (providerEmail && body.formType !== 'soap_capture') {
+    const providerName =
+      (body.data.providerName as string) ||
+      (body.data.name as string) ||
+      undefined;
+    sendEmail({
+      to: providerEmail,
+      subject: `PeptidePure™ — ${typeLabel} Received`,
+      html: formConfirmationHtml(body.formType, providerName),
+    });
+  }
 
   return NextResponse.json(
     { id: submission.id, createdAt: submission.created_at },
