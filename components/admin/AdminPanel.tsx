@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import AdminDashboard from './AdminDashboard';
 import AdminOrdersPanel from './AdminOrdersPanel';
 import AdminProductsPanel from './AdminProductsPanel';
@@ -79,125 +80,15 @@ function HexLogo({ size = 24 }: { size?: number }) {
 }
 
 export default function AdminPanel() {
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null); // null = checking
-  const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState(false);
-  const [loginLoading, setLoginLoading] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
 
-  // Check auth on mount
-  useEffect(() => {
-    fetch('/api/admin/login')
-      .then((r) => r.json())
-      .then((d) => setAuthenticated(d.authenticated === true))
-      .catch(() => setAuthenticated(false));
-  }, []);
-
-  const handleLogin = async (e: { preventDefault(): void }) => {
-    e.preventDefault();
-    setLoginLoading(true);
-    setPasswordError(false);
-    try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      if (res.ok) {
-        setAuthenticated(true);
-        setPassword('');
-      } else {
-        setPasswordError(true);
-      }
-    } catch {
-      setPasswordError(true);
-    } finally {
-      setLoginLoading(false);
-    }
-  };
-
   const handleLogout = async () => {
-    try {
-      await fetch('/api/admin/logout', { method: 'POST' });
-    } finally {
-      setAuthenticated(false);
-      setActiveSection('dashboard');
-    }
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = '/account';
   };
 
-  // --- Loading spinner while checking auth ---
-  if (authenticated === null) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: 'var(--navy)', fontFamily: "'Inter', system-ui, sans-serif" }}
-      >
-        <div className="flex flex-col items-center gap-4">
-          <HexLogo size={36} />
-          <div
-            className="w-8 h-8 rounded-full animate-spin"
-            style={{ border: '3px solid rgba(200,149,44,0.3)', borderTopColor: 'var(--gold)' }}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // --- Login form ---
-  if (!authenticated) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: 'var(--navy)', fontFamily: "'Inter', system-ui, sans-serif" }}
-      >
-        <form
-          onSubmit={handleLogin}
-          className="w-full max-w-sm rounded-2xl p-8"
-          style={{ background: 'white' }}
-        >
-          <div className="flex items-center gap-2 mb-1 justify-center">
-            <HexLogo size={28} />
-            <span className="font-bold text-lg" style={{ color: 'var(--navy)' }}>
-              PeptidePure Admin
-            </span>
-          </div>
-          <p className="text-center text-xs mb-6" style={{ color: 'var(--text-light)' }}>
-            Enter password to continue
-          </p>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setPasswordError(false);
-            }}
-            placeholder="Password"
-            autoFocus
-            className="w-full px-4 py-3 rounded-lg text-sm focus:outline-none mb-3"
-            style={{
-              border: passwordError ? '1px solid #DC2626' : '1px solid var(--border)',
-              color: 'var(--text-dark)',
-            }}
-          />
-          {passwordError && (
-            <p className="text-xs mb-3" style={{ color: '#DC2626' }}>
-              Incorrect password. Please try again.
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={loginLoading}
-            className="w-full py-3 rounded-lg text-sm font-semibold text-white transition-all"
-            style={{ background: loginLoading ? 'var(--text-light)' : 'var(--gold)' }}
-          >
-            {loginLoading ? 'Signing in…' : 'Sign In'}
-          </button>
-        </form>
-      </div>
-    );
-  }
-
-  // --- Main authenticated layout ---
+  // --- Main layout ---
   return (
     <div
       className="flex min-h-screen"
