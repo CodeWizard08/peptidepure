@@ -94,6 +94,7 @@ export default function Header() {
     { label: 'Our Company', href: '/our-company' },
     { label: 'COA', href: '/coa' },
     { label: 'Inventory', href: '/inventory' },
+    { label: 'Getting Started', href: '/how-to-get-started' },
     { label: 'Contact Us', href: '/contact' },
   ];
 

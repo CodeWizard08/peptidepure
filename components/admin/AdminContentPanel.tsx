@@ -18,6 +18,7 @@ const PAGES = [
   { key: 'refunds', label: 'Refunds & Returns' },
   { key: 'accessibility', label: 'Accessibility' },
   { key: 'peptide-dosing-safety', label: 'Dosing & Safety' },
+  { key: 'how-to-get-started', label: 'Getting Started' },
 ];
 
 export default function AdminContentPanel() {

@@ -1,0 +1,105 @@
+{
+  "hero": {
+    "sectionLabel": "For Clinicians",
+    "heading": "How to Get Started",
+    "subtitle": "Everything you need to enroll your practice in the Mortensen Medical Research Network and begin contributing to observational peptide research."
+  },
+  "intro": "Joining PeptidePure™ as a credentialed clinician gives you access to wholesale peptide pricing, IRB-approved observational protocols, and the clinical data infrastructure of the Mortensen Medical Research Network (MMRN). Follow the steps below to get fully onboarded.",
+  "steps": [
+    {
+      "number": "01",
+      "title": "Create Your Clinician Account",
+      "text": "Register at peptidepure.com/account with your professional email. You will be asked to provide your NPI number, state license number, and credential type (MD, DO, PA-C, NP, ND, etc.).",
+      "items": [
+        "Upload a copy of your state medical license during registration.",
+        "Your application is reviewed within 1–2 business days.",
+        "Upon approval, you will receive a welcome email with your wholesale access credentials."
+      ]
+    },
+    {
+      "number": "02",
+      "title": "Review the IRB Protocol",
+      "text": "All clinicians who order through PeptidePure™ are invited (not required) to enroll in the IRB-approved Mortensen Medical Research Network observational registry under Protocol MMRN-001-2025.",
+      "items": [
+        "Download and review the full protocol document below.",
+        "The IRB is centrally managed by the Institute of Regenerative and Cellular Medicine (IRCM).",
+        "Participation is voluntary. Enrollment does not create an employment or agency relationship."
+      ]
+    },
+    {
+      "number": "03",
+      "title": "Obtain Patient Informed Consent",
+      "text": "Before enrolling any patient in the observational registry, you must obtain written informed consent using the MMRN-approved consent template. A sample consent form is available for download below.",
+      "items": [
+        "The consent form covers: purpose of the registry, data collected, voluntary nature, withdrawal rights, and HIPAA authorization.",
+        "Signed consent forms must be retained in the patient chart for a minimum of 7 years.",
+        "De-identified data only is submitted to the registry — no patient-identifiable information is transmitted to Peptide Pure LLC."
+      ]
+    },
+    {
+      "number": "04",
+      "title": "Set Up onzen.health Data Capture",
+      "text": "Participating clinicians use the onzen.health platform to capture structured treatment and outcome data. Your account will be provisioned after practice enrollment is confirmed.",
+      "items": [
+        "Log in at onzen.health with the credentials provided in your welcome email.",
+        "Complete the 30-minute onzen.health onboarding tutorial before entering patient data.",
+        "Data must be submitted within 14 days of each patient visit per MMRN-001-2025 protocol.",
+        "Contact dr.elaine@peptidepure.com with any protocol or data capture questions."
+      ]
+    },
+    {
+      "number": "05",
+      "title": "Place Your First Order",
+      "text": "Once your account is approved, you can browse wholesale inventory, add items to your cart, and check out. A $1,000 minimum order applies.",
+      "items": [
+        "All prices are displayed at clinician wholesale rates after login.",
+        "Orders ship Monday–Friday, excluding U.S. holidays.",
+        "Tracking information is emailed when your order ships.",
+        "For orders under $1,000, contact info@peptidepure.com for manual processing."
+      ]
+    },
+    {
+      "number": "06",
+      "title": "Submit Clinical Data & Track Outcomes",
+      "text": "Use the IRB forms in your account to submit baseline assessments, treatment logs, adverse event reports, and patient outcome reports.",
+      "items": [
+        "IRB — Baseline: Complete within 7 days of enrolling a patient.",
+        "IRB — Treatment Log: Submit after each treatment visit.",
+        "IRB — AE/SAE Report: Submit within 24 hours of any adverse event.",
+        "Patient Outcomes: Submit 90-day and 180-day follow-up reports."
+      ]
+    }
+  ],
+  "resources": {
+    "heading": "Downloads & Resources",
+    "items": [
+      {
+        "title": "MMRN-001-2025 Protocol Summary",
+        "description": "Overview of the observational registry design, data collection requirements, and adverse event reporting obligations.",
+        "href": "/docs/mmrn-001-2025-protocol-summary.pdf",
+        "label": "Download PDF"
+      },
+      {
+        "title": "Patient Informed Consent Template",
+        "description": "IRCM-approved consent form template for enrolling patients in the Mortensen Medical Research Network.",
+        "href": "/docs/mmrn-patient-consent-template.pdf",
+        "label": "Download PDF"
+      },
+      {
+        "title": "Data Capture Best Practices",
+        "description": "Step-by-step guide for completing each IRB form accurately and submitting data via onzen.health.",
+        "href": "/docs/data-capture-best-practices.pdf",
+        "label": "Download PDF"
+      }
+    ]
+  },
+  "support": {
+    "heading": "Need Help?",
+    "text": "Our clinical team is available Monday–Friday, 9AM–4PM PST.",
+    "contacts": [
+      { "name": "Pamela", "role": "Clinician Relations & Account Setup", "email": "pamela@peptidepure.com" },
+      { "name": "Dr. Elaine", "role": "Medical Director — Protocol & Clinical Questions", "email": "dr.elaine@peptidepure.com" },
+      { "name": "General Support", "role": "Orders, billing, and technical support", "email": "info@peptidepure.com" }
+    ]
+  }
+}
