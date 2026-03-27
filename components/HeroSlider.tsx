@@ -56,7 +56,7 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
   return (
     <section
       className="relative overflow-hidden select-none"
-      style={{ height: '100vh', minHeight: '640px', marginTop: 'calc(-1 * var(--nav-h))' }}
+      style={{ height: '100vh', minHeight: '640px', marginTop: 'calc(-1 * var(--nav-h))', background: 'var(--navy)' }}
     >
       {/* Background videos */}
       {slides.map((s, i) => (
@@ -67,7 +67,9 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
           muted
           loop
           playsInline
+          autoPlay={i === 0}
           preload={i === 0 ? 'auto' : 'none'}
+          poster={i === 0 ? s.image : undefined}
           className="absolute inset-0 w-full h-full object-cover"
           style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 1 : 0, transition: 'opacity 1s ease-in-out' }}
         />
