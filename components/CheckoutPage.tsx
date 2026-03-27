@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { createClient } from '@/lib/supabase/client';
 import { formatCents } from '@/lib/format';
@@ -504,9 +505,11 @@ export default function CheckoutPage() {
                             className="w-12 h-12 rounded-lg overflow-hidden shrink-0"
                             style={{ background: 'linear-gradient(135deg, #0B1F3A, #1a3a6b)' }}
                           >
-                            <img
+                            <Image
                               src={item.imageUrl || '/images/oral-peptides.png'}
                               alt={item.name}
+                              width={48}
+                              height={48}
                               className="w-full h-full object-cover"
                             />
                           </div>

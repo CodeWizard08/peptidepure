@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import AddToCartButton from '@/components/AddToCartButton';
 import { formatCents } from '@/lib/format';
 
@@ -104,10 +105,13 @@ export default function ProductHero({
                 style={{ background: 'linear-gradient(145deg, #0B1F3A 0%, #1a3a6b 60%, #243f6e 100%)' }}
               >
                 {product.image_url ? (
-                  <img
+                  <Image
                     src={product.image_url}
                     alt={baseName}
-                    className="h-full w-full object-cover"
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 42vw"
+                    className="object-cover"
                   />
                 ) : (
                   <div className="flex flex-col items-center gap-3">

@@ -1,10 +1,26 @@
 import type { Metadata, Viewport } from 'next';
+import { Cormorant_Garamond, Bricolage_Grotesque } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
 import ChatWidget from '@/components/ChatWidget';
 import { getContent } from '@/lib/content';
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-display',
+  display: 'swap',
+});
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-body',
+  display: 'swap',
+});
 
 export const viewport: Viewport = {
   themeColor: '#0B1F3A',
@@ -82,33 +98,48 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Bricolage+Grotesque:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>
+      <body className={`${cormorant.variable} ${bricolage.variable}`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'PeptidePure™',
-              url: 'https://peptidepure.com',
-              logo: 'https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2025/05/product-line-up.webp',
-              description:
-                'Clinician-only peptide sourcing platform. USA cGMP-compliant peptides with >99% purity.',
-              contactPoint: {
-                '@type': 'ContactPoint',
-                contactType: 'customer service',
+            __html: JSON.stringify([
+              {
+                '@context': 'https://schema.org',
+                '@type': 'Organization',
+                '@id': 'https://peptidepure.com/#organization',
+                name: 'PeptidePure™',
+                url: 'https://peptidepure.com',
+                logo: {
+                  '@type': 'ImageObject',
+                  url: 'https://peptidepure.com/logo.webp',
+                  width: 140,
+                  height: 36,
+                },
+                description: 'Clinician-only peptide sourcing platform. USA cGMP-compliant peptides with >99% purity.',
                 telephone: '+1-858-480-1017',
-                url: 'https://peptidepure.com/contact',
+                contactPoint: {
+                  '@type': 'ContactPoint',
+                  contactType: 'customer service',
+                  telephone: '+1-858-480-1017',
+                  url: 'https://peptidepure.com/contact',
+                  availableLanguage: 'English',
+                },
+                sameAs: [],
               },
-            }),
+              {
+                '@context': 'https://schema.org',
+                '@type': 'WebSite',
+                '@id': 'https://peptidepure.com/#website',
+                url: 'https://peptidepure.com',
+                name: 'PeptidePure™',
+                publisher: { '@id': 'https://peptidepure.com/#organization' },
+                potentialAction: {
+                  '@type': 'SearchAction',
+                  target: { '@type': 'EntryPoint', urlTemplate: 'https://peptidepure.com/peptides?q={search_term_string}' },
+                  'query-input': 'required name=search_term_string',
+                },
+              },
+            ]),
           }}
         />
         <Providers>

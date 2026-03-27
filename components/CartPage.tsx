@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { formatCents } from '@/lib/format';
 
@@ -55,9 +56,11 @@ export default function CartPage() {
                       className="w-20 h-20 rounded-xl overflow-hidden"
                       style={{ background: 'linear-gradient(135deg, #0B1F3A, #1a3a6b)' }}
                     >
-                      <img
+                      <Image
                         src={item.imageUrl || '/images/oral-peptides.png'}
                         alt={item.name}
+                        width={80}
+                        height={80}
                         className="w-full h-full object-cover"
                       />
                     </div>

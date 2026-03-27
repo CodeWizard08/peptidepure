@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 
 export default function ResetPasswordForm() {
@@ -37,7 +38,7 @@ export default function ResetPasswordForm() {
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--off-white)' }}>
       <div className="w-full max-w-md rounded-3xl p-8 md:p-10" style={{ background: 'white', border: '1px solid rgba(11,31,58,0.08)', boxShadow: '0 8px 40px rgba(11,31,58,0.07)' }}>
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex mb-6"><img src="/logo.webp" alt="PeptidePure™" style={{ height: '32px', width: 'auto' }} /></Link>
+          <Link href="/" className="inline-flex mb-6"><Image src="/logo.webp" alt="PeptidePure™" width={140} height={32} priority style={{ height: '32px', width: 'auto' }} /></Link>
           <h1 className="text-2xl font-black" style={{ color: 'var(--navy)', letterSpacing: '-0.02em' }}>Reset Password</h1>
           <p className="text-sm mt-1" style={{ color: 'var(--text-light)' }}>Enter your new password below.</p>
         </div>

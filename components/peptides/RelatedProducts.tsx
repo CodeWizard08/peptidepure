@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 type RelatedProduct = {
   id: string;
@@ -34,10 +35,12 @@ export default function RelatedProducts({ products }: { products: RelatedProduct
             style={{ border: '1px solid var(--border)' }}
           >
             <div className="h-44 flex items-center justify-center relative" style={{ background: 'linear-gradient(135deg, #0B1F3A, #1a3a6b)' }}>
-              <img
+              <Image
                 src={item.image_url || '/images/oral-peptides.png'}
                 alt={item.name}
-                className="h-full w-full object-cover"
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
             </div>

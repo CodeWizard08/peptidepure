@@ -67,6 +67,7 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
           muted
           loop
           playsInline
+          preload={i === 0 ? 'auto' : 'none'}
           className="absolute inset-0 w-full h-full object-cover"
           style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 1 : 0, transition: 'opacity 1s ease-in-out' }}
         />
