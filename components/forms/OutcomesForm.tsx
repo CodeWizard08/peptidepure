@@ -41,6 +41,11 @@ export default function OutcomesForm() {
                     </label>
                   ))}
                 </div>
+                {!reporterType && (
+                  <p className="text-xs mt-3 italic" style={{ color: 'var(--text-light)' }}>
+                    Select your role above to continue filling out the report.
+                  </p>
+                )}
               </div>
               {reporterType === 'provider' && (
                 <>

@@ -12,6 +12,12 @@ const PAGES = [
   { key: 'coa', label: 'COA' },
   { key: 'contact', label: 'Contact' },
   { key: 'footer', label: 'Footer' },
+  { key: 'privacy', label: 'Privacy Policy' },
+  { key: 'terms', label: 'Terms & Conditions' },
+  { key: 'shipping', label: 'Shipping & Payments' },
+  { key: 'refunds', label: 'Refunds & Returns' },
+  { key: 'accessibility', label: 'Accessibility' },
+  { key: 'peptide-dosing-safety', label: 'Dosing & Safety' },
 ];
 
 export default function AdminContentPanel() {

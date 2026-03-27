@@ -496,6 +496,7 @@ export default function SoapCaptureForm() {
   const [parseError, setParseError] = useState('');
   const [log, setLog] = useState<SessionRecord[]>([]);
   const [toast, setToast] = useState('');
+  const [saving, setSaving] = useState(false);
 
   // Scroll to results when they arrive
   useEffect(() => {
@@ -555,10 +556,23 @@ export default function SoapCaptureForm() {
     showToast('JSON exported');
   }
 
-  function handleSaveLog() {
+  async function handleSaveLog() {
     if (!result) return;
-    setLog((prev) => [...prev, buildRecord(result!, meta)]);
-    showToast('Record saved to session log');
+    const record = buildRecord(result, meta);
+    setLog((prev) => [...prev, record]);
+    setSaving(true);
+    try {
+      await fetch('/api/forms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formType: 'soap_capture', data: record }),
+      });
+      showToast('Record saved to database');
+    } catch {
+      showToast('Saved locally — database sync failed');
+    } finally {
+      setSaving(false);
+    }
   }
 
   const inputStyle = INPUT_BASE;
@@ -592,7 +606,7 @@ export default function SoapCaptureForm() {
                 Encounter Details
               </h2>
               <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                Stored in browser session only — not sent to any server.
+                Records are saved to the database when you click "Save to Log."
               </p>
             </div>
             <div className="px-6 md:px-8 py-6 space-y-4">
@@ -872,11 +886,12 @@ P: Continue current protocol. Added Tirzepatide 2.5mg/wk for metabolic optimizat
                   </button>
                   <button
                     onClick={handleSaveLog}
+                    disabled={saving}
                     className="text-sm font-semibold px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-colors"
-                    style={{ border: '1.5px solid var(--border-mid)', color: 'var(--text-dark)', background: 'transparent', cursor: 'pointer' }}
+                    style={{ border: '1.5px solid var(--border-mid)', color: 'var(--text-dark)', background: 'transparent', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                    Save to Log
+                    {saving ? 'Saving...' : 'Save to Log'}
                   </button>
                 </div>
               </div>
