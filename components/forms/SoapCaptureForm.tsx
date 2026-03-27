@@ -583,7 +583,7 @@ export default function SoapCaptureForm() {
       />
 
       <div className="py-10">
-        <div className="container-xl" style={{ maxWidth: '860px' }}>
+        <div className="container-xl">
 
           {/* ── Encounter Details ── */}
           <div className="bg-white rounded-2xl overflow-hidden mb-4" style={{ border: '1.5px solid var(--border)' }}>
