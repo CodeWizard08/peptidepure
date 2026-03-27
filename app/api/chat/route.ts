@@ -1,8 +1,8 @@
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const SYSTEM_PROMPT = `You are a clinical AI assistant for PeptidePure™, a clinician-only peptide sourcing and research platform. You help licensed clinicians with peptide compound information, reconstitution math, dosing protocols, injection techniques, storage, clinical pearls, and safety considerations.
 
@@ -299,11 +299,14 @@ export async function POST(req: NextRequest) {
   }
 
   // Stream the response
-  const stream = anthropic.messages.stream({
-    model: 'claude-sonnet-4-6',
+  const stream = await openai.chat.completions.create({
+    model: 'gpt-4o',
     max_tokens: 1024,
-    system: SYSTEM_PROMPT,
-    messages,
+    stream: true,
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      ...messages,
+    ],
   });
 
   const encoder = new TextEncoder();
@@ -311,11 +314,9 @@ export async function POST(req: NextRequest) {
     async start(controller) {
       try {
         for await (const chunk of stream) {
-          if (
-            chunk.type === 'content_block_delta' &&
-            chunk.delta.type === 'text_delta'
-          ) {
-            controller.enqueue(encoder.encode(chunk.delta.text));
+          const text = chunk.choices[0]?.delta?.content;
+          if (text) {
+            controller.enqueue(encoder.encode(text));
           }
         }
       } finally {
