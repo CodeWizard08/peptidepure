@@ -106,6 +106,7 @@ export default function ChatWidget() {
   async function sendMessage(text: string) {
     const userMsg = text.trim();
     if (!userMsg || streaming) return;
+    if (!loggedIn) return;
 
     setInput('');
     const newMessages: Message[] = [...messages, { role: 'user', content: userMsg }];
@@ -355,20 +356,34 @@ export default function ChatWidget() {
                 <p className="text-xs mb-6 max-w-xs" style={{ color: 'var(--text-light)' }}>
                   Ask me about peptide protocols, dosing, reconstitution, or clinical stacks.
                 </p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {SUGGESTIONS.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => sendMessage(s)}
-                      className="text-xs px-3.5 py-1.5 rounded-full border transition-all"
-                      style={{ borderColor: 'var(--border)', color: 'var(--navy)', background: 'white' }}
-                      onMouseEnter={(e) => { const b = e.currentTarget; b.style.background = 'var(--navy)'; b.style.color = 'white'; b.style.borderColor = 'var(--navy)'; }}
-                      onMouseLeave={(e) => { const b = e.currentTarget; b.style.background = 'white'; b.style.color = 'var(--navy)'; b.style.borderColor = 'var(--border)'; }}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
+                {loggedIn ? (
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {SUGGESTIONS.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => sendMessage(s)}
+                        className="text-xs px-3.5 py-1.5 rounded-full border transition-all"
+                        style={{ borderColor: 'var(--border)', color: 'var(--navy)', background: 'white' }}
+                        onMouseEnter={(e) => { const b = e.currentTarget; b.style.background = 'var(--navy)'; b.style.color = 'white'; b.style.borderColor = 'var(--navy)'; }}
+                        onMouseLeave={(e) => { const b = e.currentTarget; b.style.background = 'white'; b.style.color = 'var(--navy)'; b.style.borderColor = 'var(--border)'; }}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {SUGGESTIONS.map((s) => (
+                      <span
+                        key={s}
+                        className="text-xs px-3.5 py-1.5 rounded-full border"
+                        style={{ borderColor: 'var(--border)', color: 'var(--text-light)', background: 'white', opacity: 0.5 }}
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
