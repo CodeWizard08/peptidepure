@@ -177,6 +177,11 @@ export default function AdminProductsPanel() {
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message });
@@ -294,6 +299,32 @@ export default function AdminProductsPanel() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      showToast('success', 'Product deleted');
+      setConfirmDeleteId(null);
+      await fetchProducts();
+    } catch {
+      showToast('error', 'Failed to delete product');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const categories = ['all', ...Array.from(new Set(products.map((p) => p.category).filter(Boolean)))];
+
+  const filteredProducts = products.filter((p) => {
+    const q = searchQuery.toLowerCase();
+    if (q && !p.name.toLowerCase().includes(q) && !p.slug?.toLowerCase().includes(q)) return false;
+    if (categoryFilter !== 'all' && p.category !== categoryFilter) return false;
+    if (statusFilter === 'active' && !p.is_active) return false;
+    if (statusFilter === 'inactive' && p.is_active) return false;
+    return true;
+  });
+
   const isEditing = editingId !== null;
 
   return (
@@ -327,6 +358,40 @@ export default function AdminProductsPanel() {
           style={{ background: '#FEE2E2', color: '#991B1B', border: '1px solid #FCA5A5' }}
         >
           Failed to load products.
+        </div>
+      )}
+
+      {/* Search + filters */}
+      {!isEditing && !loading && products.length > 0 && (
+        <div className="flex flex-wrap gap-3 mb-5">
+          <input
+            type="text"
+            placeholder="Search by name or slug…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 min-w-45 px-3 py-2 rounded-lg text-sm focus:outline-none"
+            style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
+          />
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-3 py-2 rounded-lg text-sm focus:outline-none"
+            style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
+          >
+            {categories.map((c) => (
+              <option key={c} value={c}>{c === 'all' ? 'All Categories' : c}</option>
+            ))}
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2 rounded-lg text-sm focus:outline-none"
+            style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
         </div>
       )}
 
@@ -575,105 +640,84 @@ export default function AdminProductsPanel() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--off-white)' }}>
-                  {['Name', 'Category', 'Price', 'Status', 'Sort', 'Actions'].map((h) => (
-                    <th
-                      key={h}
-                      className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide"
-                      style={{ color: 'var(--text-light)' }}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product, idx) => {
-                  const badge = product.is_active ? STATUS_BADGE.active : STATUS_BADGE.inactive;
-                  const isCurrentlyEditing = editingId === product.id;
-                  return (
-                    <tr
-                      key={product.id}
-                      style={{
-                        borderBottom: idx < products.length - 1 ? '1px solid var(--border)' : 'none',
-                        background: isCurrentlyEditing ? 'var(--gold-pale)' : 'white',
-                      }}
-                    >
-                      <td className="px-5 py-4">
-                        <div>
-                          <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>
-                            {product.name}
-                          </p>
-                          {product.slug && (
-                            <p className="text-xs font-mono mt-0.5" style={{ color: 'var(--text-light)' }}>
-                              /{product.slug}
-                            </p>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-5 py-4">
-                        <div>
-                          <span className="text-sm" style={{ color: 'var(--text-dark)' }}>
-                            {product.category}
+            {filteredProducts.length === 0 ? (
+              <div className="py-12 text-center">
+                <p className="text-sm" style={{ color: 'var(--text-light)' }}>No products match your filters.</p>
+              </div>
+            ) : (
+              <table className="w-full">
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--off-white)' }}>
+                    {['Name', 'Category', 'Price', 'Status', 'Sort', 'Actions'].map((h) => (
+                      <th key={h} className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-light)' }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.map((product, idx) => {
+                    const badge = product.is_active ? STATUS_BADGE.active : STATUS_BADGE.inactive;
+                    const isCurrentlyEditing = editingId === product.id;
+                    const isConfirmingDelete = confirmDeleteId === product.id;
+                    return (
+                      <tr
+                        key={product.id}
+                        style={{
+                          borderBottom: idx < filteredProducts.length - 1 ? '1px solid var(--border)' : 'none',
+                          background: isCurrentlyEditing ? 'var(--gold-pale)' : 'white',
+                        }}
+                      >
+                        <td className="px-5 py-4">
+                          <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{product.name}</p>
+                          {product.slug && <p className="text-xs font-mono mt-0.5" style={{ color: 'var(--text-light)' }}>/{product.slug}</p>}
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className="text-sm" style={{ color: 'var(--text-dark)' }}>{product.category}</span>
+                          {product.subcategory && <p className="text-xs mt-0.5" style={{ color: 'var(--text-light)' }}>{product.subcategory}</p>}
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{fmt(product.price_cents)}</span>
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full" style={{ background: badge.bg, color: badge.text }}>
+                            {product.is_active ? 'Active' : 'Inactive'}
                           </span>
-                          {product.subcategory && (
-                            <p className="text-xs mt-0.5" style={{ color: 'var(--text-light)' }}>
-                              {product.subcategory}
-                            </p>
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className="text-sm" style={{ color: 'var(--text-mid)' }}>{product.sort_order}</span>
+                        </td>
+                        <td className="px-5 py-4">
+                          {isConfirmingDelete ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs" style={{ color: '#991B1B' }}>Delete permanently?</span>
+                              <button onClick={() => handleDelete(product.id)} disabled={deleting} className="text-xs px-2 py-1 rounded-lg font-bold text-white" style={{ background: '#DC2626' }}>
+                                {deleting ? '…' : 'Yes'}
+                              </button>
+                              <button onClick={() => setConfirmDeleteId(null)} className="text-xs px-2 py-1 rounded-lg font-semibold" style={{ color: 'var(--text-mid)', border: '1px solid var(--border)' }}>
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => handleEdit(product)} className="text-xs px-3 py-1.5 rounded-lg font-semibold" style={{ color: 'var(--navy)', background: 'var(--off-white)', border: '1px solid var(--border)' }}>
+                                Edit
+                              </button>
+                              <button onClick={() => handleToggleActive(product)} className="text-xs px-3 py-1.5 rounded-lg font-semibold" style={{ color: product.is_active ? '#991B1B' : '#065F46', background: product.is_active ? '#FEE2E2' : '#D1FAE5', border: `1px solid ${product.is_active ? '#FCA5A5' : '#6EE7B7'}` }}>
+                                {product.is_active ? 'Deactivate' : 'Activate'}
+                              </button>
+                              <button onClick={() => setConfirmDeleteId(product.id)} className="text-xs px-3 py-1.5 rounded-lg font-semibold" style={{ color: '#991B1B', background: '#FEE2E2', border: '1px solid #FCA5A5' }}>
+                                Delete
+                              </button>
+                            </div>
                           )}
-                        </div>
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>
-                          {fmt(product.price_cents)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <span
-                          className="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full"
-                          style={{ background: badge.bg, color: badge.text }}
-                        >
-                          {product.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className="text-sm" style={{ color: 'var(--text-mid)' }}>
-                          {product.sort_order}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleEdit(product)}
-                            className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors"
-                            style={{
-                              color: 'var(--navy)',
-                              background: 'var(--off-white)',
-                              border: '1px solid var(--border)',
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleToggleActive(product)}
-                            className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors"
-                            style={{
-                              color: product.is_active ? '#991B1B' : '#065F46',
-                              background: product.is_active ? '#FEE2E2' : '#D1FAE5',
-                              border: `1px solid ${product.is_active ? '#FCA5A5' : '#6EE7B7'}`,
-                            }}
-                          >
-                            {product.is_active ? 'Deactivate' : 'Activate'}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
       </div>

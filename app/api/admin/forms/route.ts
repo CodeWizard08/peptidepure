@@ -42,3 +42,20 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ submissions: submissions || [], total: count || 0, page, limit });
 }
+
+export async function DELETE(request: NextRequest) {
+  const authed = await isAuthenticated();
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 });
+
+  const supabase = getAdminSupabase();
+  const { error } = await supabase.from('form_submissions').delete().eq('id', id);
+  if (error) {
+    console.error('Form delete error:', error);
+    return NextResponse.json({ error: 'Failed to delete submission' }, { status: 500 });
+  }
+  return NextResponse.json({ success: true });
+}

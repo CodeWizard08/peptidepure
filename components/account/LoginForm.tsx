@@ -19,8 +19,9 @@ export default function LoginForm() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError(error.message); setLoading(false); }
+    else if (data.user?.app_metadata?.role === 'admin') { router.push('/admin'); }
     else { router.refresh(); }
   };
 
