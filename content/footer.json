@@ -6,7 +6,8 @@
     { "label": "Our Company", "href": "/our-company" },
     { "label": "Buy Peptides", "href": "/peptides" },
     { "label": "How It Works", "href": "/how-it-works" },
-    { "label": "COA Library", "href": "/coa" }
+    { "label": "COA Library", "href": "/coa" },
+    { "label": "Dosing & Safety", "href": "/peptide-dosing-safety" }
   ],
   "legalLinks": [
     { "label": "Privacy Policy", "href": "/privacy" },

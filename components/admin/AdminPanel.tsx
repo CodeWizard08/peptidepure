@@ -200,7 +200,7 @@ export default function AdminPanel() {
         {activeSection === 'dashboard' && (
           <AdminDashboard onNavigate={(s) => setActiveSection(s as Section)} />
         )}
-        {activeSection === 'orders' && <AdminOrdersPanel />}
+        {activeSection === 'orders' && <AdminOrdersPanel embedded />}
         {activeSection === 'products' && <AdminProductsPanel />}
         {activeSection === 'inventory' && <AdminInventoryPanel />}
         {activeSection === 'inventory-list' && <AdminInventoryListPanel />}
