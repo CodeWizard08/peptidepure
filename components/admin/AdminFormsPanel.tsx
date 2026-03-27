@@ -65,6 +65,10 @@ export default function AdminFormsPanel() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const fetchSubmissions = useCallback(async () => {
     setLoading(true);
@@ -87,6 +91,33 @@ export default function AdminFormsPanel() {
   useEffect(() => {
     fetchSubmissions();
   }, [fetchSubmissions]);
+
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3500);
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/forms?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      showToast('success', 'Submission deleted');
+      setConfirmDeleteId(null);
+      if (expandedId === id) setExpandedId(null);
+      await fetchSubmissions();
+    } catch {
+      showToast('error', 'Failed to delete submission');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const filteredSubmissions = submissions.filter((s) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return getSubmitterInfo(s).toLowerCase().includes(q);
+  });
 
   const totalPages = Math.ceil(total / 20);
 
@@ -121,6 +152,18 @@ export default function AdminFormsPanel() {
             {tab.label}
           </button>
         ))}
+      </div>
+
+      {/* Search */}
+      <div className="mb-5">
+        <input
+          type="text"
+          placeholder="Search by submitter name…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full max-w-sm px-3 py-2 rounded-lg text-sm focus:outline-none"
+          style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
+        />
       </div>
 
       {error && (
@@ -173,11 +216,17 @@ export default function AdminFormsPanel() {
         </div>
       ) : (
         <div className="space-y-2">
-          {submissions.map((submission) => {
+          {filteredSubmissions.length === 0 ? (
+            <div className="rounded-xl py-12 text-center" style={{ background: 'white', border: '1px solid var(--border)' }}>
+              <p className="text-sm" style={{ color: 'var(--text-light)' }}>No submissions match your search.</p>
+            </div>
+          ) : null}
+          {filteredSubmissions.map((submission) => {
             const isExpanded = expandedId === submission.id;
             const typeColor = getTypeColor(submission.type);
             const submitter = getSubmitterInfo(submission);
             const formData = submission.data || {};
+            const isConfirming = confirmDeleteId === submission.id;
 
             return (
               <div
@@ -209,6 +258,34 @@ export default function AdminFormsPanel() {
                     <span className="text-xs" style={{ color: 'var(--text-light)' }}>
                       {Object.keys(formData).length} fields
                     </span>
+                    {isConfirming ? (
+                      <>
+                        <span className="text-xs" style={{ color: '#991B1B' }}>Delete?</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDelete(submission.id); }}
+                          disabled={deleting}
+                          className="text-xs px-2 py-1 rounded-lg font-bold text-white"
+                          style={{ background: '#DC2626' }}
+                        >
+                          {deleting ? '…' : 'Yes'}
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }}
+                          className="text-xs px-2 py-1 rounded-lg font-semibold"
+                          style={{ color: 'var(--text-mid)', border: '1px solid var(--border)', background: 'white' }}
+                        >
+                          No
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(submission.id); }}
+                        className="text-xs px-2 py-1 rounded-lg font-semibold"
+                        style={{ color: '#991B1B', background: '#FEE2E2', border: '1px solid #FCA5A5' }}
+                      >
+                        Delete
+                      </button>
+                    )}
                     <svg
                       className="w-4 h-4 transition-transform"
                       style={{
@@ -252,7 +329,7 @@ export default function AdminFormsPanel() {
                                 {humanizeKey(key)}
                               </span>
                               <span
-                                className="text-xs break-words"
+                                className="text-xs wrap-break-word"
                                 style={{ color: 'var(--text-dark)' }}
                               >
                                 {value === null || value === undefined
@@ -293,7 +370,7 @@ export default function AdminFormsPanel() {
                                   {humanizeKey(key)}
                                 </span>
                                 <span
-                                  className="text-xs break-words"
+                                  className="text-xs wrap-break-word"
                                   style={{ color: 'var(--text-dark)' }}
                                 >
                                   {value === null || value === undefined
@@ -312,6 +389,12 @@ export default function AdminFormsPanel() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {toast && (
+        <div className="fixed top-6 right-6 z-50 px-5 py-3 rounded-xl text-sm font-semibold shadow-lg" style={{ background: toast.type === 'success' ? '#059669' : '#DC2626', color: 'white' }}>
+          {toast.message}
         </div>
       )}
 

@@ -153,17 +153,12 @@ export async function DELETE(request: NextRequest) {
 
   const supabase = getAdminSupabase();
 
-  const { data: product, error } = await supabase
-    .from('products')
-    .update({ is_active: false })
-    .eq('id', id)
-    .select('id, is_active')
-    .single();
+  const { error } = await supabase.from('products').delete().eq('id', id);
 
   if (error) {
     console.error('Product delete error:', error);
-    return NextResponse.json({ error: 'Failed to deactivate product' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });
   }
 
-  return NextResponse.json({ product });
+  return NextResponse.json({ success: true });
 }

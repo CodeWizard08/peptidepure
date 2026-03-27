@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/admin-auth';
 import { createClient } from '@supabase/supabase-js';
 
@@ -7,6 +7,23 @@ function getAdminSupabase() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
+}
+
+export async function DELETE(request: NextRequest) {
+  const authed = await isAuthenticated();
+  if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 });
+
+  const supabase = getAdminSupabase();
+  const { error } = await supabase.auth.admin.deleteUser(id);
+  if (error) {
+    console.error('User delete error:', error);
+    return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
+  }
+  return NextResponse.json({ success: true });
 }
 
 export async function GET() {
