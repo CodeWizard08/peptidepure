@@ -103,8 +103,6 @@ export default function ChatWidget() {
     }
   }, [open]);
 
-  if (!loggedIn) return null;
-
   async function sendMessage(text: string) {
     const userMsg = text.trim();
     if (!userMsg || streaming) return;
@@ -383,44 +381,66 @@ export default function ChatWidget() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
+          {/* Input / Login prompt */}
           <div className="shrink-0 px-4 py-3.5" style={{ borderTop: '1px solid var(--border)', background: '#F8FAFC' }}>
-            <div
-              className="flex items-end gap-2 rounded-xl px-3.5 py-2.5"
-              style={{ background: 'white', border: '1.5px solid var(--border)', transition: 'border-color 0.15s' }}
-              onFocusCapture={(e) => (e.currentTarget.style.borderColor = 'var(--navy)')}
-              onBlurCapture={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-            >
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask about peptide protocols…"
-                rows={1}
-                disabled={streaming}
-                className="flex-1 resize-none text-sm outline-none bg-transparent leading-relaxed"
-                style={{ color: 'var(--navy)', maxHeight: '120px', minHeight: '22px', overflowY: 'auto' }}
-                onInput={(e) => {
-                  const el = e.currentTarget;
-                  el.style.height = 'auto';
-                  el.style.height = `${el.scrollHeight}px`;
-                }}
-              />
-              <button
-                onClick={() => sendMessage(input)}
-                disabled={!input.trim() || streaming}
-                className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-opacity disabled:opacity-25"
-                style={{ background: 'var(--navy)' }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" />
-                </svg>
-              </button>
-            </div>
-            <p className="text-center text-xs mt-2" style={{ color: 'var(--text-light)' }}>
-              For licensed clinicians only · Not medical advice
-            </p>
+            {loggedIn ? (
+              <>
+                <div
+                  className="flex items-end gap-2 rounded-xl px-3.5 py-2.5"
+                  style={{ background: 'white', border: '1.5px solid var(--border)', transition: 'border-color 0.15s' }}
+                  onFocusCapture={(e) => (e.currentTarget.style.borderColor = 'var(--navy)')}
+                  onBlurCapture={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+                >
+                  <textarea
+                    ref={inputRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask about peptide protocols…"
+                    rows={1}
+                    disabled={streaming}
+                    className="flex-1 resize-none text-sm outline-none bg-transparent leading-relaxed"
+                    style={{ color: 'var(--navy)', maxHeight: '120px', minHeight: '22px', overflowY: 'auto' }}
+                    onInput={(e) => {
+                      const el = e.currentTarget;
+                      el.style.height = 'auto';
+                      el.style.height = `${el.scrollHeight}px`;
+                    }}
+                  />
+                  <button
+                    onClick={() => sendMessage(input)}
+                    disabled={!input.trim() || streaming}
+                    className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-opacity disabled:opacity-25"
+                    style={{ background: 'var(--navy)' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" />
+                    </svg>
+                  </button>
+                </div>
+                <p className="text-center text-xs mt-2" style={{ color: 'var(--text-light)' }}>
+                  For licensed clinicians only · Not medical advice
+                </p>
+              </>
+            ) : (
+              <div className="text-center py-1">
+                <p className="text-xs mb-3" style={{ color: 'var(--text-mid)' }}>
+                  Sign in to chat with our clinical AI assistant.
+                </p>
+                <a
+                  href="/account"
+                  className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-opacity hover:opacity-90"
+                  style={{ background: 'var(--navy)', color: 'white' }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                    <polyline points="10 17 15 12 10 7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
+                  </svg>
+                  Sign In
+                </a>
+              </div>
+            )}
           </div>
         </div>
       )}
