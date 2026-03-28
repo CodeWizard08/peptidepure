@@ -22,7 +22,7 @@ export default function TreatmentLogForm() {
 
   return (
     <div style={{ background: 'var(--off-white)', minHeight: '100vh' }}>
-      <FormHeader breadcrumb="Clinical Forms" title="IRB — Treatment Log" subtitle="Per-visit treatment record for investigational peptide protocol participants." />
+      <FormHeader breadcrumb="Data Capture" title="IRB — Treatment Log" subtitle="Per-visit treatment record for investigational peptide protocol participants." />
       <div className="py-12">
         <div className="container-xl">
           <div className="bg-white rounded-2xl shadow-sm p-8 md:p-10" style={{ border: '1px solid var(--border)' }}>

@@ -3,8 +3,8 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: 'Clinical Forms — PeptidePure™',
-  description: 'IRB clinical documentation forms for peptide protocols: baseline assessment, treatment log, and adverse event reporting.',
+  title: 'Data Capture — PeptidePure™',
+  description: 'Clinical data capture tools for peptide protocols: SOAP notes, baseline assessment, treatment log, and adverse event reporting.',
   robots: { index: false, follow: false },
   alternates: { canonical: '/forms' },
 };

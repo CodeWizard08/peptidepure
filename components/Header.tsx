@@ -99,11 +99,11 @@ export default function Header() {
   ];
 
   const formLinks = [
+    { label: 'SOAP Data Capture', href: '/forms/soap-capture' },
     { label: 'IRB — Baseline', href: '/forms/baseline' },
     { label: 'IRB — Treatment Log', href: '/forms/treatment-log' },
     { label: 'IRB — AE / SAE Report', href: '/forms/ae-sae-report' },
     { label: 'Patient Outcomes', href: '/forms/outcomes' },
-    { label: 'SOAP Data Capture', href: '/forms/soap-capture' },
   ];
 
   return (
@@ -161,7 +161,7 @@ export default function Header() {
                     }`}
                     style={{ color: glass ? 'rgba(255,255,255,0.82)' : 'var(--text-dark)' }}
                   >
-                    Forms
+                    Data Capture
                     <svg
                       className={`w-3.5 h-3.5 transition-transform duration-200 ${formsOpen ? 'rotate-180' : ''}`}
                       fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -174,6 +174,14 @@ export default function Header() {
                       className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-xl py-1.5 z-50"
                       style={{ border: '1px solid var(--border)', minWidth: '13rem' }}
                     >
+                      <Link
+                        href="/forms"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold hover:bg-gray-50 transition-colors"
+                        style={{ color: 'var(--gold)', borderBottom: '1px solid var(--border)' }}
+                        onClick={() => setFormsOpen(false)}
+                      >
+                        All Data Capture Tools
+                      </Link>
                       {formLinks.map((item) => (
                         <Link
                           key={item.href}
@@ -381,7 +389,7 @@ export default function Header() {
                   style={{ color: 'var(--text-dark)' }}
                   onClick={() => setMobileFormsOpen(!mobileFormsOpen)}
                 >
-                  <span>Forms</span>
+                  <span>Data Capture</span>
                   <svg
                     className="w-4 h-4 transition-transform duration-200"
                     style={{
