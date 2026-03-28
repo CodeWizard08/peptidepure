@@ -38,11 +38,11 @@
     },
     {
       "number": "04",
-      "title": "Set Up onzen.health Data Capture",
-      "text": "Participating clinicians use the onzen.health platform to capture structured treatment and outcome data. Your account will be provisioned after practice enrollment is confirmed.",
+      "title": "Set Up Data Capture",
+      "text": "Participating clinicians use the built-in PeptidePure™ Data Capture tools to record structured treatment and outcome data. Access is available in your account once practice enrollment is confirmed.",
       "items": [
-        "Log in at onzen.health with the credentials provided in your welcome email.",
-        "Complete the 30-minute onzen.health onboarding tutorial before entering patient data.",
+        "Navigate to Data Capture in your account menu after logging in.",
+        "Start with the SOAP Data Capture form to record clinical notes in a structured format.",
         "Data must be submitted within 14 days of each patient visit per MMRN-001-2025 protocol.",
         "Contact dr.elaine@peptidepure.com with any protocol or data capture questions."
       ]
@@ -87,7 +87,7 @@
       },
       {
         "title": "Data Capture Best Practices",
-        "description": "Step-by-step guide for completing each IRB form accurately and submitting data via onzen.health.",
+        "description": "Step-by-step guide for completing each IRB form accurately and submitting data through the PeptidePure™ Data Capture tools.",
         "href": "/docs/data-capture-best-practices.pdf",
         "label": "Download PDF"
       }

@@ -25,7 +25,7 @@ export default function OutcomesForm() {
 
   return (
     <div style={{ background: 'var(--off-white)', minHeight: '100vh' }}>
-      <FormHeader breadcrumb="Clinical Forms" title="Patient Outcomes Report" subtitle="Capture treatment outcomes, side effects, and overall response for peptide protocols." />
+      <FormHeader breadcrumb="Data Capture" title="Patient Outcomes Report" subtitle="Capture treatment outcomes, side effects, and overall response for peptide protocols." />
       <div className="py-12">
         <div className="container-xl">
           <div className="bg-white rounded-2xl shadow-sm p-8 md:p-10" style={{ border: '1px solid var(--border)' }}>

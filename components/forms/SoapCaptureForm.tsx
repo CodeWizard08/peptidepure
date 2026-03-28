@@ -556,6 +556,69 @@ export default function SoapCaptureForm() {
     showToast('JSON exported');
   }
 
+  function handleExportPDF() {
+    if (!result) return;
+    const record = buildRecord(result, meta);
+    const m = record.meta;
+    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    const tableRows = (headers: string[], rows: string[][]) => {
+      const hdr = headers.map((h) => `<th style="text-align:left;padding:6px 10px;border-bottom:2px solid #0B1F3A;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#0B1F3A">${h}</th>`).join('');
+      const body = rows.map((r) => '<tr>' + r.map((c) => `<td style="padding:5px 10px;border-bottom:1px solid #e5e7eb;font-size:12px;color:#374151">${esc(c)}</td>`).join('') + '</tr>').join('');
+      return `<table style="width:100%;border-collapse:collapse;margin-bottom:8px"><thead><tr>${hdr}</tr></thead><tbody>${body}</tbody></table>`;
+    };
+
+    const section = (title: string, color: string, content: string) =>
+      `<div style="margin-bottom:18px"><h3 style="font-size:13px;font-weight:700;color:${color};margin:0 0 6px;text-transform:uppercase;letter-spacing:1px">${title}</h3>${content}</div>`;
+
+    let body = '';
+
+    if (record.vitals.length)
+      body += section('Vitals', '#16a34a', tableRows(['Name', 'Value', 'Unit'], record.vitals.map((v) => [v.name, v.value, v.unit])));
+    if (record.labs.length)
+      body += section('Lab Values', '#0284c7', tableRows(['Name', 'Value', 'Unit', 'Status'], record.labs.map((l) => [cap(l.name), l.isPanel ? 'WNL' : String(l.value), l.unit, l.status])));
+    if (record.bodyComposition.length)
+      body += section('Body Composition', '#6366f1', tableRows(['Metric', 'Value'], record.bodyComposition.map((b) => [b.name, b.value])));
+    if (record.patientReportedOutcomes.length)
+      body += section('Patient-Reported Outcomes', '#b45309', tableRows(['Measure', 'Value', 'Category'], record.patientReportedOutcomes.map((p) => [p.name, p.value, p.category])));
+    if (record.medications.length)
+      body += section('Medications', '#7c3aed', tableRows(['Name', 'Dose', 'Frequency'], record.medications.map((md) => [cap(md.name), md.dose, md.freq])));
+    if (record.adverseEvents.length)
+      body += section('Adverse Events', '#dc2626', tableRows(['Event', 'Severity', 'Resolution', 'Related'], record.adverseEvents.map((a) => [a.name, a.severity, a.resolution, a.related])));
+
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>SOAP Data Capture — ${esc(m.patientId || 'Unknown')}</title>
+<style>@media print{@page{margin:0.6in}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}body{font-family:-apple-system,system-ui,sans-serif;color:#1f2937;margin:0;padding:24px}</style>
+</head><body>
+<div style="border-bottom:3px solid #0B1F3A;padding-bottom:14px;margin-bottom:18px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+    <div>
+      <h1 style="font-size:20px;font-weight:800;color:#0B1F3A;margin:0">PeptidePure™ — SOAP Data Capture</h1>
+      <p style="font-size:11px;color:#6b7280;margin:4px 0 0;text-transform:uppercase;letter-spacing:1px">Protocol ${esc(m.irbProtocol)}</p>
+    </div>
+    <p style="font-size:11px;color:#6b7280;margin:0">Generated ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px 16px;margin-bottom:20px;font-size:12px">
+  <div><strong style="color:#0B1F3A">Patient ID:</strong> ${esc(m.patientId || '—')}</div>
+  <div><strong style="color:#0B1F3A">Date:</strong> ${esc(m.encounterDate || '—')}</div>
+  <div><strong style="color:#0B1F3A">Clinician:</strong> ${esc(m.clinician || '—')}</div>
+  <div><strong style="color:#0B1F3A">Clinic:</strong> ${esc(m.clinic || '—')}</div>
+</div>
+${body}
+<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af;text-align:center">
+  PeptidePure™ — Confidential Clinical Document — ${esc(m.irbProtocol)}
+</div>
+</body></html>`;
+
+    const win = window.open('', '_blank');
+    if (!win) { showToast('Pop-up blocked — please allow pop-ups'); return; }
+    win.document.write(html);
+    win.document.close();
+    win.onafterprint = () => win.close();
+    setTimeout(() => win.print(), 300);
+    showToast('PDF print dialog opened');
+  }
+
   async function handleSaveLog() {
     if (!result) return;
     const record = buildRecord(result, meta);
@@ -591,7 +654,7 @@ export default function SoapCaptureForm() {
   return (
     <div style={{ background: 'var(--off-white)', minHeight: '100vh' }}>
       <FormHeader
-        breadcrumb="Clinical Forms · PPRN-001-2025"
+        breadcrumb="Data Capture · PPRN-001-2025"
         title="SOAP Note Data Capture"
         subtitle="Paste any SOAP note — labs, vitals, body composition, PROs, medications, and adverse events are auto-extracted into structured IRB fields."
       />
@@ -883,6 +946,14 @@ P: Continue current protocol. Added Tirzepatide 2.5mg/wk for metabolic optimizat
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     JSON
+                  </button>
+                  <button
+                    onClick={handleExportPDF}
+                    className="text-sm font-semibold px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-colors"
+                    style={{ border: '1.5px solid var(--border-mid)', color: 'var(--text-dark)', background: 'transparent', cursor: 'pointer' }}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    PDF
                   </button>
                   <button
                     onClick={handleSaveLog}

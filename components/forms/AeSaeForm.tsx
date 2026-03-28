@@ -22,7 +22,7 @@ export default function AeSaeForm() {
 
   return (
     <div style={{ background: 'var(--off-white)', minHeight: '100vh' }}>
-      <FormHeader breadcrumb="Clinical Forms" title="IRB — AE / SAE Report" subtitle="Adverse Event and Serious Adverse Event reporting for investigational peptide protocols." />
+      <FormHeader breadcrumb="Data Capture" title="IRB — AE / SAE Report" subtitle="Adverse Event and Serious Adverse Event reporting for investigational peptide protocols." />
       <div className="py-12">
         <div className="container-xl">
           <div className="bg-white rounded-2xl shadow-sm p-8 md:p-10" style={{ border: '1px solid var(--border)' }}>
