@@ -49,48 +49,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    // Generate a recovery link via Admin API (does NOT send an email)
+    // Generate a recovery link via Admin API for branded email delivery.
+    // Use Supabase-provided action_link directly to avoid token parameter mismatches.
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email,
+      options: { redirectTo },
     });
 
-    if (error) {
-      // Don't reveal whether the user exists — always show success to the client
+    const resetLink = data?.properties?.action_link;
+    let sent = false;
+
+    if (!error && resetLink) {
+      sent = await sendEmail({
+        to: email,
+        subject: 'Reset your PeptidePure™ password',
+        html: resetEmailHtml(resetLink),
+      });
+    } else if (error) {
       console.error('Generate link error:', error.message);
-      return NextResponse.json({ success: true });
+    } else {
+      console.error('No action_link in generated reset link payload');
     }
-
-    // The generated link contains a token_hash and type.
-    // We need to build a link that goes through our auth callback.
-    const hashed_token = data.properties?.hashed_token;
-    if (!hashed_token) {
-      console.error('No hashed_token in generated link');
-      return NextResponse.json({ success: true });
-    }
-
-    // Build the verification URL that Supabase expects
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const verifyUrl = `${supabaseUrl}/auth/v1/verify?token=${hashed_token}&type=recovery&redirect_to=${encodeURIComponent(redirectTo)}`;
-
-    // Send via Resend
-    const sent = await sendEmail({
-      to: email,
-      subject: 'Reset your PeptidePure™ password',
-      html: resetEmailHtml(verifyUrl),
-    });
 
     if (!sent) {
-      // Fallback: use Supabase's built-in email as backup
-      console.warn('Resend failed, falling back to Supabase email');
-      await supabaseAdmin.auth.admin.generateLink({
-        type: 'recovery',
-        email,
-      });
-      // Also try the standard method as absolute fallback
-      const { createClient: createAnonClient } = await import('@/lib/supabase/server');
-      const supabase = await createAnonClient();
-      await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+      // Fallback: trigger Supabase built-in reset email path.
+      // This improves deliverability when custom email provider is misconfigured.
+      const supabaseAnon = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      const { error: fallbackError } = await supabaseAnon.auth.resetPasswordForEmail(email, { redirectTo });
+      if (fallbackError) {
+        console.error('Supabase fallback reset email failed:', fallbackError.message);
+      }
     }
 
     return NextResponse.json({ success: true });

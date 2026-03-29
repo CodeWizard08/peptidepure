@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
+import type { PolicyPageContent, PolicySection } from '@/lib/content-types';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -9,15 +10,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/privacy' },
 };
 
-interface PolicySection {
-  title: string;
-  text?: string;
-  items?: string[];
-  extra?: string;
-}
-
 export default async function PrivacyPage() {
-  const content = await getContent<any>('privacy');
+  const content = await getContent<PolicyPageContent>('privacy');
 
   return (
     <>

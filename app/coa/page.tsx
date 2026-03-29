@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
+import type { CoaContent } from '@/lib/content-types';
 
 const COAGallery = dynamic(() => import('@/components/COAGallery'), {
   loading: () => (
@@ -23,6 +24,6 @@ export const metadata: Metadata = {
 };
 
 export default async function COAPage() {
-  const content = await getContent<any>('coa');
+  const content = await getContent<CoaContent>('coa');
   return <COAGallery content={content} />;
 }

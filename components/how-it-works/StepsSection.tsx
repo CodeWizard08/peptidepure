@@ -1,4 +1,6 @@
-export default function StepsSection({ content }: { content: any }) {
+import type { HowItWorksContent } from '@/lib/content-types';
+
+export default function StepsSection({ content }: { content: HowItWorksContent }) {
   return (
     <section className="py-20 relative overflow-hidden" style={{ background: 'var(--off-white)' }}>
       <style>{`
@@ -31,7 +33,7 @@ export default function StepsSection({ content }: { content: any }) {
           borderRadius: '1rem',
           overflow: 'hidden',
         }}>
-          {content.steps.items.map((item: { step: string; icon: string; title: string; desc: string }, i: number) => (
+          {content.steps.items.map((item, i: number) => (
             <div key={i} className="how-step" style={{ padding: '3rem 2.75rem 2.75rem' }}>
 
               {/* Step number + trailing line */}

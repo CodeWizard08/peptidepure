@@ -1,16 +1,7 @@
 import PageHero from '@/components/sections/PageHero';
+import type { ShippingPageContent, ShippingSection } from '@/lib/content-types';
 
-interface ShippingSection {
-  type: string;
-  title: string;
-  paragraphs?: string[];
-  items?: string[];
-  extra?: string;
-  columns?: string[];
-  rows?: string[][];
-}
-
-export default function ShippingContent({ content }: { content: any }) {
+export default function ShippingContent({ content }: { content: ShippingPageContent }) {
   return (
     <>
       <PageHero sectionLabel={content.hero.sectionLabel} heading={content.hero.heading} subtitle={content.hero.subtitle} />

@@ -21,10 +21,11 @@ import WhyDifferentSection from '@/components/home/WhyDifferentSection';
 import FreeShippingSection from '@/components/home/FreeShippingSection';
 import FinalCTA from '@/components/home/FinalCTA';
 import { getContent } from '@/lib/content';
+import type { HeroSliderContent, HomeContent } from '@/lib/content-types';
 
 export default async function HomePage() {
-  const content = await getContent<any>('home');
-  const heroContent = await getContent<any>('hero-slider');
+  const content = await getContent<HomeContent>('home');
+  const heroContent = await getContent<HeroSliderContent>('hero-slider');
 
   return (
     <>

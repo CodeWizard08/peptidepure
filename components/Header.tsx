@@ -13,16 +13,18 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [formsOpen, setFormsOpen] = useState(false);
   const formsCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mobileFormsOpen, setMobileFormsOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const { cartCount, cartTotal } = useCart();
 
-  const showBanner = !bannerDismissed;
-
   const supabase = createClient();
   const pathname = usePathname();
   const isHome = pathname === '/';
+  const isAdminRoute = pathname.startsWith('/admin');
+  const showBanner = !bannerDismissed && !isAdminRoute;
   const glass = isHome && !scrolled;
 
   // Restore banner dismissed state from sessionStorage and sync --nav-h immediately
@@ -49,6 +51,8 @@ export default function Header() {
   useEffect(() => {
     setMobileOpen(false);
     setMobileFormsOpen(false);
+    setFormsOpen(false);
+    setMoreOpen(false);
   }, [pathname]);
 
   // Lock body scroll when mobile menu is open
@@ -89,15 +93,19 @@ export default function Header() {
   }, []);
 
   const navLinks = [
-    { label: 'All Peptides', href: '/peptides' },
-    { label: 'How It Works', href: '/how-it-works' },
-    { label: 'Our Company', href: '/our-company' },
-    { label: 'COA', href: '/coa' },
-    { label: 'Inventory', href: '/inventory' },
-    { label: 'Getting Started', href: '/how-to-get-started' },
-    { label: 'Legality', href: '/legality' },
-    { label: 'Contact Us', href: '/contact' },
+    { label: 'All Peptides', href: '/peptides', section: 'main' as const },
+    { label: 'Our Company', href: '/our-company', section: 'main' as const },
+    { label: 'COA', href: '/coa', section: 'main' as const },
+    { label: 'How It Works', href: '/how-it-works', section: 'main' as const, requiresAuth: true },
+    { label: 'Contact Us', href: '/contact', section: 'main' as const },
+    { label: 'Inventory', href: '/inventory', section: 'more' as const, requiresAuth: true },
+    { label: 'Getting Started', href: '/how-to-get-started', section: 'more' as const },
+    { label: 'Legality', href: '/legality', section: 'more' as const },
   ];
+
+  const visibleNavLinks = navLinks.filter((link) => !link.requiresAuth || user);
+  const mainNavLinks = visibleNavLinks.filter((link) => link.section === 'main');
+  const secondaryNavLinks = visibleNavLinks.filter((link) => link.section === 'more');
 
   const formLinks = [
     { label: 'SOAP Data Capture', href: '/forms/soap-capture' },
@@ -133,7 +141,7 @@ export default function Header() {
 
             {/* Desktop Nav */}
             <nav className="hidden lg:flex items-center gap-1">
-              {navLinks.filter((link) => (link.href !== '/how-it-works' && link.href !== '/inventory') || user).map((link) => (
+              {mainNavLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -145,6 +153,55 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
+              {secondaryNavLinks.length > 0 && (
+                <div
+                  className="relative"
+                  onMouseEnter={() => {
+                    if (moreCloseTimer.current) clearTimeout(moreCloseTimer.current);
+                    setMoreOpen(true);
+                  }}
+                  onMouseLeave={() => {
+                    moreCloseTimer.current = setTimeout(() => setMoreOpen(false), 150);
+                  }}
+                >
+                  <button
+                    className={`px-3.5 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center gap-1 ${
+                      glass ? 'hover:bg-white/10' : 'hover:bg-gray-50'
+                    }`}
+                    style={{ color: glass ? 'rgba(255,255,255,0.82)' : 'var(--text-dark)' }}
+                  >
+                    More
+                    <svg
+                      className={`w-3.5 h-3.5 transition-transform duration-200 ${moreOpen ? 'rotate-180' : ''}`}
+                      fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {moreOpen && (
+                    <div
+                      className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-xl py-1.5 z-50"
+                      style={{ border: '1px solid var(--border)', minWidth: '12rem' }}
+                    >
+                      {secondaryNavLinks.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                          style={{ color: pathname === item.href ? 'var(--gold)' : 'var(--text-dark)' }}
+                          onClick={() => setMoreOpen(false)}
+                        >
+                          <span
+                            className="w-1.5 h-1.5 rounded-full shrink-0"
+                            style={{ background: 'var(--gold)' }}
+                          />
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
               {user && (
                 <div
                   className="relative"
@@ -364,7 +421,7 @@ export default function Header() {
       >
         <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 64px)' }}>
           <div className="px-5 py-5 space-y-1">
-            {navLinks.filter((link) => (link.href !== '/how-it-works' && link.href !== '/inventory') || user).map((link) => (
+            {mainNavLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -381,6 +438,31 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+
+            {secondaryNavLinks.length > 0 && (
+              <div className="pt-2">
+                <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
+                  More
+                </p>
+                {secondaryNavLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
+                    style={{
+                      color: pathname === link.href ? 'var(--gold)' : 'var(--text-mid)',
+                      background: pathname === link.href ? 'var(--gold-pale)' : 'transparent',
+                    }}
+                    onClick={closeMobile}
+                  >
+                    {pathname === link.href && (
+                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: 'var(--gold)' }} />
+                    )}
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            )}
 
             {/* Forms accordion — logged-in users only */}
             {user && (

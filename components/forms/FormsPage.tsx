@@ -111,7 +111,7 @@ function useFormState(formType: string) {
    SOAP Note Form
 ───────────────────────────────────────────── */
 function SoapNoteForm() {
-  const { submitted, submitting, error, setSubmitted, handleSubmit } = useFormState('soap-note');
+  const { submitted, submitting, error, setSubmitted, handleSubmit } = useFormState('soap_capture');
 
   if (submitted) {
     return <SuccessBanner message="SOAP Note submitted successfully." onReset={() => setSubmitted(false)} />;

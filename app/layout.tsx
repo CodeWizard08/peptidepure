@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import Providers from '@/components/Providers';
 import ChatWidget from '@/components/ChatWidget';
 import { getContent } from '@/lib/content';
+import type { FooterContent } from '@/lib/content-types';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -94,7 +95,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const footerContent = await getContent<any>('footer');
+  const footerContent = await getContent<FooterContent>('footer');
 
   return (
     <html lang="en">

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getContent } from '@/lib/content';
+import type { HowToGetStartedContent } from '@/lib/content-types';
 import PageHero from '@/components/sections/PageHero';
 
 export const metadata: Metadata = {
@@ -10,28 +11,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/how-to-get-started' },
 };
 
-interface Step {
-  number: string;
-  title: string;
-  text: string;
-  items: string[];
-}
-
-interface Resource {
-  title: string;
-  description: string;
-  href: string;
-  label: string;
-}
-
-interface Contact {
-  name: string;
-  role: string;
-  email: string;
-}
-
 export default async function HowToGetStartedPage() {
-  const content = await getContent<any>('how-to-get-started');
+  const content = await getContent<HowToGetStartedContent>('how-to-get-started');
 
   return (
     <>
@@ -50,7 +31,7 @@ export default async function HowToGetStartedPage() {
 
           {/* Steps */}
           <div className="space-y-12">
-            {content.steps.map((step: Step, i: number) => (
+            {content.steps.map((step, i: number) => (
               <div key={i} className="flex gap-6">
                 {/* Step number */}
                 <div className="shrink-0">
@@ -96,7 +77,7 @@ export default async function HowToGetStartedPage() {
               {content.resources.heading}
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
-              {content.resources.items.map((resource: Resource, i: number) => (
+              {content.resources.items.map((resource, i: number) => (
                 <div
                   key={i}
                   className="rounded-xl p-6"
@@ -140,7 +121,7 @@ export default async function HowToGetStartedPage() {
               {content.support.text}
             </p>
             <div className="grid md:grid-cols-3 gap-4">
-              {content.support.contacts.map((contact: Contact, i: number) => (
+              {content.support.contacts.map((contact, i: number) => (
                 <div
                   key={i}
                   className="rounded-xl p-5"

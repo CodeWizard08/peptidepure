@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
 import ShippingContent from '@/components/ShippingContent';
+import type { ShippingPageContent } from '@/lib/content-types';
 
 export const metadata: Metadata = {
   title: 'Shipping & Payment',
@@ -10,6 +11,6 @@ export const metadata: Metadata = {
 };
 
 export default async function ShippingPage() {
-  const content = await getContent<any>('shipping');
+  const content = await getContent<ShippingPageContent>('shipping');
   return <ShippingContent content={content} />;
 }

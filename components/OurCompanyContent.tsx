@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import PageHero from '@/components/sections/PageHero';
 import CTASection from '@/components/sections/CTASection';
+import type { OurCompanyPageContent } from '@/lib/content-types';
 
-export default function OurCompanyContent({ content }: { content: any }) {
+export default function OurCompanyContent({ content }: { content: OurCompanyPageContent }) {
   return (
     <>
       <PageHero sectionLabel={content.hero.sectionLabel} heading={content.hero.heading} subtitle={content.hero.subtitle} />

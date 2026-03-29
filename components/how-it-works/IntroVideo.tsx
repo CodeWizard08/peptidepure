@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import type { HowItWorksContent } from '@/lib/content-types';
 
-export default function IntroVideo({ content }: { content: any }) {
+export default function IntroVideo({ content }: { content: HowItWorksContent }) {
   const iframeRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 

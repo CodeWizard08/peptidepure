@@ -7,6 +7,7 @@ import StarterPackages from '@/components/peptides/StarterPackages';
 import ProductGrid from '@/components/peptides/ProductGrid';
 import ProtocolsSection from '@/components/peptides/ProtocolsSection';
 import { CATEGORY_CONFIG, PRODUCTS_PER_PAGE, type Product } from '@/lib/peptideConfig';
+import type { PeptidesContent } from '@/lib/content-types';
 
 export const metadata: Metadata = {
   title: 'Peptide Catalog',
@@ -30,7 +31,7 @@ export default async function PeptidesPage({
   const to = from + PRODUCTS_PER_PAGE - 1;
 
   const [content, supabase] = await Promise.all([
-    getContent<any>('peptides'),
+    getContent<PeptidesContent>('peptides'),
     createClient(),
   ]);
 

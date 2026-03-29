@@ -14,7 +14,7 @@ const FROM_EMAIL = process.env.FROM_EMAIL || 'PeptidePure <info@peptidepure.com>
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'info@peptidepure.com';
 
 type EmailOptions = {
-  to: string;
+  to: string | string[];
   subject: string;
   html: string;
 };
@@ -36,7 +36,11 @@ export async function sendEmail({ to, subject, html }: EmailOptions): Promise<bo
 }
 
 export async function sendAdminNotification(subject: string, html: string): Promise<boolean> {
-  return sendEmail({ to: ADMIN_EMAIL, subject, html });
+  const recipients = (process.env.ADMIN_EMAILS ?? ADMIN_EMAIL)
+    .split(',')
+    .map((email) => email.trim())
+    .filter(Boolean);
+  return sendEmail({ to: recipients.length > 0 ? recipients : ADMIN_EMAIL, subject, html });
 }
 
 // ── Email Templates ────────────────────────────────────────

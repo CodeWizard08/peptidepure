@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
+import type { OurCompanyPageContent } from '@/lib/content-types';
 import OurCompanyContent from '@/components/OurCompanyContent';
 
 export const metadata: Metadata = {
@@ -15,6 +16,6 @@ export const metadata: Metadata = {
 };
 
 export default async function OurCompanyPage() {
-  const content = await getContent<any>('our-company');
+  const content = await getContent<OurCompanyPageContent>('our-company');
   return <OurCompanyContent content={content} />;
 }

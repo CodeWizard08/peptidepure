@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getContent, writeContent } from '@/lib/content';
 import { isAuthenticated } from '@/lib/admin-auth';
-
-const VALID_PAGES = [
-  'home', 'hero-slider', 'peptides', 'how-it-works',
-  'our-company', 'coa', 'contact', 'footer',
-  'inventory', 'privacy', 'terms', 'shipping', 'refunds',
-  'accessibility', 'peptide-dosing-safety', 'how-to-get-started',
-];
+import { VALID_CONTENT_PAGES } from '@/lib/content-types';
 
 export async function GET(request: NextRequest) {
   if (!(await isAuthenticated())) {
@@ -15,7 +9,7 @@ export async function GET(request: NextRequest) {
   }
 
   const page = request.nextUrl.searchParams.get('page');
-  if (!page || !VALID_PAGES.includes(page)) {
+  if (!page || !VALID_CONTENT_PAGES.includes(page as (typeof VALID_CONTENT_PAGES)[number])) {
     return NextResponse.json({ error: 'Invalid page' }, { status: 400 });
   }
 
@@ -33,7 +27,7 @@ export async function PUT(request: NextRequest) {
   }
 
   const page = request.nextUrl.searchParams.get('page');
-  if (!page || !VALID_PAGES.includes(page)) {
+  if (!page || !VALID_CONTENT_PAGES.includes(page as (typeof VALID_CONTENT_PAGES)[number])) {
     return NextResponse.json({ error: 'Invalid page' }, { status: 400 });
   }
 

@@ -8,6 +8,7 @@ import EducationalFocus from '@/components/how-it-works/EducationalFocus';
 import SolutionSection from '@/components/how-it-works/SolutionSection';
 import StepsSection from '@/components/how-it-works/StepsSection';
 import PeptideFuture from '@/components/how-it-works/PeptideFuture';
+import type { HowItWorksContent } from '@/lib/content-types';
 
 export const metadata: Metadata = {
   title: 'How It Works',
@@ -26,7 +27,7 @@ export default async function HowItWorksPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/account');
 
-  const content = await getContent<any>('how-it-works');
+  const content = await getContent<HowItWorksContent>('how-it-works');
 
   return (
     <>
@@ -39,7 +40,7 @@ export default async function HowItWorksPage() {
       <EducationalFocus content={content} />
       <SolutionSection content={content} />
       <StepsSection content={content} />
-      <PeptideFuture content={content} />
+      <PeptideFuture />
     </>
   );
 }

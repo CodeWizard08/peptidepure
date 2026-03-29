@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type { ContactPageContent } from '@/lib/content-types';
 
 const contactIcons = [
   // Phone
@@ -17,7 +18,7 @@ const contactIcons = [
   </svg>,
 ];
 
-export default function ContactForm({ content }: { content: any }) {
+export default function ContactForm({ content }: { content: ContactPageContent }) {
   const [form, setForm] = useState({
     name: '',
     email: '',

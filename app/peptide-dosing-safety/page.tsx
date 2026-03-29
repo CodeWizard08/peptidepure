@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getContent } from '@/lib/content';
 import { createClient } from '@/lib/supabase/server';
 import PeptideDosingContent from '@/components/PeptideDosingContent';
+import type { PeptideDosingContent as PeptideDosingPageContent } from '@/lib/content-types';
 
 export const metadata: Metadata = {
   title: 'Peptide Dosing & Safety Guide',
@@ -21,6 +22,6 @@ export default async function PeptideDosingPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/account');
 
-  const content = await getContent<any>('peptide-dosing-safety');
+  const content = await getContent<PeptideDosingPageContent>('peptide-dosing-safety');
   return <PeptideDosingContent content={content} />;
 }

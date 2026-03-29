@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Redis } from '@upstash/redis';
+import { validateContentShape } from '@/lib/content-types';
 
 const CONTENT_DIR = path.join(process.cwd(), 'content');
 
@@ -21,17 +22,24 @@ export async function getContent<T = Record<string, unknown>>(page: string): Pro
   // Try Redis first (has latest admin edits)
   const kv = getRedis();
   if (kv) {
-    const data = await kv.get<T>(`content:${page}`);
-    if (data) return data;
+    const data = await kv.get<unknown>(`content:${page}`);
+    if (data) {
+      validateContentShape(page, data);
+      return data as T;
+    }
   }
 
   // Fallback to JSON file (initial seed data / local dev)
   const filePath = path.join(CONTENT_DIR, `${page}.json`);
   const raw = fs.readFileSync(filePath, 'utf-8');
-  return JSON.parse(raw) as T;
+  const parsed = JSON.parse(raw) as unknown;
+  validateContentShape(page, parsed);
+  return parsed as T;
 }
 
 export async function writeContent(page: string, data: unknown): Promise<void> {
+  validateContentShape(page, data);
+
   let written = false;
 
   // Write to Redis if available (production)

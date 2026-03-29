@@ -1,4 +1,6 @@
-export default function EducationalFocus({ content }: { content: any }) {
+import type { HowItWorksContent } from '@/lib/content-types';
+
+export default function EducationalFocus({ content }: { content: HowItWorksContent }) {
   return (
     <section className="py-16" style={{ background: 'var(--off-white)' }}>
       <div className="container-xl">

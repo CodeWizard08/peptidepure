@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import type { PeptidesContent } from '@/lib/content-types';
 
-export default function ProtocolsSection({ content }: { content: any }) {
+type ProtocolsContent = PeptidesContent['protocols'];
+
+export default function ProtocolsSection({ content }: { content: ProtocolsContent }) {
   return (
     <>
       <div className="mb-6">
@@ -12,7 +15,7 @@ export default function ProtocolsSection({ content }: { content: any }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {content.items.map((protocol: any, i: number) => (
+        {content.items.map((protocol, i: number) => (
           <div
             key={i}
             className="bg-white rounded-2xl overflow-hidden shadow-sm card-hover flex flex-col"

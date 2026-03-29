@@ -1,4 +1,6 @@
 /* SVG icons for solutionFeatures — kept inline because JSON can't hold JSX */
+import type { HowItWorksContent } from '@/lib/content-types';
+
 const solutionIcons = [
   // 0 — 3RD Party COAs (flask / beaker)
   <svg key={0} className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
@@ -17,7 +19,7 @@ const solutionIcons = [
   </svg>,
 ];
 
-export default function SolutionSection({ content }: { content: any }) {
+export default function SolutionSection({ content }: { content: HowItWorksContent }) {
   return (
     <section className="py-20 relative overflow-hidden" style={{ background: '#F5EFE6' }}>
 
@@ -54,7 +56,7 @@ export default function SolutionSection({ content }: { content: any }) {
 
         {/* 3 feature columns */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {content.solutionFeatures.map((item: { title: string; desc: string }, i: number) => (
+          {content.solutionFeatures.map((item, i: number) => (
             <div
               key={i}
               className="bg-white rounded-2xl p-7 shadow-sm"
@@ -80,7 +82,7 @@ export default function SolutionSection({ content }: { content: any }) {
         <div>
           <span className="section-label block mb-8">{content.relevanceStats.sectionLabel}</span>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16">
-            {content.relevanceStats.items.map((item: { stat: string; label: string; desc: string }, i: number) => (
+            {content.relevanceStats.items.map((item, i: number) => (
               <div
                 key={i}
                 className="flex gap-5 items-start py-6"

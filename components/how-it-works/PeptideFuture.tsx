@@ -41,7 +41,7 @@ const features = [
   },
 ];
 
-export default function PeptideFuture({ content }: { content: any }) {
+export default function PeptideFuture() {
   return (
     <section className="relative overflow-hidden">
       {/* Background image with overlay */}

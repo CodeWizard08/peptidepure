@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
+import type { PolicyPageContent, PolicySection } from '@/lib/content-types';
 
 export const metadata: Metadata = {
   title: 'Terms & Conditions',
@@ -9,15 +10,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/terms' },
 };
 
-interface TermsSection {
-  title: string;
-  text?: string;
-  items?: string[];
-  extra?: string;
-}
-
 export default async function TermsPage() {
-  const content = await getContent<any>('terms');
+  const content = await getContent<PolicyPageContent>('terms');
 
   return (
     <>
@@ -36,7 +30,7 @@ export default async function TermsPage() {
 
           {/* Sections */}
           <div className="space-y-10">
-            {content.sections.map((section: TermsSection, i: number) => (
+            {content.sections.map((section: PolicySection, i: number) => (
               <div key={i}>
                 <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--navy)' }}>
                   {section.title}

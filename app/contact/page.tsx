@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
+import type { ContactPageContent } from '@/lib/content-types';
 
 const ContactForm = dynamic(() => import('@/components/ContactForm'), {
   loading: () => (
@@ -23,6 +24,6 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-  const content = await getContent<any>('contact');
+  const content = await getContent<ContactPageContent>('contact');
   return <ContactForm content={content} />;
 }

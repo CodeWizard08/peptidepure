@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getContent } from '@/lib/content';
 import PageHero from '@/components/sections/PageHero';
+import type { PolicyPageContent, PolicySection } from '@/lib/content-types';
 
 export const metadata: Metadata = {
   title: 'Accessibility',
@@ -9,15 +10,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/accessibility' },
 };
 
-interface PolicySection {
-  title: string;
-  text?: string;
-  items?: string[];
-  extra?: string;
-}
-
 export default async function AccessibilityPage() {
-  const content = await getContent<any>('accessibility');
+  const content = await getContent<PolicyPageContent>('accessibility');
 
   return (
     <>

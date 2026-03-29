@@ -1,4 +1,5 @@
 import PageHero from '@/components/sections/PageHero';
+import type { PeptideDosingContent as PeptideDosingPageContent } from '@/lib/content-types';
 
 const CATEGORY_COLORS: Record<string, string> = {
   'Metabolic Optimization': '#C8952C',
@@ -14,13 +15,9 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Cognitive & Mood': '#0891B2',
 };
 
-interface PeptideCard {
-  name: string; category: string; categoryColor: string;
-  vial: string; diluent: string; concentration: string;
-  startingDose: string; startingUnits: string; notes: string; storage: string;
-}
+type PeptideCard = PeptideDosingPageContent['peptides'][number];
 
-export default function PeptideDosingContent({ content }: { content: any }) {
+export default function PeptideDosingContent({ content }: { content: PeptideDosingPageContent }) {
   const { hero, overview, safetyPrinciples, reconstitutionSteps, conversionRule, peptides, disclaimer } = content;
 
   return (
