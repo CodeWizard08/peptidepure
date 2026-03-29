@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import ContentField, { humanize, updateAtPath } from './ContentField';
 
 const PAGES = [
@@ -22,6 +22,9 @@ const PAGES = [
 ];
 
 export default function AdminContentPanel() {
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
   const [activePage, setActivePage] = useState('home');
   const [content, setContent] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,6 +55,29 @@ export default function AdminContentPanel() {
       return () => clearTimeout(id);
     }
   }, [toast]);
+
+  const checkScroll = useCallback(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const el = tabsRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', checkScroll, { passive: true });
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll]);
+
+  const scrollTabs = (dir: 'left' | 'right') => {
+    tabsRef.current?.scrollBy({ left: dir === 'left' ? -200 : 200, behavior: 'smooth' });
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -107,23 +133,55 @@ export default function AdminContentPanel() {
             {saving ? 'Saving…' : 'Save Page'}
           </button>
         </div>
-        {/* Tab bar */}
-        <div className="flex overflow-x-auto px-8 gap-1 pb-0" style={{ scrollbarWidth: 'none' }}>
-          {PAGES.map((page) => (
+        {/* Tab bar with scroll arrows */}
+        <div className="relative flex items-end px-8">
+          {canScrollLeft && (
             <button
-              key={page.key}
-              onClick={() => setActivePage(page.key)}
-              className="shrink-0 px-4 py-2.5 text-sm font-medium transition-colors rounded-t-lg"
+              onClick={() => scrollTabs('left')}
+              className="absolute left-0 z-10 flex items-center justify-center w-8 h-full top-0"
               style={{
-                color: activePage === page.key ? 'var(--gold)' : 'var(--text-mid)',
-                background: activePage === page.key ? 'var(--gold-pale)' : 'transparent',
-                borderBottom: activePage === page.key ? '2px solid var(--gold)' : '2px solid transparent',
-                fontWeight: activePage === page.key ? 600 : 400,
+                background: 'linear-gradient(to right, white 60%, transparent)',
               }}
             >
-              {page.label}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'var(--navy)' }}>
+                <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </button>
-          ))}
+          )}
+          <div
+            ref={tabsRef}
+            className="flex overflow-x-auto gap-1 pb-0 w-full"
+            style={{ scrollbarWidth: 'none' }}
+          >
+            {PAGES.map((page) => (
+              <button
+                key={page.key}
+                onClick={() => setActivePage(page.key)}
+                className="shrink-0 px-4 py-2.5 text-sm font-medium transition-colors rounded-t-lg"
+                style={{
+                  color: activePage === page.key ? 'var(--gold)' : 'var(--text-mid)',
+                  background: activePage === page.key ? 'var(--gold-pale)' : 'transparent',
+                  borderBottom: activePage === page.key ? '2px solid var(--gold)' : '2px solid transparent',
+                  fontWeight: activePage === page.key ? 600 : 400,
+                }}
+              >
+                {page.label}
+              </button>
+            ))}
+          </div>
+          {canScrollRight && (
+            <button
+              onClick={() => scrollTabs('right')}
+              className="absolute right-0 z-10 flex items-center justify-center w-8 h-full top-0"
+              style={{
+                background: 'linear-gradient(to left, white 60%, transparent)',
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'var(--navy)' }}>
+                <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
