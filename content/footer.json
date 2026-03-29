@@ -14,7 +14,8 @@
     { "label": "Terms of Use", "href": "/terms" },
     { "label": "Shipping & Payments", "href": "/shipping" },
     { "label": "Refunds & Returns", "href": "/refunds" },
-    { "label": "Accessibility Statement", "href": "/accessibility" }
+    { "label": "Accessibility Statement", "href": "/accessibility" },
+    { "label": "Legality & Compliance", "href": "/legality" }
   ],
   "contactItems": [
     { "label": "Phone", "value": "(858) 480-1017", "sub": "Mon–Fri  ·  9AM – 4PM PST", "href": "tel:8584801017" },

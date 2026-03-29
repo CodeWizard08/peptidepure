@@ -74,21 +74,27 @@
     "heading": "Downloads & Resources",
     "items": [
       {
-        "title": "MMRN-001-2025 Protocol Summary",
+        "title": "PPRN-001-2025 Protocol Summary",
         "description": "Overview of the observational registry design, data collection requirements, and adverse event reporting obligations.",
-        "href": "/docs/mmrn-001-2025-protocol-summary.pdf",
+        "href": "/docs/PPRN_001_2025_Protocol_Summary.pdf",
         "label": "Download PDF"
       },
       {
-        "title": "Patient Informed Consent Template",
+        "title": "Informed Consent Template",
         "description": "IRCM-approved consent form template for enrolling patients in the Mortensen Medical Research Network.",
-        "href": "/docs/mmrn-patient-consent-template.pdf",
+        "href": "/docs/PPRN_Informed_Consent_Template.pdf",
         "label": "Download PDF"
       },
       {
         "title": "Data Capture Best Practices",
         "description": "Step-by-step guide for completing each IRB form accurately and submitting data through the PeptidePure™ Data Capture tools.",
-        "href": "/docs/data-capture-best-practices.pdf",
+        "href": "/docs/PPRN_Data_Capture_Best_Practices.pdf",
+        "label": "Download PDF"
+      },
+      {
+        "title": "Adverse Event Report Form",
+        "description": "Standardized form for reporting adverse events and serious adverse events per PPRN-001-2025 protocol requirements.",
+        "href": "/docs/PPRN_Adverse_Event_Report_Form.pdf",
         "label": "Download PDF"
       }
     ]

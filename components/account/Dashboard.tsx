@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import type { Order } from '@/lib/types/order';
+import Link from 'next/link';
 import DashboardHome from './DashboardHome';
 import OrdersPanel from './OrdersPanel';
 import AddressesPanel from './AddressesPanel';
@@ -25,6 +26,7 @@ export default function Dashboard({ user, onSignOut }: { user: User; onSignOut: 
   const [ordersFetched, setOrdersFetched] = useState(false);
   const supabase = createClient();
   const displayName = user.user_metadata?.full_name || 'Clinician';
+  const isAdmin = user.app_metadata?.role === 'admin';
 
   useEffect(() => {
     if ((tab === 'orders' || tab === 'dashboard') && !ordersFetched) {
@@ -44,7 +46,17 @@ export default function Dashboard({ user, onSignOut }: { user: User; onSignOut: 
       <div className="py-8" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="container-xl">
           <span className="section-label">Clinician Portal</span>
-          <h1 className="text-2xl md:text-3xl font-bold mt-1" style={{ color: 'var(--navy)' }}>My Account</h1>
+          <div className="flex items-center gap-3 mt-1">
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--navy)' }}>My Account</h1>
+            {isAdmin && (
+              <span
+                className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full"
+                style={{ background: 'var(--gold)', color: 'white' }}
+              >
+                Admin
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -63,6 +75,19 @@ export default function Dashboard({ user, onSignOut }: { user: User; onSignOut: 
                   </button>
                 );
               })}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-left hover:bg-gray-50"
+                  style={{ color: 'var(--gold)' }}
+                >
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ opacity: 0.7 }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Admin Panel
+                </Link>
+              )}
               <div className="pt-2" style={{ borderTop: '1px solid var(--border)' }}>
                 <button onClick={onSignOut} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-left hover:bg-red-50" style={{ color: '#DC2626' }}>
                   <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ opacity: 0.7 }}>

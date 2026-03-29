@@ -95,7 +95,7 @@ export default async function HowToGetStartedPage() {
             <h2 className="text-2xl font-bold mb-8" style={{ color: 'var(--navy)' }}>
               {content.resources.heading}
             </h2>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 gap-6">
               {content.resources.items.map((resource: Resource, i: number) => (
                 <div
                   key={i}
@@ -115,6 +115,9 @@ export default async function HowToGetStartedPage() {
                   </p>
                   <a
                     href={resource.href}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold"
                     style={{ color: 'var(--gold)' }}
                   >

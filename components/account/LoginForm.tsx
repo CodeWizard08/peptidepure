@@ -28,11 +28,24 @@ export default function LoginForm() {
   const handleResetPassword = async () => {
     if (!email) { setError('Enter your email address first, then click "Lost your password?"'); return; }
     setError(''); setSuccessMsg('');
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/account/reset-password`,
-    });
-    if (error) { setError(error.message); }
-    else { setEmail(''); setPassword(''); setSuccessMsg('Password reset email sent — check your inbox.'); }
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          redirectTo: `${window.location.origin}/auth/callback?next=/account/reset-password`,
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to send reset email');
+      }
+      setEmail(''); setPassword('');
+      setSuccessMsg('Password reset email sent — check your inbox (and spam folder).');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    }
   };
 
   return (
