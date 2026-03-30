@@ -97,10 +97,10 @@ export default function Header() {
     { label: 'Our Company', href: '/our-company', section: 'main' as const },
     { label: 'COA', href: '/coa', section: 'main' as const },
     { label: 'How It Works', href: '/how-it-works', section: 'main' as const, requiresAuth: true },
-    { label: 'Contact Us', href: '/contact', section: 'main' as const },
+    { label: 'Legality', href: '/legality', section: 'main' as const },
     { label: 'Inventory', href: '/inventory', section: 'more' as const, requiresAuth: true },
     { label: 'Getting Started', href: '/how-to-get-started', section: 'more' as const },
-    { label: 'Legality', href: '/legality', section: 'more' as const },
+    { label: 'Contact Us', href: '/contact', section: 'more' as const },
   ];
 
   const visibleNavLinks = navLinks.filter((link) => !link.requiresAuth || user);
