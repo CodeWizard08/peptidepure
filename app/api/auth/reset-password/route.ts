@@ -49,8 +49,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
+    console.log(`[reset-password] Request for: ${email}`);
+    console.log(`[reset-password] redirectTo: ${redirectTo}`);
+
     // Generate a recovery link via Admin API for branded email delivery.
-    // Use Supabase-provided action_link directly to avoid token parameter mismatches.
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email,
@@ -60,21 +62,24 @@ export async function POST(request: Request) {
     const resetLink = data?.properties?.action_link;
     let sent = false;
 
+    console.log(`[reset-password] generateLink error: ${error?.message ?? 'none'}`);
+    console.log(`[reset-password] action_link: ${resetLink ? 'generated' : 'MISSING'}`);
+
     if (!error && resetLink) {
       sent = await sendEmail({
         to: email,
         subject: 'Reset your PeptidePure™ password',
         html: resetEmailHtml(resetLink),
       });
+      console.log(`[reset-password] Resend result: ${sent ? 'SENT' : 'FAILED'}`);
     } else if (error) {
-      console.error('Generate link error:', error.message);
+      console.error('[reset-password] Generate link error:', error.message);
     } else {
-      console.error('No action_link in generated reset link payload');
+      console.error('[reset-password] No action_link in payload');
     }
 
     if (!sent) {
-      // Fallback: trigger Supabase built-in reset email path.
-      // This improves deliverability when custom email provider is misconfigured.
+      console.log('[reset-password] Falling back to Supabase built-in email...');
       const supabaseAnon = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -82,7 +87,9 @@ export async function POST(request: Request) {
 
       const { error: fallbackError } = await supabaseAnon.auth.resetPasswordForEmail(email, { redirectTo });
       if (fallbackError) {
-        console.error('Supabase fallback reset email failed:', fallbackError.message);
+        console.error('[reset-password] Supabase fallback FAILED:', fallbackError.message);
+      } else {
+        console.log('[reset-password] Supabase fallback sent (check spam)');
       }
     }
 
