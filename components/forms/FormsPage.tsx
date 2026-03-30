@@ -346,6 +346,105 @@ function AdverseEventForm() {
 }
 
 /* ─────────────────────────────────────────────
+   Quick Capture — paste clinical note
+───────────────────────────────────────────── */
+function QuickCapture() {
+  const [note, setNote] = useState('');
+  const [patientId, setPatientId] = useState('');
+  const [encounterDate, setEncounterDate] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+    try {
+      const res = await fetch('/api/forms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          formType: 'soap_capture',
+          data: {
+            captureMethod: 'quick-paste',
+            patientId,
+            encounterDate,
+            rawClinicalNote: note,
+            capturedAt: new Date().toISOString(),
+          },
+        }),
+      });
+      if (!res.ok) throw new Error('Submission failed');
+      setSubmitted(true);
+      setNote('');
+      setPatientId('');
+      setEncounterDate('');
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div className="text-center py-6">
+        <svg className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--gold)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+        <p className="text-sm font-semibold mb-1" style={{ color: 'var(--navy)' }}>Clinical note submitted successfully.</p>
+        <p className="text-xs mb-4" style={{ color: 'var(--text-light)' }}>Data has been saved and will be extracted into structured fields.</p>
+        <button onClick={() => setSubmitted(false)} className="text-xs font-semibold underline" style={{ color: 'var(--gold)' }}>
+          Submit another note
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="irb-form space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <FieldLabel required>Patient ID / Initials</FieldLabel>
+          <input type="text" value={patientId} onChange={(e) => setPatientId(e.target.value)} required placeholder="e.g. JD-001" />
+        </div>
+        <div>
+          <FieldLabel required>Encounter Date</FieldLabel>
+          <input type="date" value={encounterDate} onChange={(e) => setEncounterDate(e.target.value)} required />
+        </div>
+      </div>
+      <div>
+        <FieldLabel required>Clinical Note</FieldLabel>
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          required
+          placeholder={"Paste your full clinical note here — SOAP note, progress note, encounter summary, or any structured/unstructured clinical documentation.\n\nExample:\nS: Patient reports improved energy levels after 4 weeks on BPC-157...\nO: BP 118/76, HR 68, Weight 182 lbs...\nA: Responding well to protocol...\nP: Continue current protocol..."}
+          style={{ minHeight: '220px', lineHeight: '1.7' }}
+        />
+      </div>
+      <p className="text-xs leading-relaxed" style={{ color: 'var(--text-light)' }}>
+        Vitals, labs, body composition, medications, patient-reported outcomes, and adverse events will be automatically extracted and structured from your note.
+      </p>
+      {error && <ErrorBanner message={error} />}
+      <div className="flex items-center gap-4 flex-wrap">
+        <button type="submit" className="btn-primary" disabled={submitting}>
+          {submitting ? 'Submitting...' : 'Submit Clinical Note'}
+        </button>
+        <Link
+          href="/forms/soap-capture"
+          className="text-xs font-semibold underline underline-offset-2"
+          style={{ color: 'var(--gold)' }}
+        >
+          Or use the interactive extraction tool →
+        </Link>
+      </div>
+    </form>
+  );
+}
+
+/* ─────────────────────────────────────────────
    Main Forms Page
 ───────────────────────────────────────────── */
 export default function FormsPage() {
@@ -357,14 +456,18 @@ export default function FormsPage() {
           <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--gold)' }}>
             Clinical Tools
           </span>
-          <h1 className="text-3xl font-bold text-white mt-2">Forms &amp; Data Capture</h1>
+          <h1 className="text-3xl font-bold text-white mt-2">Data Capture Made Simple</h1>
           <p className="text-sm mt-2 max-w-xl" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            Submit clinical data directly on-site. Complete the SOAP Note for each patient encounter and use the Adverse Event Report for any AE/SAE documentation.
+            Paste your clinical note (SOAP, progress note, or encounter) below. Our system automatically extracts and
+            structures the key data. Prefer manual entry? You can complete individual fields at any time.
           </p>
           {/* Quick jump links */}
           <div className="flex gap-4 mt-6 flex-wrap">
-            <a href="#soap-note" className="text-xs font-semibold px-4 py-2 rounded-full transition-colors" style={{ background: 'rgba(200,149,44,0.15)', color: 'var(--gold)', border: '1px solid rgba(200,149,44,0.3)' }}>
-              SOAP Note
+            <a href="#quick-capture" className="text-xs font-semibold px-4 py-2 rounded-full transition-colors" style={{ background: 'rgba(200,149,44,0.15)', color: 'var(--gold)', border: '1px solid rgba(200,149,44,0.3)' }}>
+              Paste Clinical Note
+            </a>
+            <a href="#soap-note" className="text-xs font-semibold px-4 py-2 rounded-full transition-colors" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.15)' }}>
+              Manual SOAP Form
             </a>
             <a href="#ae-report" className="text-xs font-semibold px-4 py-2 rounded-full transition-colors" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.15)' }}>
               Adverse Event Report
@@ -378,15 +481,54 @@ export default function FormsPage() {
 
       <div className="py-12">
         <div className="container-xl max-w-4xl">
+
+          {/* ═══════════════════════════════════════════
+             QUICK CAPTURE — paste clinical note (easiest option, top of page)
+          ═══════════════════════════════════════════ */}
+          <div id="quick-capture" className="scroll-mt-28 bg-white rounded-2xl shadow-sm p-8 md:p-10 mb-6" style={{ border: '2px solid var(--gold)', boxShadow: '0 4px 24px rgba(200,149,44,0.08)' }}>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: 'var(--gold-pale)', border: '1.5px solid var(--gold)' }}>
+                  <svg className="w-5 h-5" style={{ color: 'var(--gold)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>Paste Clinical Note</h2>
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ background: 'var(--gold-pale)', color: 'var(--gold)' }}>
+                      Fastest
+                    </span>
+                  </div>
+                  <p className="text-xs" style={{ color: 'var(--text-light)' }}>
+                    Copy your entire SOAP note, progress note, or encounter — we extract and organize the data for you
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6">
+              <QuickCapture />
+            </div>
+          </div>
+
+          {/* Divider between quick capture and manual forms */}
+          <div className="flex items-center gap-4 mb-10 mt-10">
+            <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
+            <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
+              Or use manual entry forms
+            </span>
+            <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
+          </div>
+
           {/* Required fields note */}
           <p className="text-xs mb-10" style={{ color: 'var(--text-light)' }}>
             <span style={{ color: 'var(--gold)' }}>*</span> indicates required fields. All submissions are encrypted and stored per HIPAA guidelines.
           </p>
 
           {/* ═══════════════════════════════════════════
-             SOAP Note / Data Capture
+             SOAP Note / Data Capture (manual)
           ═══════════════════════════════════════════ */}
-          <SectionAnchor id="soap-note" label="SOAP Note / Data Capture" />
+          <SectionAnchor id="soap-note" label="SOAP Note — Manual Entry" />
           <div className="bg-white rounded-2xl shadow-sm p-8 md:p-10 mb-16" style={{ border: '1px solid var(--border)' }}>
             <div className="flex items-center gap-3 mb-1">
               <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: 'var(--gold-pale)', border: '1.5px solid var(--gold)' }}>
@@ -396,7 +538,7 @@ export default function FormsPage() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>SOAP Note</h2>
-                <p className="text-xs" style={{ color: 'var(--text-light)' }}>Primary clinical documentation — complete for each patient encounter</p>
+                <p className="text-xs" style={{ color: 'var(--text-light)' }}>Field-by-field entry — complete for each patient encounter</p>
               </div>
             </div>
             <div className="mt-8">
