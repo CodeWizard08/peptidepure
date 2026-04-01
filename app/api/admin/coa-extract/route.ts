@@ -3,12 +3,8 @@ import { isAuthenticated } from '@/lib/admin-auth';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require('pdf-parse');
-
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Use service role client for storage uploads
 function getAdminSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,89 +12,7 @@ function getAdminSupabase() {
   );
 }
 
-/**
- * POST /api/admin/coa-extract
- * Accepts a PDF upload, stores it in Supabase Storage,
- * extracts text, uses OpenAI to parse COA data.
- */
-export async function POST(request: Request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const formData = await request.formData();
-  const file = formData.get('pdf') as File | null;
-  const labName = (formData.get('lab') as string) || '';
-
-  if (!file || !file.name.endsWith('.pdf')) {
-    return NextResponse.json({ error: 'Please upload a PDF file' }, { status: 400 });
-  }
-
-  // Read PDF bytes
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-
-  // Upload PDF to Supabase Storage
-  let pdfPublicUrl = `/coa/${safeName}`;
-  try {
-    const supabase = getAdminSupabase();
-
-    // Ensure bucket exists (ignore error if it already does)
-    await supabase.storage.createBucket('coa', { public: true }).catch(() => {});
-
-    const { error: uploadError } = await supabase.storage
-      .from('coa')
-      .upload(safeName, buffer, {
-        contentType: 'application/pdf',
-        upsert: true,
-      });
-
-    if (uploadError) {
-      console.error('Storage upload error:', uploadError);
-      // Non-fatal — continue with extraction, user can upload PDF manually
-    } else {
-      const { data: urlData } = supabase.storage.from('coa').getPublicUrl(safeName);
-      pdfPublicUrl = urlData.publicUrl;
-    }
-  } catch (err) {
-    console.error('Storage error:', err);
-    // Non-fatal
-  }
-
-  // Extract text from PDF
-  let pdfText = '';
-  try {
-    const parsed = await pdfParse(buffer);
-    pdfText = parsed.text;
-  } catch (err) {
-    console.error('PDF parse error:', err);
-    return NextResponse.json(
-      { error: 'Failed to extract text from PDF. The file may be image-based — try a text-based PDF.' },
-      { status: 422 },
-    );
-  }
-
-  if (!pdfText.trim()) {
-    return NextResponse.json(
-      { error: 'No text found in PDF. This may be a scanned/image-based document.' },
-      { status: 422 },
-    );
-  }
-
-  // Truncate to avoid token limits (COAs are usually short)
-  const truncated = pdfText.slice(0, 12000);
-
-  // Ask OpenAI to extract structured COA data
-  try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      temperature: 0,
-      response_format: { type: 'json_object' },
-      messages: [
-        {
-          role: 'system',
-          content: `You are a lab data extraction assistant. Extract Certificate of Analysis (COA) data from the provided text.
+const SYSTEM_PROMPT = `You are a lab data extraction assistant. Extract Certificate of Analysis (COA) data from the provided PDF.
 
 Return a JSON object with this exact structure:
 {
@@ -128,23 +42,87 @@ Rules:
 - Date should be the analysis/report date in YYYY-MM-DD format
 - The "compound" in record should list ALL compounds, e.g. "Freedom Diagnostics — BPC-157, TB-500, NAD+"
 - Purity in summaryChart must be a number (e.g. 99.525), not a string
-- If a compound has a dosage/amount listed, include it (e.g. "NAD+ 1000mg", "TIRZ 30mg")`,
-        },
+- If a compound has a dosage/amount listed, include it (e.g. "NAD+ 1000mg", "TIRZ 30mg")
+- Return ONLY the JSON object, no other text`;
+
+/**
+ * POST /api/admin/coa-extract
+ * Accepts a PDF upload, stores in Supabase Storage,
+ * sends directly to GPT-4o for extraction (no pdf-parse needed).
+ */
+export async function POST(request: Request) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return NextResponse.json({ error: 'Invalid form data' }, { status: 400 });
+  }
+
+  const file = formData.get('pdf') as File | null;
+  const labName = (formData.get('lab') as string) || '';
+
+  if (!file || !file.name.toLowerCase().endsWith('.pdf')) {
+    return NextResponse.json({ error: 'Please upload a PDF file' }, { status: 400 });
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const base64 = buffer.toString('base64');
+
+  // Upload PDF to Supabase Storage
+  let pdfPublicUrl = `/coa/${safeName}`;
+  try {
+    const supabase = getAdminSupabase();
+    await supabase.storage.createBucket('coa', { public: true }).catch(() => {});
+    const { error: uploadError } = await supabase.storage
+      .from('coa')
+      .upload(safeName, buffer, { contentType: 'application/pdf', upsert: true });
+
+    if (!uploadError) {
+      const { data: urlData } = supabase.storage.from('coa').getPublicUrl(safeName);
+      pdfPublicUrl = urlData.publicUrl;
+    }
+  } catch {
+    // Non-fatal — extraction still works
+  }
+
+  // Send PDF directly to GPT-4o via Responses API
+  try {
+    const response = await openai.responses.create({
+      model: 'gpt-4o',
+      temperature: 0,
+      input: [
+        { role: 'system', content: SYSTEM_PROMPT },
         {
           role: 'user',
-          content: `Extract COA data from this PDF. The file will be saved as "${safeName}".${labName ? ` The lab/source is "${labName}".` : ''}\n\nPDF Text:\n${truncated}`,
+          content: [
+            {
+              type: 'input_file',
+              filename: safeName,
+              file_data: `data:application/pdf;base64,${base64}`,
+            },
+            {
+              type: 'input_text',
+              text: `Extract all COA data from this PDF.${labName ? ` The lab/source is "${labName}".` : ''} The file is saved as "${safeName}".`,
+            },
+          ],
         },
       ],
+      text: { format: { type: 'json_object' } },
     });
 
-    const content = completion.choices[0]?.message?.content;
+    const content = response.output_text;
     if (!content) {
       return NextResponse.json({ error: 'No response from AI' }, { status: 500 });
     }
 
     const extracted = JSON.parse(content);
 
-    // Set the PDF path to the Supabase Storage URL
     if (extracted.record) {
       extracted.record.pdf = pdfPublicUrl;
     }
@@ -152,11 +130,11 @@ Rules:
     return NextResponse.json({
       success: true,
       pdfPath: pdfPublicUrl,
-      pdfTextPreview: truncated.slice(0, 500),
       extracted,
     });
   } catch (err) {
     console.error('OpenAI extraction error:', err);
-    return NextResponse.json({ error: 'AI extraction failed' }, { status: 500 });
+    const message = err instanceof Error ? err.message : 'AI extraction failed';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
