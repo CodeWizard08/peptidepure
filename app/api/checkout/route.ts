@@ -80,7 +80,7 @@ export async function POST(request: Request) {
     return sum + product.price_cents * item.quantity;
   }, 0);
 
-  if (orderTotalCents < 100_000) {
+  if (orderTotalCents < 100) { // TEMP for testing, restore to 100_000
     return NextResponse.json(
       { error: 'Minimum order is $1,000. For smaller orders, please email info@peptidepure.com.' },
       { status: 400 }
