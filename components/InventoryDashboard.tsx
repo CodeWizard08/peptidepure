@@ -573,7 +573,7 @@ export default function InventoryDashboard({
       </div>
 
       {/* ── Category Pills ───────────────────────────── */}
-      <div className="container-xl mt-5">
+      <div className="container-xl !mt-5">
         <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
           {CATEGORIES.map(({ key, label, icon }) => {
             const active = activeCategory === key;
@@ -608,7 +608,7 @@ export default function InventoryDashboard({
       </div>
 
       {/* ── Content ──────────────────────────────────── */}
-      <div className="container-xl mt-5 pb-16">
+      <div className="container-xl !mt-5 pb-16">
         {/* Active filter summary */}
         {hasActiveFilters && (
           <div className="flex items-center gap-3 mb-5 px-1">
