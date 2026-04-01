@@ -44,7 +44,6 @@ function TextInput({ value, onChange, placeholder, mono }: { value: string; onCh
 
 export default function AdminInventoryListPanel() {
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [lastUpdated, setLastUpdated] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -58,11 +57,10 @@ export default function AdminInventoryListPanel() {
   };
 
   useEffect(() => {
-    fetch('/api/content?page=inventory')
+    fetch('/api/admin/inventory')
       .then((r) => r.json())
       .then((data) => {
         setItems(data.inventory || []);
-        setLastUpdated(data.lastUpdated || '');
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -97,10 +95,10 @@ export default function AdminInventoryListPanel() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch('/api/content?page=inventory', {
+      const res = await fetch('/api/admin/inventory', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lastUpdated, inventory: items }),
+        body: JSON.stringify({ inventory: items }),
       });
       if (!res.ok) throw new Error();
       setDirty(false);
@@ -147,21 +145,6 @@ export default function AdminInventoryListPanel() {
         </div>
       </div>
 
-      {/* Last updated */}
-      <div className="flex items-center gap-3 mb-6 mt-4 p-4 rounded-xl" style={{ background: 'white', border: '1px solid var(--border)' }}>
-        <label className="text-xs font-semibold uppercase tracking-wide shrink-0" style={{ color: 'var(--text-mid)' }}>
-          Last Updated
-        </label>
-        <input
-          type="text"
-          value={lastUpdated}
-          onChange={(e) => { setLastUpdated(e.target.value); markDirty(); }}
-          placeholder="e.g. March 2026"
-          className="flex-1 max-w-xs px-3 py-1.5 rounded-lg text-sm focus:outline-none"
-          style={{ background: 'var(--off-white)', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
-        />
-        <span className="text-xs" style={{ color: 'var(--text-light)' }}>Shown at the top of the /inventory page</span>
-      </div>
 
       {/* Filters + Add */}
       <div className="flex flex-wrap gap-3 mb-4">

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import type { Order } from '@/lib/types/order';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import DashboardHome from './DashboardHome';
 import OrdersPanel from './OrdersPanel';
 import AddressesPanel from './AddressesPanel';
@@ -20,7 +21,11 @@ const NAV_ITEMS: { key: DashboardTab; label: string; icon: React.ReactNode }[] =
 ];
 
 export default function Dashboard({ user, onSignOut }: { user: User; onSignOut: () => void }) {
-  const [tab, setTab] = useState<DashboardTab>('dashboard');
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get('tab') as DashboardTab) ?? 'dashboard';
+  const [tab, setTab] = useState<DashboardTab>(
+    ['dashboard', 'orders', 'addresses', 'account'].includes(initialTab) ? initialTab : 'dashboard'
+  );
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersFetched, setOrdersFetched] = useState(false);

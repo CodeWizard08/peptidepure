@@ -33,6 +33,7 @@ export type Order = {
   patient_id: string;
   order_type: string;
   status: 'pending' | 'approved' | 'processing' | 'completed' | 'cancelled';
+  payment_method: string | null;
   items: OrderItemJson[];
   subtotal_cents: number;
   discount_cents: number;

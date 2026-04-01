@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 /* ── Types ─────────────────────────────────────────────── */
 type Status = 'ok' | 'low' | 'order' | 'out';
@@ -279,28 +280,64 @@ export default function InventoryDashboard({
   const [activeStatus, setActiveStatus] = useState<Status | 'all'>('all');
   const [activeCategory, setActiveCategory] = useState<CategoryKey>('all');
   const [view, setView] = useState<ViewMode>('grid');
+  const [liveInventory, setLiveInventory] = useState<InventoryItem[]>(inventory);
+  const [justUpdated, setJustUpdated] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
+
+  /* ── Real-time subscription ───────────────────────────── */
+  const fetchInventory = useCallback(async () => {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from('inventory')
+      .select('id, product, dose, stock, status, notes')
+      .order('sort_order', { ascending: true });
+    if (data) {
+      setLiveInventory(
+        data.map((r) => ({
+          id: r.id as string,
+          product: r.product as string,
+          dose: r.dose as string,
+          stock: r.stock as number,
+          status: r.status as Status,
+          notes: r.notes as string | undefined,
+        }))
+      );
+      setJustUpdated(true);
+      setTimeout(() => setJustUpdated(false), 2500);
+    }
+  }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel('inventory-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, () => {
+        fetchInventory();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchInventory]);
 
   /* ── Computed ─────────────────────────────────────────── */
   const counts = useMemo(() => ({
-    all:   inventory.length,
-    ok:    inventory.filter((i) => i.status === 'ok').length,
-    low:   inventory.filter((i) => i.status === 'low').length,
-    order: inventory.filter((i) => i.status === 'order').length,
-    out:   inventory.filter((i) => i.status === 'out').length,
-  }), [inventory]);
+    all:   liveInventory.length,
+    ok:    liveInventory.filter((i) => i.status === 'ok').length,
+    low:   liveInventory.filter((i) => i.status === 'low').length,
+    order: liveInventory.filter((i) => i.status === 'order').length,
+    out:   liveInventory.filter((i) => i.status === 'out').length,
+  }), [liveInventory]);
 
-  const totalUnits = useMemo(() => inventory.reduce((s, i) => s + i.stock, 0), [inventory]);
+  const totalUnits = useMemo(() => liveInventory.reduce((s, i) => s + i.stock, 0), [liveInventory]);
 
   const categoryCounts = useMemo(() => {
-    const map: Record<CategoryKey, number> = { all: inventory.length, weight: 0, recovery: 0, longevity: 0, cognitive: 0, hormonal: 0, specialty: 0 };
-    inventory.forEach((i) => { map[getCategory(i.product)]++; });
+    const map: Record<CategoryKey, number> = { all: liveInventory.length, weight: 0, recovery: 0, longevity: 0, cognitive: 0, hormonal: 0, specialty: 0 };
+    liveInventory.forEach((i) => { map[getCategory(i.product)]++; });
     return map;
-  }, [inventory]);
+  }, [liveInventory]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return inventory.filter((item) => {
+    return liveInventory.filter((item) => {
       const matchesStatus = activeStatus === 'all' || item.status === activeStatus;
       const matchesCategory = activeCategory === 'all' || getCategory(item.product) === activeCategory;
       const matchesSearch =
@@ -393,15 +430,16 @@ export default function InventoryDashboard({
                 <span
                   className="w-2 h-2 rounded-full"
                   style={{
-                    background: '#10B981',
+                    background: justUpdated ? 'var(--gold)' : '#10B981',
                     animation: 'livePulse 2s ease-in-out infinite',
+                    transition: 'background 0.3s',
                   }}
                 />
                 <span
                   className="text-[11px] font-bold uppercase tracking-[0.2em]"
-                  style={{ color: 'var(--gold)' }}
+                  style={{ color: justUpdated ? 'white' : 'var(--gold)', transition: 'color 0.3s' }}
                 >
-                  Clinician Portal · Live
+                  {justUpdated ? 'Updated' : 'Clinician Portal · Live'}
                 </span>
               </div>
               <h1
