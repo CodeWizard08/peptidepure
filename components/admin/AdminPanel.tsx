@@ -10,8 +10,9 @@ import AdminFormsPanel from './AdminFormsPanel';
 import AdminContentPanel from './AdminContentPanel';
 import AdminInventoryPanel from './AdminInventoryPanel';
 import AdminInventoryListPanel from './AdminInventoryListPanel';
+import AdminCoaPanel from './AdminCoaPanel';
 
-type Section = 'dashboard' | 'orders' | 'products' | 'inventory' | 'inventory-list' | 'users' | 'forms' | 'content';
+type Section = 'dashboard' | 'orders' | 'products' | 'inventory' | 'inventory-list' | 'users' | 'forms' | 'content' | 'coa';
 
 const NAV: { key: Section; label: string; icon: React.ReactNode }[] = [
   {
@@ -74,6 +75,16 @@ const NAV: { key: Section; label: string; icon: React.ReactNode }[] = [
     icon: (
       <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'coa',
+    label: 'COA Manager',
+    icon: (
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 2v6h6" />
       </svg>
     ),
   },
@@ -206,6 +217,7 @@ export default function AdminPanel() {
         {activeSection === 'inventory-list' && <AdminInventoryListPanel />}
         {activeSection === 'users' && <AdminUsersPanel />}
         {activeSection === 'forms' && <AdminFormsPanel />}
+        {activeSection === 'coa' && <AdminCoaPanel />}
         {activeSection === 'content' && <AdminContentPanel />}
       </main>
     </div>

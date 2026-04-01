@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['pdf-parse'],
   poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],

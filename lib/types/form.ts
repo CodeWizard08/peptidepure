@@ -1,4 +1,4 @@
-export type FormType = 'baseline' | 'treatment-log' | 'ae-sae-report' | 'outcomes' | 'contact' | 'soap_capture';
+export type FormType = 'baseline' | 'treatment-log' | 'ae-sae-report' | 'outcomes' | 'contact' | 'soap_capture' | 'product-request';
 
 export type FormSubmission = {
   id: string;
