@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       .insert({
         patient_id: metadata.userId,
         order_type: 'supplement',
-        status: 'confirmed',
+        status: 'approved',
         payment_method: 'credit_card',
         stripe_session_id: session.id,
         items: orderItems,

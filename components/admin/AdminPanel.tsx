@@ -112,6 +112,7 @@ function HexLogo({ size = 24 }: { size?: number }) {
 
 export default function AdminPanel() {
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -119,23 +120,40 @@ export default function AdminPanel() {
     window.location.href = '/account';
   };
 
-  // --- Main layout ---
+  const navigate = (section: Section) => {
+    setActiveSection(section);
+    setSidebarOpen(false);
+  };
+
   return (
     <div
       className="flex min-h-screen"
       style={{ fontFamily: "'Inter', system-ui, sans-serif", background: 'var(--off-white)' }}
     >
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className="w-56 shrink-0 flex flex-col sticky top-0 h-screen overflow-y-auto"
+        className={`
+          fixed inset-y-0 left-0 z-50 w-56 flex flex-col overflow-y-auto
+          transition-transform duration-300 ease-in-out
+          lg:sticky lg:top-0 lg:h-screen lg:translate-x-0
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
         style={{
           background: 'var(--navy)',
           borderRight: '1px solid rgba(200,149,44,0.15)',
         }}
       >
-        {/* Logo */}
+        {/* Logo + close button */}
         <div
-          className="px-5 py-5"
+          className="px-5 py-5 flex items-center justify-between"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
         >
           <div className="flex items-center gap-2">
@@ -147,6 +165,16 @@ export default function AdminPanel() {
               </p>
             </div>
           </div>
+          {/* Close button — mobile only */}
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden p-1 rounded"
+            style={{ color: 'rgba(255,255,255,0.5)' }}
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         {/* Nav */}
@@ -156,7 +184,7 @@ export default function AdminPanel() {
             return (
               <button
                 key={item.key}
-                onClick={() => setActiveSection(item.key)}
+                onClick={() => navigate(item.key)}
                 className="w-full text-left flex items-center gap-3 px-5 py-3 text-sm transition-all"
                 style={{
                   color: isActive ? '#C8952C' : 'rgba(255,255,255,0.55)',
@@ -208,8 +236,30 @@ export default function AdminPanel() {
 
       {/* Main content */}
       <main className="flex-1 min-w-0 overflow-y-auto">
+        {/* Mobile top bar */}
+        <div
+          className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3 lg:hidden"
+          style={{ background: 'var(--navy)', borderBottom: '1px solid rgba(200,149,44,0.15)' }}
+        >
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-1.5 rounded-lg"
+            style={{ color: 'white', background: 'rgba(255,255,255,0.1)' }}
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div className="flex items-center gap-2">
+            <HexLogo size={18} />
+            <span className="text-sm font-bold text-white">
+              {NAV.find((n) => n.key === activeSection)?.label || 'Admin'}
+            </span>
+          </div>
+        </div>
+
         {activeSection === 'dashboard' && (
-          <AdminDashboard onNavigate={(s) => setActiveSection(s as Section)} />
+          <AdminDashboard onNavigate={(s) => navigate(s as Section)} />
         )}
         {activeSection === 'orders' && <AdminOrdersPanel embedded />}
         {activeSection === 'products' && <AdminProductsPanel />}

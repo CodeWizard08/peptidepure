@@ -159,22 +159,26 @@ export async function POST(request: Request) {
     });
   }
 
-  // Send emails (fire and forget — don't block the response)
+  // Send emails — await both in parallel so failures are logged
   const emailData = {
     id: order.id,
     items: orderItems,
     total_cents: totalCents,
     shipping_address: shippingAddress,
   };
-  sendEmail({
-    to: shippingAddress.email,
-    subject: `Order Received — ${order.id.slice(0, 8).toUpperCase()}`,
-    html: orderConfirmationHtml(emailData),
-  });
-  sendAdminNotification(
-    `New Order: $${(totalCents / 100).toFixed(2)} from ${shippingAddress.name}`,
-    newOrderAdminHtml(emailData)
-  );
+  const [customerSent, adminSent] = await Promise.all([
+    sendEmail({
+      to: shippingAddress.email,
+      subject: `Order Received — ${order.id.slice(0, 8).toUpperCase()}`,
+      html: orderConfirmationHtml(emailData),
+    }),
+    sendAdminNotification(
+      `New Order: $${(totalCents / 100).toFixed(2)} from ${shippingAddress.name}`,
+      newOrderAdminHtml(emailData)
+    ),
+  ]);
+  if (!customerSent) console.error(`Customer email failed for order ${order.id}`);
+  if (!adminSent) console.error(`Admin notification failed for order ${order.id}`);
 
   return NextResponse.json({ orderId: order.id }, { status: 201 });
 }

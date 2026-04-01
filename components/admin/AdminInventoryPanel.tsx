@@ -149,9 +149,9 @@ export default function AdminInventoryPanel() {
   });
 
   return (
-    <div className="p-8" style={{ background: 'var(--off-white)', minHeight: '100%' }}>
+    <div className="p-4 sm:p-8" style={{ background: 'var(--off-white)', minHeight: '100%' }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <h2 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>Inventory & Pricing</h2>
           <p className="text-sm mt-1" style={{ color: 'var(--text-mid)' }}>
@@ -228,11 +228,14 @@ export default function AdminInventoryPanel() {
             <table className="w-full">
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--off-white)' }}>
-                  {['Product', 'Status', 'Clinician Price', 'Retail / Patient Price', 'Stock Status', 'Lead Time (days)', ''].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-light)' }}>
-                      {h}
-                    </th>
-                  ))}
+                  {['Product', 'Status', 'Clinician Price', 'Retail / Patient Price', 'Stock Status', 'Lead Time (days)', ''].map((h) => {
+                    const hideMobile = ['Status', 'Retail / Patient Price', 'Lead Time (days)'].includes(h);
+                    return (
+                      <th key={h} className={`px-3 sm:px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${hideMobile ? 'hidden lg:table-cell' : ''}`} style={{ color: 'var(--text-light)' }}>
+                        {h}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
@@ -251,13 +254,13 @@ export default function AdminInventoryPanel() {
                       }}
                     >
                       {/* Product name */}
-                      <td className="px-4 py-3">
-                        <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{product.name}</p>
-                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-light)' }}>{product.category}{product.subcategory ? ` · ${product.subcategory}` : ''}</p>
+                      <td className="px-3 sm:px-4 py-3">
+                        <p className="text-sm font-semibold truncate max-w-40" style={{ color: 'var(--navy)' }}>{product.name}</p>
+                        <p className="text-xs mt-0.5 truncate max-w-40" style={{ color: 'var(--text-light)' }}>{product.category}{product.subcategory ? ` · ${product.subcategory}` : ''}</p>
                       </td>
 
                       {/* Active badge */}
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-3 hidden lg:table-cell">
                         <span
                           className="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-full"
                           style={{
@@ -270,7 +273,7 @@ export default function AdminInventoryPanel() {
                       </td>
 
                       {/* Clinician price */}
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-3">
                         <div className="flex items-center gap-1">
                           <span className="text-xs" style={{ color: 'var(--text-light)' }}>$</span>
                           <input
@@ -290,7 +293,7 @@ export default function AdminInventoryPanel() {
                       </td>
 
                       {/* Retail / patient price */}
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-3 hidden lg:table-cell">
                         <div className="flex items-center gap-1">
                           <span className="text-xs" style={{ color: 'var(--text-light)' }}>$</span>
                           <input
@@ -311,7 +314,7 @@ export default function AdminInventoryPanel() {
                       </td>
 
                       {/* Inventory status */}
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-3">
                         <select
                           value={row.inventory}
                           onChange={(e) => updateRow(product.id, { inventory: e.target.value as InventoryStatus })}
@@ -329,7 +332,7 @@ export default function AdminInventoryPanel() {
                       </td>
 
                       {/* Lead time days — only relevant when status is lead_time */}
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-3 hidden lg:table-cell">
                         {row.inventory === 'lead_time' ? (
                           <input
                             type="number"
@@ -350,7 +353,7 @@ export default function AdminInventoryPanel() {
                       </td>
 
                       {/* Save button */}
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-3">
                         {isDirty && (
                           <button
                             onClick={() => handleSave(product)}

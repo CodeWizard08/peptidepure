@@ -13,6 +13,15 @@ function getResend(): Resend | null {
 const FROM_EMAIL = process.env.FROM_EMAIL || 'PeptidePure <info@peptidepure.com>';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'info@peptidepure.com';
 
+/** Escape HTML to prevent XSS in email templates */
+function esc(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 type EmailOptions = {
   to: string | string[];
   subject: string;
@@ -54,7 +63,7 @@ export function orderConfirmationHtml(order: {
   const itemRows = order.items
     .map(
       (i) =>
-        `<tr><td style="padding:8px;border-bottom:1px solid #eee">${i.product_name}</td>
+        `<tr><td style="padding:8px;border-bottom:1px solid #eee">${esc(i.product_name)}</td>
          <td style="padding:8px;border-bottom:1px solid #eee;text-align:center">${i.quantity}</td>
          <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">$${(i.line_total_cents / 100).toFixed(2)}</td></tr>`
     )
@@ -65,12 +74,12 @@ export function orderConfirmationHtml(order: {
   return `
     <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px">
       <div style="background:#0B1F3A;padding:24px;border-radius:12px 12px 0 0;text-align:center">
-        <h1 style="color:#fff;margin:0;font-size:20px">PeptidePure™</h1>
+        <h1 style="color:#fff;margin:0;font-size:20px">PeptidePure&#8482;</h1>
         <p style="color:#C8952C;margin:4px 0 0;font-size:13px">Order Confirmation</p>
       </div>
       <div style="background:#fff;padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
         <p style="color:#0B1F3A;font-size:14px">Thank you for your order!</p>
-        <p style="color:#6b7280;font-size:13px">Order ID: <strong>${order.id.slice(0, 8).toUpperCase()}</strong></p>
+        <p style="color:#6b7280;font-size:13px">Order ID: <strong>${esc(order.id.slice(0, 8).toUpperCase())}</strong></p>
 
         <table style="width:100%;border-collapse:collapse;margin:16px 0">
           <thead>
@@ -91,7 +100,7 @@ export function orderConfirmationHtml(order: {
 
         <p style="font-size:13px;color:#6b7280;margin:0"><strong>Ship to:</strong></p>
         <p style="font-size:13px;color:#0B1F3A;margin:4px 0">
-          ${addr.name}<br/>${addr.line1}<br/>${addr.city}, ${addr.state} ${addr.zip}
+          ${esc(addr.name)}<br/>${esc(addr.line1)}<br/>${esc(addr.city)}, ${esc(addr.state)} ${esc(addr.zip)}
         </p>
 
         <p style="font-size:12px;color:#9ca3af;margin-top:24px">
@@ -108,13 +117,13 @@ export function newOrderAdminHtml(order: {
   total_cents: number;
   shipping_address: { name: string; email: string };
 }): string {
-  const itemList = order.items.map((i) => `<li>${i.product_name} x${i.quantity}</li>`).join('');
+  const itemList = order.items.map((i) => `<li>${esc(i.product_name)} x${i.quantity}</li>`).join('');
 
   return `
     <div style="font-family:Inter,Arial,sans-serif;max-width:500px;padding:16px">
       <h2 style="color:#0B1F3A;margin:0 0 12px">New Order Received</h2>
-      <p style="color:#6b7280;font-size:14px">Order <strong>${order.id.slice(0, 8).toUpperCase()}</strong></p>
-      <p style="font-size:14px;color:#0B1F3A"><strong>Customer:</strong> ${order.shipping_address.name} (${order.shipping_address.email})</p>
+      <p style="color:#6b7280;font-size:14px">Order <strong>${esc(order.id.slice(0, 8).toUpperCase())}</strong></p>
+      <p style="font-size:14px;color:#0B1F3A"><strong>Customer:</strong> ${esc(order.shipping_address.name)} (${esc(order.shipping_address.email)})</p>
       <p style="font-size:14px;color:#0B1F3A"><strong>Total:</strong> $${(order.total_cents / 100).toFixed(2)}</p>
       <ul style="font-size:13px;color:#374151">${itemList}</ul>
       <p style="font-size:12px;color:#9ca3af;margin-top:16px">Manage this order in the admin dashboard.</p>
@@ -124,7 +133,7 @@ export function newOrderAdminHtml(order: {
 
 export function formConfirmationHtml(formType: string, providerName?: string): string {
   const typeLabel = formType.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-  const name = providerName || 'Clinician';
+  const name = esc(providerName || 'Clinician');
 
   const formMessages: Record<string, string> = {
     contact: 'A member of our team will respond within one business day.',
@@ -133,6 +142,7 @@ export function formConfirmationHtml(formType: string, providerName?: string): s
     'ae-sae-report': 'Your AE/SAE Report has been received. Our medical team will review it promptly. For urgent adverse events, contact dr.elaine@peptidepure.com directly.',
     outcomes: 'Your Patient Outcomes Report has been received and recorded.',
     soap_capture: 'Your SOAP capture record has been saved to the database.',
+    'product-request': 'Your product request has been received. Our sourcing team will review availability and follow up with you shortly.',
   };
 
   const message = formMessages[formType] || 'Your form submission has been received.';
@@ -140,20 +150,20 @@ export function formConfirmationHtml(formType: string, providerName?: string): s
   return `
     <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px">
       <div style="background:#0B1F3A;padding:24px;border-radius:12px 12px 0 0;text-align:center">
-        <h1 style="color:#fff;margin:0;font-size:20px">PeptidePure™</h1>
+        <h1 style="color:#fff;margin:0;font-size:20px">PeptidePure&#8482;</h1>
         <p style="color:#C8952C;margin:4px 0 0;font-size:13px">Submission Confirmation</p>
       </div>
       <div style="background:#fff;padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
         <p style="color:#0B1F3A;font-size:15px;font-weight:600">Thank you, ${name}.</p>
         <p style="color:#6b7280;font-size:14px;margin:4px 0 16px">
-          We have received your <strong style="color:#0B1F3A">${typeLabel}</strong> submission.
+          We have received your <strong style="color:#0B1F3A">${esc(typeLabel)}</strong> submission.
         </p>
         <p style="color:#374151;font-size:14px;line-height:1.6">${message}</p>
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0" />
         <p style="font-size:12px;color:#9ca3af">
           Questions? Contact us at
           <a href="mailto:info@peptidepure.com" style="color:#C8952C">info@peptidepure.com</a>
-          or call (858) 480-1017, Mon–Fri 9AM–4PM PST.
+          or call (858) 480-1017, Mon&#8211;Fri 9AM&#8211;4PM PST.
         </p>
       </div>
     </div>
@@ -164,7 +174,8 @@ export function formSubmissionAdminHtml(formType: string, data: Record<string, u
   const entries = Object.entries(data)
     .map(([key, val]) => {
       const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase());
-      return `<tr><td style="padding:6px 8px;font-weight:600;font-size:13px;color:#0B1F3A;vertical-align:top;white-space:nowrap">${label}</td><td style="padding:6px 8px;font-size:13px;color:#374151">${Array.isArray(val) ? val.join(', ') : String(val || '—')}</td></tr>`;
+      const value = Array.isArray(val) ? val.join(', ') : String(val || '—');
+      return `<tr><td style="padding:6px 8px;font-weight:600;font-size:13px;color:#0B1F3A;vertical-align:top;white-space:nowrap">${esc(label)}</td><td style="padding:6px 8px;font-size:13px;color:#374151">${esc(value)}</td></tr>`;
     })
     .join('');
 
@@ -173,7 +184,7 @@ export function formSubmissionAdminHtml(formType: string, data: Record<string, u
   return `
     <div style="font-family:Inter,Arial,sans-serif;max-width:600px;padding:16px">
       <h2 style="color:#0B1F3A;margin:0 0 4px">New Form Submission</h2>
-      <p style="color:#C8952C;font-size:14px;font-weight:600;margin:0 0 16px">${typeLabel}</p>
+      <p style="color:#C8952C;font-size:14px;font-weight:600;margin:0 0 16px">${esc(typeLabel)}</p>
       <table style="width:100%;border-collapse:collapse">${entries}</table>
     </div>
   `;

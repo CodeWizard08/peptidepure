@@ -207,7 +207,7 @@ export default function AdminCoaPanel() {
 
   /* ── Render ────────────────────────────────────────────── */
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="p-4 sm:p-8 max-w-5xl">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       {/* Header */}
@@ -358,7 +358,7 @@ export default function AdminCoaPanel() {
               {extracted.summaryChart.map((entry, i) => (
                 <div
                   key={i}
-                  className="grid grid-cols-[1fr_120px_100px_auto] gap-3 items-end p-3 rounded-xl"
+                  className="grid grid-cols-1 sm:grid-cols-[1fr_120px_100px_auto] gap-3 items-end p-3 rounded-xl"
                   style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
                 >
                   <div>

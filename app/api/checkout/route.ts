@@ -146,7 +146,7 @@ export async function POST(request: Request) {
     .insert({
       patient_id: user.id,
       order_type: 'supplement',
-      status: 'confirmed',
+      status: 'approved',
       payment_method: 'credit_card',
       transaction_id: chargeResult.transactionId,
       items: orderItems,
@@ -182,7 +182,7 @@ export async function POST(request: Request) {
     });
   }
 
-  // Send emails (fire and forget)
+  // Send emails — await both in parallel so failures are logged
   if (order) {
     const orderData = {
       id: order.id,
@@ -190,15 +190,19 @@ export async function POST(request: Request) {
       total_cents: orderTotalCents,
       shipping_address: body.shipping,
     };
-    sendEmail({
-      to: body.shipping.email,
-      subject: `Order Confirmed — ${order.id.slice(0, 8).toUpperCase()}`,
-      html: orderConfirmationHtml(orderData),
-    });
-    sendAdminNotification(
-      `New Order: $${amountDollars.toFixed(2)} from ${body.shipping.name}`,
-      newOrderAdminHtml(orderData)
-    );
+    const [customerSent, adminSent] = await Promise.all([
+      sendEmail({
+        to: body.shipping.email,
+        subject: `Order Confirmed — ${order.id.slice(0, 8).toUpperCase()}`,
+        html: orderConfirmationHtml(orderData),
+      }),
+      sendAdminNotification(
+        `New Order: $${amountDollars.toFixed(2)} from ${body.shipping.name}`,
+        newOrderAdminHtml(orderData)
+      ),
+    ]);
+    if (!customerSent) console.error(`Customer email failed for order ${order.id}`);
+    if (!adminSent) console.error(`Admin notification failed for order ${order.id}`);
   }
 
   return NextResponse.json({

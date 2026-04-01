@@ -81,7 +81,7 @@ export default function AdminUsersPanel() {
   });
 
   return (
-    <div className="p-8" style={{ background: 'var(--off-white)', minHeight: '100%' }}>
+    <div className="p-4 sm:p-8" style={{ background: 'var(--off-white)', minHeight: '100%' }}>
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>Registered Clinicians</h2>
@@ -142,11 +142,14 @@ export default function AdminUsersPanel() {
             <table className="w-full">
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--off-white)' }}>
-                  {['Name', 'Email', 'Credential', 'NPI', 'Clinic / Practice', 'Joined', 'Actions'].map((h) => (
-                    <th key={h} className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-light)' }}>
-                      {h}
-                    </th>
-                  ))}
+                  {['Name', 'Email', 'Credential', 'NPI', 'Clinic / Practice', 'Joined', 'Actions'].map((h) => {
+                    const hideMobile = ['Email', 'Credential', 'NPI', 'Clinic / Practice', 'Joined'].includes(h);
+                    return (
+                      <th key={h} className={`px-3 sm:px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide ${hideMobile ? 'hidden md:table-cell' : ''}`} style={{ color: 'var(--text-light)' }}>
+                        {h}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
@@ -159,14 +162,15 @@ export default function AdminUsersPanel() {
                       className="transition-colors hover:bg-gray-50"
                       style={{ borderBottom: idx < filteredUsers.length - 1 ? '1px solid var(--border)' : 'none' }}
                     >
-                      <td className="px-5 py-4">
+                      <td className="px-3 sm:px-5 py-4">
                         <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{meta.full_name || '—'}</p>
-                        {meta.phone && <p className="text-xs mt-0.5" style={{ color: 'var(--text-light)' }}>{meta.phone}</p>}
+                        <p className="text-xs mt-0.5 md:hidden truncate" style={{ color: 'var(--text-light)' }}>{user.email || ''}</p>
+                        {meta.phone && <p className="text-xs mt-0.5 hidden md:block" style={{ color: 'var(--text-light)' }}>{meta.phone}</p>}
                       </td>
-                      <td className="px-5 py-4">
-                        <span className="text-sm" style={{ color: 'var(--text-dark)' }}>{user.email || '—'}</span>
+                      <td className="px-3 sm:px-5 py-4 hidden md:table-cell">
+                        <span className="text-sm truncate max-w-40 block" style={{ color: 'var(--text-dark)' }}>{user.email || '—'}</span>
                       </td>
-                      <td className="px-5 py-4">
+                      <td className="px-3 sm:px-5 py-4 hidden md:table-cell">
                         {meta.credential ? (
                           <span className="text-xs font-bold px-2 py-1 rounded-full uppercase" style={{ background: 'var(--gold-pale)', color: 'var(--gold)' }}>
                             {meta.credential}
@@ -175,16 +179,16 @@ export default function AdminUsersPanel() {
                           <span className="text-xs" style={{ color: 'var(--text-light)' }}>—</span>
                         )}
                       </td>
-                      <td className="px-5 py-4">
+                      <td className="px-3 sm:px-5 py-4 hidden md:table-cell">
                         <span className="text-sm font-mono" style={{ color: 'var(--text-dark)' }}>{meta.npi_number || '—'}</span>
                       </td>
-                      <td className="px-5 py-4">
-                        <span className="text-sm" style={{ color: 'var(--text-dark)' }}>{meta.clinic || '—'}</span>
+                      <td className="px-3 sm:px-5 py-4 hidden md:table-cell">
+                        <span className="text-sm truncate max-w-32 block" style={{ color: 'var(--text-dark)' }}>{meta.clinic || '—'}</span>
                       </td>
-                      <td className="px-5 py-4">
+                      <td className="px-3 sm:px-5 py-4 hidden md:table-cell">
                         <span className="text-xs" style={{ color: 'var(--text-light)' }}>{fmtDate(user.created_at)}</span>
                       </td>
-                      <td className="px-5 py-4">
+                      <td className="px-3 sm:px-5 py-4">
                         {isConfirming ? (
                           <div className="flex items-center gap-2">
                             <span className="text-xs" style={{ color: '#991B1B' }}>Delete user?</span>

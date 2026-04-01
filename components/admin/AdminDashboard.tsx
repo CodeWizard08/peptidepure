@@ -21,10 +21,9 @@ type Stats = {
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   pending: { bg: '#FEF3C7', text: '#92400E' },
-  confirmed: { bg: '#DBEAFE', text: '#1E40AF' },
+  approved: { bg: '#DBEAFE', text: '#1E40AF' },
   processing: { bg: '#E0E7FF', text: '#3730A3' },
-  shipped: { bg: '#D1FAE5', text: '#065F46' },
-  delivered: { bg: '#ECFDF5', text: '#047857' },
+  completed: { bg: '#D1FAE5', text: '#065F46' },
   cancelled: { bg: '#FEE2E2', text: '#991B1B' },
 };
 
@@ -103,7 +102,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (section: s
   }, []);
 
   return (
-    <div className="p-8" style={{ background: 'var(--off-white)', minHeight: '100%' }}>
+    <div className="p-4 sm:p-8" style={{ background: 'var(--off-white)', minHeight: '100%' }}>
       {/* Header */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>
@@ -207,7 +206,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (section: s
                   {['Order #', 'Status', 'Customer', 'Amount', 'Date'].map((h) => (
                     <th
                       key={h}
-                      className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide"
+                      className={`px-4 sm:px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide ${h === 'Customer' || h === 'Date' ? 'hidden sm:table-cell' : ''}`}
                       style={{ color: 'var(--text-light)' }}
                     >
                       {h}
@@ -226,12 +225,12 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (section: s
                           idx < stats.recentOrders.length - 1 ? '1px solid var(--border)' : 'none',
                       }}
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-4 sm:px-6 py-4">
                         <span className="text-sm font-bold" style={{ color: 'var(--navy)' }}>
                           #{order.id.slice(0, 8).toUpperCase()}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 sm:px-6 py-4">
                         <span
                           className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full"
                           style={{ background: colors.bg, color: colors.text }}
@@ -239,17 +238,17 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (section: s
                           {order.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-sm" style={{ color: 'var(--text-dark)' }}>
+                      <td className="px-4 sm:px-6 py-4 hidden sm:table-cell">
+                        <span className="text-sm truncate max-w-[150px] block" style={{ color: 'var(--text-dark)' }}>
                           {order.shipping_address?.name || '—'}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 sm:px-6 py-4">
                         <span className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>
                           {fmt(order.total_cents)}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 sm:px-6 py-4 hidden sm:table-cell">
                         <span className="text-xs" style={{ color: 'var(--text-light)' }}>
                           {fmtDate(order.created_at)}
                         </span>

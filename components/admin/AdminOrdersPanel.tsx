@@ -7,11 +7,11 @@ type OrderItem = { product_name: string; quantity: number; unit_price_cents: num
 type ShippingAddress = { name: string; email: string; phone?: string; line1: string; line2?: string; city: string; state: string; zip: string };
 type Order = { id: string; status: string; payment_method?: string; items: OrderItem[]; subtotal_cents: number; total_cents: number; shipping_address: ShippingAddress | null; tracking_number: string | null; patient_notes: string | null; clinician_notes: string | null; created_at: string };
 
-const STATUS_OPTIONS = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+const STATUS_OPTIONS = ['pending', 'approved', 'processing', 'completed', 'cancelled'];
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  pending: { bg: '#FEF3C7', text: '#92400E' }, confirmed: { bg: '#DBEAFE', text: '#1E40AF' },
-  processing: { bg: '#E0E7FF', text: '#3730A3' }, shipped: { bg: '#D1FAE5', text: '#065F46' },
-  delivered: { bg: '#ECFDF5', text: '#047857' }, cancelled: { bg: '#FEE2E2', text: '#991B1B' },
+  pending: { bg: '#FEF3C7', text: '#92400E' }, approved: { bg: '#DBEAFE', text: '#1E40AF' },
+  processing: { bg: '#E0E7FF', text: '#3730A3' }, completed: { bg: '#D1FAE5', text: '#065F46' },
+  cancelled: { bg: '#FEE2E2', text: '#991B1B' },
 };
 
 const fmt = (cents: number) => `$${(cents / 100).toFixed(2)}`;
@@ -98,12 +98,12 @@ export default function AdminOrdersPanel({ embedded = false }: { embedded?: bool
         </div>
       )}
       {embedded && (
-        <div className="px-8 pt-8 pb-2">
+        <div className="px-4 sm:px-8 pt-4 sm:pt-8 pb-2">
           <h2 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>Orders</h2>
           <p className="text-sm mt-1" style={{ color: 'var(--text-mid)' }}>{total} total order{total !== 1 ? 's' : ''}</p>
         </div>
       )}
-      <div className={embedded ? 'px-8 py-4' : 'container-xl py-6'}>
+      <div className={embedded ? 'px-4 sm:px-8 py-4' : 'container-xl py-6'}>
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <input
             type="text"
@@ -120,7 +120,7 @@ export default function AdminOrdersPanel({ embedded = false }: { embedded?: bool
           ))}
         </div>
       </div>
-      <div className={embedded ? 'px-8 pb-12' : 'container-xl pb-12'}>
+      <div className={embedded ? 'px-4 sm:px-8 pb-12' : 'container-xl pb-12'}>
         {loading ? (
           <div className="py-20 flex justify-center"><div className="w-8 h-8 rounded-full animate-spin" style={{ border: '3px solid var(--border)', borderTopColor: 'var(--gold)' }} /></div>
         ) : filteredOrders.length === 0 ? (
