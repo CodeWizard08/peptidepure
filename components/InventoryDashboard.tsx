@@ -459,7 +459,7 @@ export default function InventoryDashboard({
       </div>
 
       {/* ── Controls Bar ─────────────────────────────── */}
-      <div className="container-xl -!mt-7 relative z-10">
+      <div className="!-mt-7 container-xl relative z-10">
         <div
           className="rounded-2xl p-4 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center"
           style={{
