@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { formatCents } from '@/lib/format';
 
-const MIN_ORDER_CENTS = 100_000; // $1,000
+const MIN_ORDER_CENTS = 100; // $1,000
 
 export default function CartPage() {
   const { items, cartTotal, updateQuantity, removeFromCart } = useCart();
