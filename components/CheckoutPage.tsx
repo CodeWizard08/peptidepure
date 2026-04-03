@@ -38,7 +38,7 @@ const US_STATES = [
   'VA','WA','WV','WI','WY','DC',
 ];
 
-const MIN_ORDER_CENTS = 100; // $1 — TEMP for testing, restore to 100_000
+const MIN_ORDER_CENTS = 100_000; // $1,000
 
 export default function CheckoutPage() {
   const router = useRouter();
