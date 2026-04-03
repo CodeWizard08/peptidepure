@@ -24,6 +24,7 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
   const [current, setCurrent] = useState(0);
   const [textKey, setTextKey] = useState(0);
   const [progressKey, setProgressKey] = useState(0);
+  const [videosReady, setVideosReady] = useState<Set<number>>(new Set());
   const animating = useRef(false);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
@@ -69,9 +70,9 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
           playsInline
           autoPlay={i === 0}
           preload={i === 0 ? 'auto' : 'none'}
-          poster={i === 0 ? s.image : undefined}
+          onCanPlayThrough={() => setVideosReady((prev) => new Set(prev).add(i))}
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 1 : 0, transition: 'opacity 1s ease-in-out' }}
+          style={{ opacity: i === current && videosReady.has(i) ? 1 : 0, zIndex: i === current ? 1 : 0, transition: 'opacity 1s ease-in-out' }}
         />
       ))}
 
