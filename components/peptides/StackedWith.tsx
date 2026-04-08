@@ -73,15 +73,15 @@ export default async function StackedWith({
         {/* Header */}
         <div className="mb-8">
           <p
-            className="text-[10px] font-bold uppercase tracking-[0.18em] mb-2"
+            className="text-xs font-bold uppercase tracking-[0.18em] mb-2"
             style={{ color: 'var(--gold)' }}
           >
             Clinical Synergy
           </p>
-          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--navy)' }}>
+          <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: 'var(--navy)' }}>
             Frequently stacked with {baseName}
           </h2>
-          <p className="text-sm max-w-xl" style={{ color: 'var(--text-mid)' }}>
+          <p className="text-base max-w-xl" style={{ color: 'var(--text-mid)' }}>
             Peptides commonly combined with {baseName} for synergistic clinical outcomes.
           </p>
         </div>
@@ -125,14 +125,14 @@ export default async function StackedWith({
                 <div className="flex-1 min-w-0 flex flex-col justify-between">
                   <div>
                     <h3
-                      className="text-sm font-bold leading-snug mb-1 group-hover:underline"
+                      className="text-base font-bold leading-snug mb-1 group-hover:underline"
                       style={{ color: 'var(--navy)' }}
                     >
                       {stackBaseName}
                     </h3>
                     {reason ? (
                       <p
-                        className="text-xs leading-relaxed line-clamp-2"
+                        className="text-sm leading-relaxed line-clamp-2"
                         style={{ color: 'var(--text-mid)' }}
                       >
                         {reason}
@@ -140,7 +140,7 @@ export default async function StackedWith({
                     ) : (
                       product.description && (
                         <p
-                          className="text-xs leading-relaxed line-clamp-2"
+                          className="text-sm leading-relaxed line-clamp-2"
                           style={{ color: 'var(--text-mid)' }}
                         >
                           {product.description}
@@ -149,7 +149,7 @@ export default async function StackedWith({
                     )}
                   </div>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-sm font-bold" style={{ color: 'var(--gold)' }}>
+                    <span className="text-base font-bold" style={{ color: 'var(--gold)' }}>
                       {formatCents(product.price_cents)}
                     </span>
                     <svg

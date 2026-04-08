@@ -66,22 +66,22 @@ export default async function ProtocolMembership({ baseName }: { baseName: strin
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 gap-4">
           <div>
             <p
-              className="text-[10px] font-bold uppercase tracking-[0.18em] mb-2"
+              className="text-xs font-bold uppercase tracking-[0.18em] mb-2"
               style={{ color: 'var(--gold)' }}
             >
               Essential Protocol Packages
             </p>
-            <h2 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>
+            <h2 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--navy)' }}>
               {baseName} is part of {matching.length} clinical protocol
               {matching.length === 1 ? '' : 's'}
             </h2>
-            <p className="text-sm mt-2 max-w-xl" style={{ color: 'var(--text-mid)' }}>
+            <p className="text-base mt-3 max-w-xl" style={{ color: 'var(--text-mid)' }}>
               Bundle this peptide with synergistic compounds at clinic-tier pricing.
             </p>
           </div>
           <Link
             href="/peptides#protocols"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold transition-colors hover:underline"
+            className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold transition-colors hover:underline"
             style={{ color: 'var(--navy)' }}
           >
             View all protocols
@@ -123,7 +123,7 @@ export default async function ProtocolMembership({ baseName }: { baseName: strin
                 />
                 {/* "Includes this peptide" badge */}
                 <div
-                  className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                  className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
                   style={{
                     background: 'rgba(200,149,44,0.95)',
                     color: 'var(--navy)',
@@ -139,12 +139,12 @@ export default async function ProtocolMembership({ baseName }: { baseName: strin
               {/* Body */}
               <div className="p-5">
                 <h3
-                  className="text-base font-bold leading-snug mb-2 group-hover:underline"
+                  className="text-lg font-bold leading-snug mb-2 group-hover:underline"
                   style={{ color: 'var(--navy)' }}
                 >
                   {protocol.name}
                 </h3>
-                <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--text-mid)' }}>
+                <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-mid)' }}>
                   {protocol.description}
                 </p>
 
@@ -155,7 +155,7 @@ export default async function ProtocolMembership({ baseName }: { baseName: strin
                     return (
                       <span
                         key={peptide}
-                        className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                        className="text-xs px-2.5 py-1 rounded-full font-medium"
                         style={{
                           background: isCurrent ? 'var(--gold-pale)' : 'var(--off-white)',
                           color: isCurrent ? 'var(--gold)' : 'var(--text-mid)',
@@ -172,7 +172,7 @@ export default async function ProtocolMembership({ baseName }: { baseName: strin
 
                 {/* CTA */}
                 <div
-                  className="flex items-center justify-between pt-3 text-xs font-semibold"
+                  className="flex items-center justify-between pt-3 text-sm font-semibold"
                   style={{ color: 'var(--navy)', borderTop: '1px solid var(--border)' }}
                 >
                   <span>View Protocol</span>

@@ -29,7 +29,7 @@ export default function IRBAuthorityStrip({ variant = 'full' }: { variant?: Vari
           borderBottom: '1px solid rgba(200,149,44,0.25)',
         }}
       >
-        <div className="container-xl py-2.5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[11px] text-white/90">
+        <div className="container-xl py-2.5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-white/90">
           <span className="flex items-center gap-1.5">
             <ShieldDot />
             <strong className="text-white">IRB-Approved</strong>
@@ -76,16 +76,16 @@ export default function IRBAuthorityStrip({ variant = 'full' }: { variant?: Vari
             </div>
             <div>
               <p
-                className="text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5"
+                className="text-xs font-bold uppercase tracking-[0.18em] mb-1.5"
                 style={{ color: 'var(--gold)' }}
               >
                 IRB-Approved Research Protocol
               </p>
-              <h3 className="text-base font-bold text-white mb-1 leading-snug">
+              <h3 className="text-lg font-bold text-white mb-1 leading-snug">
                 {IRB_PROTOCOL_ID} <span className="text-white/40 mx-1.5">·</span>
                 <span className="text-white/70 font-medium">{IRB_REGISTRY_ID}</span>
               </h3>
-              <p className="text-xs text-white/55 leading-relaxed">
+              <p className="text-sm text-white/55 leading-relaxed">
                 Approved {IRB_APPROVAL_DATE} · Principal Investigator: {PRINCIPAL_INVESTIGATOR}
               </p>
             </div>
@@ -117,8 +117,8 @@ function Pillar({ icon, label, sub }: { icon: React.ReactNode; label: string; su
     >
       <span className="shrink-0" style={{ color: 'var(--gold)' }}>{icon}</span>
       <div className="min-w-0">
-        <div className="text-xs font-bold text-white leading-tight">{label}</div>
-        <div className="text-[10px] text-white/55 uppercase tracking-wider leading-tight mt-0.5">{sub}</div>
+        <div className="text-sm font-bold text-white leading-tight">{label}</div>
+        <div className="text-xs text-white/55 uppercase tracking-wider leading-tight mt-0.5">{sub}</div>
       </div>
     </div>
   );

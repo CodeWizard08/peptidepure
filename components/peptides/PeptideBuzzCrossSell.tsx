@@ -120,16 +120,16 @@ export default function PeptideBuzzCrossSell({ baseName }: { baseName: string })
               }}
             />
             <div className="relative text-center text-white">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-70 mb-2">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] opacity-70 mb-2">
                 Peptide Buzz™
               </p>
-              <p className="text-2xl font-bold leading-tight">{buzz.name}</p>
-              <p className="text-xs opacity-75 mt-1.5">{buzz.tagline}</p>
+              <p className="text-2xl md:text-3xl font-bold leading-tight">{buzz.name}</p>
+              <p className="text-sm opacity-75 mt-2">{buzz.tagline}</p>
             </div>
 
             {buzz.badge && (
               <span
-                className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                className="absolute top-4 right-4 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
                 style={{
                   background: 'rgba(255,255,255,0.95)',
                   color: 'var(--navy)',
@@ -143,15 +143,15 @@ export default function PeptideBuzzCrossSell({ baseName }: { baseName: string })
           {/* Body panel */}
           <div className="lg:col-span-3 p-7 lg:p-10 flex flex-col justify-center">
             <p
-              className="text-[10px] font-bold uppercase tracking-[0.18em] mb-2"
+              className="text-xs font-bold uppercase tracking-[0.18em] mb-2"
               style={{ color: 'var(--gold)' }}
             >
               Daily Wellness Alternative
             </p>
-            <h3 className="text-xl font-bold leading-tight mb-3" style={{ color: 'var(--navy)' }}>
+            <h3 className="text-2xl font-bold leading-tight mb-3" style={{ color: 'var(--navy)' }}>
               Prefer a daily product over injection?
             </h3>
-            <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-mid)' }}>
+            <p className="text-base leading-relaxed mb-5" style={{ color: 'var(--text-mid)' }}>
               {buzz.description}
             </p>
 
@@ -160,7 +160,7 @@ export default function PeptideBuzzCrossSell({ baseName }: { baseName: string })
                 href={buzz.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all hover:shadow-md"
+                className="group inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-base transition-all hover:shadow-md"
                 style={{
                   background: 'var(--navy)',
                   color: 'white',
@@ -179,7 +179,7 @@ export default function PeptideBuzzCrossSell({ baseName }: { baseName: string })
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6 21 12m0 0-7.5 6M21 12H3" />
                 </svg>
               </Link>
-              <span className="text-[11px]" style={{ color: 'var(--text-light)' }}>
+              <span className="text-xs" style={{ color: 'var(--text-light)' }}>
                 Opens neurosting.com in a new tab
               </span>
             </div>

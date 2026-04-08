@@ -119,15 +119,15 @@ function ClinicalReferenceSection({
       <div className="container-xl py-14">
         <div className="mb-8">
           <p
-            className="text-[10px] font-bold uppercase tracking-[0.18em] mb-2"
+            className="text-xs font-bold uppercase tracking-[0.18em] mb-2"
             style={{ color: 'var(--gold)' }}
           >
             For Clinicians
           </p>
-          <h2 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>
+          <h2 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--navy)' }}>
             Clinical Reference
           </h2>
-          <p className="text-sm mt-2 max-w-xl" style={{ color: 'var(--text-mid)' }}>
+          <p className="text-base mt-3 max-w-xl" style={{ color: 'var(--text-mid)' }}>
             Pharmacology, safety, monitoring, and dosing reference for {baseName}.
             Always individualize based on patient context.
           </p>

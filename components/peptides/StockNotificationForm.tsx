@@ -70,13 +70,13 @@ export default function StockNotificationForm({
           </svg>
         </div>
         <div className="flex-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] mb-0.5" style={{ color: '#991B1B' }}>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] mb-0.5" style={{ color: '#991B1B' }}>
             Out of Stock
           </p>
-          <p className="text-sm font-bold leading-snug" style={{ color: 'var(--navy)' }}>
+          <p className="text-base font-bold leading-snug" style={{ color: 'var(--navy)' }}>
             Get notified when {productName} is back
           </p>
-          <p className="text-xs mt-1" style={{ color: 'var(--text-mid)' }}>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-mid)' }}>
             We'll send you a one-time email the moment this product is restocked.
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function StockNotificationForm({
 
       {state === 'success' ? (
         <div
-          className="rounded-lg px-4 py-3 text-xs font-medium"
+          className="rounded-lg px-4 py-3 text-sm font-medium"
           style={{
             background: 'rgba(16,185,129,0.1)',
             border: '1px solid rgba(16,185,129,0.3)',
@@ -102,7 +102,7 @@ export default function StockNotificationForm({
             placeholder="you@clinic.com"
             required
             disabled={state === 'loading'}
-            className="flex-1 px-4 py-2.5 rounded-lg text-sm outline-none transition-colors disabled:opacity-50"
+            className="flex-1 px-4 py-3 rounded-lg text-base outline-none transition-colors disabled:opacity-50"
             style={{
               background: 'white',
               border: '1px solid var(--border)',
@@ -114,7 +114,7 @@ export default function StockNotificationForm({
           <button
             type="submit"
             disabled={state === 'loading' || !email.trim()}
-            className="px-5 py-2.5 rounded-lg text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-5 py-3 rounded-lg text-base font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: 'var(--navy)', color: 'white' }}
           >
             {state === 'loading' ? 'Sending…' : 'Notify Me'}
@@ -123,7 +123,7 @@ export default function StockNotificationForm({
       )}
 
       {state === 'error' && (
-        <p className="text-xs mt-2" style={{ color: '#DC2626' }}>
+        <p className="text-sm mt-2" style={{ color: '#DC2626' }}>
           {message}
         </p>
       )}

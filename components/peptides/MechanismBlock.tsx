@@ -49,12 +49,12 @@ export default function MechanismBlock({ mechanism }: { mechanism?: Mechanism })
             </div>
             <div className="flex-1 min-w-0">
               <p
-                className="text-[10px] font-semibold uppercase tracking-wider mb-0.5"
+                className="text-xs font-semibold uppercase tracking-wider mb-1"
                 style={{ color: 'var(--text-light)' }}
               >
                 {row.label}
               </p>
-              <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--navy)' }}>
+              <p className="text-base font-medium leading-relaxed" style={{ color: 'var(--navy)' }}>
                 {row.value}
               </p>
             </div>
@@ -86,7 +86,7 @@ function ClinicalCard({
       >
         <span style={{ color: 'var(--navy)' }}>{icon}</span>
         <h3
-          className="text-[11px] font-bold uppercase tracking-[0.14em]"
+          className="text-sm font-bold uppercase tracking-[0.14em]"
           style={{ color: 'var(--navy)' }}
         >
           {label}

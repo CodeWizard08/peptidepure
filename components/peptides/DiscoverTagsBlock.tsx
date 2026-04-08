@@ -36,21 +36,21 @@ export default function DiscoverTagsBlock({
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
             <p
-              className="text-[10px] font-bold uppercase tracking-[0.18em] mb-2"
+              className="text-xs font-bold uppercase tracking-[0.18em] mb-2"
               style={{ color: 'var(--gold)' }}
             >
               Meridian DISCOVER
             </p>
-            <h2 className="text-2xl font-bold" style={{ color: 'var(--navy)' }}>
+            <h2 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--navy)' }}>
               What {baseName} targets
             </h2>
-            <p className="text-sm mt-2 max-w-xl" style={{ color: 'var(--text-mid)' }}>
+            <p className="text-base mt-3 max-w-xl" style={{ color: 'var(--text-mid)' }}>
               Patient goals, biomarkers, and wearable signals this peptide addresses.
               Powers the future Meridian AI protocol engine.
             </p>
           </div>
           <span
-            className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full self-start"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full self-start"
             style={{
               background: 'rgba(200,149,44,0.1)',
               color: 'var(--gold)',
@@ -112,7 +112,7 @@ function TagColumn({
       <div className="flex items-center gap-2 mb-4">
         <span style={{ color: 'var(--navy)' }}>{icon}</span>
         <h3
-          className="text-[11px] font-bold uppercase tracking-[0.14em]"
+          className="text-sm font-bold uppercase tracking-[0.14em]"
           style={{ color: 'var(--navy)' }}
         >
           {label}
@@ -123,7 +123,7 @@ function TagColumn({
           <span
             key={tag.slug}
             title={tag.description}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-transform hover:scale-105 cursor-default"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-transform hover:scale-105 cursor-default"
             style={{
               background: `${tag.color}10`,
               color: tag.color,

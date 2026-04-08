@@ -98,7 +98,7 @@ export default async function BundlePrompt({
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-3">
               <span
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
                 style={{
                   background: 'var(--gold)',
                   color: 'var(--navy)',
@@ -109,22 +109,22 @@ export default async function BundlePrompt({
                 </svg>
                 {bundle.tier}
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-light)' }}>
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-light)' }}>
                 Bundle Pricing Available
               </span>
             </div>
 
-            <h3 className="text-2xl font-bold leading-tight mb-2" style={{ color: 'var(--navy)' }}>
+            <h3 className="text-2xl md:text-3xl font-bold leading-tight mb-3" style={{ color: 'var(--navy)' }}>
               Save up to 80% with the {bundle.name.replace('$', '')}
             </h3>
-            <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-mid)' }}>
+            <p className="text-base leading-relaxed mb-5" style={{ color: 'var(--text-mid)' }}>
               {baseName} is included in this clinic-tier package. Bundle includes{' '}
               <strong style={{ color: 'var(--navy)' }}>{bundle.focus.toLowerCase()}</strong> with{' '}
               <strong style={{ color: 'var(--navy)' }}>{bundle.bonus}</strong> as a bonus.
             </p>
 
             {/* Price comparison strip */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
               <PriceLine
                 label="Bundle Price"
                 value={bundle.price}
@@ -150,7 +150,7 @@ export default async function BundlePrompt({
           <div className="lg:shrink-0">
             <Link
               href="/peptides#starter-packages"
-              className="group inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-all hover:shadow-lg"
+              className="group inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-base transition-all hover:shadow-lg"
               style={{
                 background: 'var(--navy)',
                 color: 'white',
@@ -192,13 +192,13 @@ function PriceLine({
   return (
     <div className="flex items-center gap-2">
       <span
-        className="text-[10px] font-semibold uppercase tracking-wider"
+        className="text-xs font-semibold uppercase tracking-wider"
         style={{ color: 'var(--text-light)' }}
       >
         {label}:
       </span>
       <span
-        className={size === 'lg' ? 'text-lg font-bold' : 'text-sm font-semibold'}
+        className={size === 'lg' ? 'text-xl font-bold' : 'text-base font-semibold'}
         style={{
           color,
           textDecoration: strike ? 'line-through' : 'none',
