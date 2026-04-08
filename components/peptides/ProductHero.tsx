@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import AddToCartButton from '@/components/AddToCartButton';
+import StockNotificationForm from '@/components/peptides/StockNotificationForm';
 import { formatCents } from '@/lib/format';
 
 type Product = {
@@ -36,12 +37,14 @@ export default function ProductHero({
   variants,
   catConfig,
   meta,
+  isClinician = false,
 }: {
   product: Product;
   baseName: string;
   variants: Variant[];
   catConfig: CatConfig;
   meta: Record<string, any>;
+  isClinician?: boolean;
 }) {
   const inventory = (meta.inventory as string) ?? 'in_stock';
   const leadTimeDays = meta.lead_time_days as number | null;
@@ -248,11 +251,14 @@ export default function ProductHero({
               </div>
             )}
 
-            {/* ═══ VOLUME PRICING TABLE (lead time items) ═══ */}
-            {volumePricing && (
+            {/* ═══ VOLUME PRICING TABLE (lead time items, clinician only) ═══ */}
+            {volumePricing && isClinician && (
               <div className="rounded-xl overflow-hidden mb-8" style={{ border: '1px solid var(--border)' }}>
-                <div className="px-5 py-3" style={{ background: 'var(--navy)' }}>
+                <div className="px-5 py-3 flex items-center justify-between" style={{ background: 'var(--navy)' }}>
                   <h3 className="text-xs font-bold uppercase tracking-widest text-white">Volume Pricing (per vial)</h3>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'var(--gold)', color: 'var(--navy)' }}>
+                    Clinician
+                  </span>
                 </div>
                 <div className="grid grid-cols-3" style={{ background: 'var(--off-white)' }}>
                   {Object.entries(volumePricing).map(([tier, cents]) => (
@@ -306,32 +312,102 @@ export default function ProductHero({
               </div>
             )}
 
-            {/* CTAs */}
-            <AddToCartButton
-              product={{
-                id: product.id,
-                name: product.name,
-                slug: product.slug,
-                price_cents: product.price_cents,
-                image_url: product.image_url,
-              }}
-              inventory={inventory}
-              leadTimeDays={leadTimeDays}
-            />
+            {/* CTAs — gated by clinician auth */}
+            {isClinician ? (
+              <>
+                <div className="mb-3 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'var(--gold-pale)', color: 'var(--gold)', border: '1px solid rgba(200,149,44,0.3)' }}>
+                  <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Clinician pricing applied
+                </div>
+                <AddToCartButton
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    price_cents: product.price_cents,
+                    image_url: product.image_url,
+                  }}
+                  inventory={inventory}
+                  leadTimeDays={leadTimeDays}
+                />
+              </>
+            ) : (
+              <div
+                className="rounded-2xl p-5 mb-6"
+                style={{
+                  background: 'linear-gradient(135deg, var(--navy) 0%, #11305c 100%)',
+                  border: '1px solid rgba(200,149,44,0.25)',
+                }}
+              >
+                <div className="flex items-start gap-3 mb-4">
+                  <div
+                    className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center"
+                    style={{ background: 'rgba(200,149,44,0.15)', border: '1px solid rgba(200,149,44,0.35)' }}
+                  >
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--gold)" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] mb-0.5" style={{ color: 'var(--gold)' }}>
+                      Clinician Access Required
+                    </p>
+                    <p className="text-sm font-bold text-white leading-snug">
+                      Sign in to view clinician pricing &amp; place orders
+                    </p>
+                    <p className="text-xs mt-1.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                      {baseName} is available exclusively to verified clinicians under IRB-approved research protocol PPRN-001-2025.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href="/account"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors"
+                    style={{ background: 'var(--gold)', color: 'var(--navy)' }}
+                  >
+                    Sign In →
+                  </Link>
+                  <Link
+                    href="/account#register"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors"
+                    style={{ background: 'rgba(255,255,255,0.08)', color: 'white', border: '1px solid rgba(255,255,255,0.15)' }}
+                  >
+                    Apply for Access
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Restock notification — only for OOS products */}
+            {isOOS && (
+              <div className="mb-6">
+                <StockNotificationForm productId={product.id} productName={baseName} />
+              </div>
+            )}
 
             {/* Trust strip */}
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs" style={{ color: 'var(--text-light)' }}>
-              <span className="flex items-center gap-1.5">
+              <Link
+                href={`/coa#${encodeURIComponent(baseName.toLowerCase())}`}
+                className="flex items-center gap-1.5 transition-colors hover:underline"
+                style={{ color: 'var(--navy)' }}
+              >
                 <IconShield />
-                Third-party tested
-              </span>
+                <span className="font-semibold">Per-batch COA verified</span>
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
               <span className="flex items-center gap-1.5">
                 <IconFlask />
-                Clinical-grade
+                503A/503B sourced
               </span>
               <span className="flex items-center gap-1.5">
                 <IconLock />
-                Clinician access only
+                IRB-protected research use
               </span>
             </div>
           </div>

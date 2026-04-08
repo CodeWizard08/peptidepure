@@ -6,6 +6,7 @@ import CategorySidebar from '@/components/peptides/CategorySidebar';
 import StarterPackages from '@/components/peptides/StarterPackages';
 import ProductGrid from '@/components/peptides/ProductGrid';
 import ProtocolsSection from '@/components/peptides/ProtocolsSection';
+import AIProtocolBuilderStub from '@/components/peptides/AIProtocolBuilderStub';
 import { CATEGORY_CONFIG, PRODUCTS_PER_PAGE, type Product } from '@/lib/peptideConfig';
 import type { PeptidesContent } from '@/lib/content-types';
 
@@ -88,6 +89,8 @@ export default async function PeptidesPage({
             <div className="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold" style={{ background: 'var(--gold-pale)', color: 'var(--gold)', border: '1px solid rgba(200,149,44,0.3)' }}>
               {content.customBadge}
             </div>
+
+            <AIProtocolBuilderStub />
 
             <StarterPackages user={user} packages={content.starterPackages} />
 

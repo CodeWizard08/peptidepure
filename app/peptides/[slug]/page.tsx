@@ -37,6 +37,12 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const { data: product } = await supabase.from('products').select('*').eq('slug', slug).eq('is_active', true).single<ProductRow>();
   if (!product) notFound();
 
+  // Auth: read current user once and propagate isClinician through the tree.
+  // Treat any authenticated session as a clinician for now (registration is
+  // already gated to verified clinicians via the registration form).
+  const { data: { user } } = await supabase.auth.getUser();
+  const isClinician = !!user;
+
   const baseName = getBaseProductName(product.name);
 
   const { data: allVariants } = await supabase
@@ -62,5 +68,16 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const catConfig = { ...rawCatConfig, label: rawCatConfig.label ?? product.category };
   const meta = product.metadata ?? {};
 
-  return <ProductDetailBody product={product} baseName={baseName} variants={variants} catConfig={catConfig} meta={meta} slug={slug} dedupedRelated={dedupedRelated} />;
+  return (
+    <ProductDetailBody
+      product={product}
+      baseName={baseName}
+      variants={variants}
+      catConfig={catConfig}
+      meta={meta}
+      slug={slug}
+      dedupedRelated={dedupedRelated}
+      isClinician={isClinician}
+    />
+  );
 }

@@ -47,6 +47,28 @@ export default function COAGallery({ content }: { content: COAContent }) {
     return ['All', ...unique];
   }, [content.records]);
 
+  // Deep link support: if URL has #peptide-name, filter & scroll
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash.replace('#', '').toLowerCase();
+    if (!hash) return;
+
+    // Find a matching category (case-insensitive, allows partial match)
+    const match = categories.find(
+      (c) =>
+        c.toLowerCase() === hash ||
+        c.toLowerCase().replace(/[^a-z0-9]/g, '') === hash.replace(/[^a-z0-9]/g, '')
+    );
+    if (match) {
+      setActiveFilter(match);
+      // Wait for re-render before scrolling
+      setTimeout(() => {
+        const grid = document.getElementById('coa-grid');
+        grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [categories]);
+
   // Filter + sort
   const filtered = useMemo(() => {
     let list = content.records;
@@ -179,7 +201,7 @@ export default function COAGallery({ content }: { content: COAContent }) {
       )}
 
       {/* Filter bar + Grid */}
-      <section className="py-16">
+      <section className="py-16" id="coa-grid">
         <div className="container-xl">
           {/* Header row */}
           <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
