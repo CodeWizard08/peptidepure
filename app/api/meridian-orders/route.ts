@@ -1,8 +1,19 @@
 import { NextResponse } from 'next/server';
 import { verifyWebhookSignature } from '@/lib/meridian';
-import { createClient } from '@/lib/supabase/server';
+import { createServiceClient } from '@/lib/supabase/service';
 import type { MeridianInboundOrder, OrderAcceptResponse } from '@/lib/types/meridian';
 import { sendAdminNotification, newOrderAdminHtml } from '@/lib/email';
+
+/**
+ * Meridian orders don't have a Supabase user. We assign them to a
+ * system profile. Set MERIDIAN_SYSTEM_PATIENT_ID in .env.local to
+ * the profile ID that should own Meridian orders (e.g. admin profile).
+ */
+function getSystemPatientId(): string {
+  const id = process.env.MERIDIAN_SYSTEM_PATIENT_ID;
+  if (!id) throw new Error('MERIDIAN_SYSTEM_PATIENT_ID is not set');
+  return id;
+}
 
 /**
  * POST /api/meridian-orders
@@ -27,7 +38,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid order payload' }, { status: 400 });
   }
 
-  const supabase = await createClient();
+  const supabase = createServiceClient();
 
   // ── Map Meridian items to our order format ────────────────────────
   const orderItems = payload.items.map((item) => ({
@@ -45,7 +56,8 @@ export async function POST(request: Request) {
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
-      order_type: 'meridian',
+      patient_id: getSystemPatientId(),
+      order_type: 'supplement',
       status: 'pending',
       payment_method: 'stripe_meridian',
       items: orderItems,

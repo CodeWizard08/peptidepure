@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     .from('orders')
     .select('id, patient_notes')
     .eq('id', body.orderId)
-    .eq('order_type', 'meridian')
+    .eq('payment_method', 'stripe_meridian')
     .single();
 
   if (error || !order) {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifyWebhookSignature } from '@/lib/meridian';
-import { createClient } from '@/lib/supabase/server';
+import { createServiceClient } from '@/lib/supabase/service';
 import type { MeridianWebhookPayload } from '@/lib/types/meridian';
 
 /**
@@ -21,13 +21,13 @@ export async function POST(request: Request) {
   }
 
   const payload: MeridianWebhookPayload = JSON.parse(rawBody);
-  const supabase = await createClient();
+  const supabase = createServiceClient();
 
   // Find our order by the Meridian order ID stored in patient_notes
   const { data: orders } = await supabase
     .from('orders')
     .select('id, status')
-    .eq('order_type', 'meridian')
+    .eq('payment_method', 'stripe_meridian')
     .ilike('patient_notes', `%${payload.orderId}%`)
     .limit(1);
 
