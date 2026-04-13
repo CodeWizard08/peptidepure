@@ -2,7 +2,8 @@
  * IRB Authority Strip
  *
  * Surfaces PeptidePure's clinical research moat: IRB-approved research protocol
- * (PPRN-001-2025 / IRCM-2025-467), MD-led oversight, and 503A/503B sourcing.
+ * (PPRN-001-2025 / IRCM-2025-467), MD-led oversight, and quality-verified
+ * sourcing across cGMP, ISO 9001, and FDA-registered 503A/503B facilities.
  *
  * Drops onto product detail pages, the catalog hero, /our-company, /coa.
  *
@@ -36,7 +37,7 @@ export default function IRBAuthorityStrip({ variant = 'full' }: { variant?: Vari
             <span className="opacity-70">Protocol {IRB_PROTOCOL_ID}</span>
           </span>
           <Divider />
-          <span>503A/503B Sourced</span>
+          <span>cGMP / ISO 9001 / 503A/503B Sources</span>
           <Divider />
           <span>Per-batch COA Verified</span>
           <Divider />
@@ -93,7 +94,7 @@ export default function IRBAuthorityStrip({ variant = 'full' }: { variant?: Vari
 
           {/* Right — 4 trust pillars */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 lg:flex-1">
-            <Pillar icon={<IconFlask />} label="503A/503B" sub="Sourced" />
+            <Pillar icon={<IconFlask />} label="cGMP & ISO 9001" sub="503A/503B Sources" />
             <Pillar icon={<IconShieldCheck />} label="Per-Batch" sub="COA Tested" />
             <Pillar icon={<IconStethoscope />} label="MD-Led" sub="Clinical Oversight" />
             <Pillar icon={<IconBuilding />} label="50-State" sub="Licensed" />

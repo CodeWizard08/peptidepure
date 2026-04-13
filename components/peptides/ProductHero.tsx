@@ -403,7 +403,7 @@ export default function ProductHero({
               </Link>
               <span className="flex items-center gap-1.5">
                 <IconFlask />
-                503A/503B sourced
+                cGMP / ISO 9001 / 503A/503B sourced
               </span>
               <span className="flex items-center gap-1.5">
                 <IconLock />

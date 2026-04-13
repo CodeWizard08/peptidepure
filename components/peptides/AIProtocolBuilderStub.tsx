@@ -133,7 +133,7 @@ export default function AIProtocolBuilderStub() {
             </p>
             <div className="space-y-3">
               <FeatureRow icon={<IconLab />}     label="DISCOVER"  desc="Match labs &amp; goals to peptides" />
-              <FeatureRow icon={<IconShop />}     label="SOURCE"    desc="503A/503B clinic-tier sourcing" />
+              <FeatureRow icon={<IconShop />}     label="SOURCE"    desc="cGMP, ISO 9001 &amp; 503A/503B sources" />
               <FeatureRow icon={<IconChart />}    label="TRACK"     desc="Biomarker &amp; wearable dashboards" />
               <FeatureRow icon={<IconRecycle />}  label="OPTIMIZE"  desc="AI-tuned protocol adjustments" />
             </div>
