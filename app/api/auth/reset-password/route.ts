@@ -59,11 +59,20 @@ export async function POST(request: Request) {
       options: { redirectTo },
     });
 
-    const resetLink = data?.properties?.action_link;
+    // Build our own link using hashed_token + verifyOtp flow (stateless, no PKCE code_verifier needed).
+    // action_link from generateLink triggers PKCE, which fails when started server-side (no code_verifier cookie).
+    const hashedToken = data?.properties?.hashed_token;
+    let resetLink: string | undefined;
+    if (hashedToken && redirectTo) {
+      const { origin } = new URL(redirectTo);
+      resetLink = `${origin}/auth/confirm?token_hash=${hashedToken}&type=recovery&next=/account/reset-password`;
+    } else {
+      resetLink = data?.properties?.action_link;
+    }
     let sent = false;
 
     console.log(`[reset-password] generateLink error: ${error?.message ?? 'none'}`);
-    console.log(`[reset-password] action_link: ${resetLink ? 'generated' : 'MISSING'}`);
+    console.log(`[reset-password] resetLink: ${resetLink ? 'generated' : 'MISSING'}`);
 
     if (!error && resetLink) {
       sent = await sendEmail({
