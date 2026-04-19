@@ -44,53 +44,39 @@ end;
 $$ language plpgsql security definer;
 
 -- Upgraded decrement_stock — now bundle-aware.
--- Walks bundle_components breadth-first with a visited set to prevent cycles.
+-- Walks bundle_components breadth-first using parallel arrays as a queue.
+-- Visited set prevents infinite loops if the component graph contains a cycle.
 create or replace function decrement_stock(p_product_id uuid, p_quantity integer)
 returns void as $$
 declare
-  visited uuid[] := array[]::uuid[];
-  queue record;
-  current_id uuid;
-  current_qty integer;
-  pending record;
+  visited      uuid[]    := array[]::uuid[];
+  queue_ids    uuid[]    := array[p_product_id];
+  queue_qtys   integer[] := array[p_quantity];
+  current_id   uuid;
+  current_qty  integer;
+  pending      record;
 begin
-  -- Stack of (product_id, quantity) tuples to process.
-  -- Implemented as a temp table because plpgsql has no native stack type.
-  create temporary table if not exists _decrement_queue (
-    product_id uuid,
-    quantity   integer
-  ) on commit drop;
+  while coalesce(array_length(queue_ids, 1), 0) > 0 loop
+    current_id  := queue_ids[1];
+    current_qty := queue_qtys[1];
+    queue_ids   := queue_ids[2:];
+    queue_qtys  := queue_qtys[2:];
 
-  delete from _decrement_queue;
-  insert into _decrement_queue values (p_product_id, p_quantity);
-
-  loop
-    select q.product_id, q.quantity into current_id, current_qty
-    from _decrement_queue q
-    limit 1;
-
-    exit when current_id is null;
-
-    delete from _decrement_queue
-    where product_id = current_id and quantity = current_qty;
-
-    -- Guard against cycles
     if current_id = any(visited) then
       continue;
     end if;
     visited := array_append(visited, current_id);
 
-    -- Decrement this product (+ its linked inventory row)
     perform _pp_decrement_one(current_id, current_qty);
 
-    -- Enqueue all components of this product with multiplied quantities
     for pending in
-      select component_product_id as product_id,
-             quantity * current_qty as quantity
+      select component_product_id as cid,
+             quantity * current_qty as qty
       from bundle_components
       where parent_product_id = current_id
     loop
-      insert into _decrement_queue values (pending.product_id, pending.quantity);
+      queue_ids  := array_append(queue_ids,  pending.cid);
+      queue_qtys := array_append(queue_qtys, pending.qty);
     end loop;
   end loop;
 end;
