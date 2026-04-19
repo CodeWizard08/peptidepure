@@ -10,7 +10,10 @@ type InventoryItem = {
   stock: number;
   status: Status;
   notes?: string;
+  product_id?: string | null;
 };
+
+type ProductOption = { id: string; name: string };
 
 const STATUS_OPTIONS: { value: Status; label: string; bg: string; color: string }[] = [
   { value: 'ok',    label: 'OK',       bg: '#D1FAE5', color: '#065F46' },
@@ -23,7 +26,7 @@ function statusStyle(s: Status) {
   return STATUS_OPTIONS.find((o) => o.value === s) ?? STATUS_OPTIONS[0];
 }
 
-const EMPTY_ITEM: InventoryItem = { product: '', dose: '', stock: 0, status: 'ok', notes: '' };
+const EMPTY_ITEM: InventoryItem = { product: '', dose: '', stock: 0, status: 'ok', notes: '', product_id: null };
 
 function Cell({ children }: { children: React.ReactNode }) {
   return <td className="px-3 py-2 align-middle">{children}</td>;
@@ -44,6 +47,7 @@ function TextInput({ value, onChange, placeholder, mono }: { value: string; onCh
 
 export default function AdminInventoryListPanel() {
   const [items, setItems] = useState<InventoryItem[]>([]);
+  const [products, setProducts] = useState<ProductOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -57,13 +61,19 @@ export default function AdminInventoryListPanel() {
   };
 
   useEffect(() => {
-    fetch('/api/admin/inventory')
-      .then((r) => r.json())
-      .then((data) => {
-        setItems(data.inventory || []);
-        setLoading(false);
+    Promise.all([
+      fetch('/api/admin/inventory').then((r) => r.json()).catch(() => ({ inventory: [] })),
+      fetch('/api/admin/products').then((r) => r.json()).catch(() => ({ products: [] })),
+    ])
+      .then(([invData, prodData]) => {
+        setItems(invData.inventory || []);
+        setProducts(
+          ((prodData.products || []) as Array<{ id: string; name: string }>)
+            .map((p) => ({ id: p.id, name: p.name }))
+            .sort((a, b) => a.name.localeCompare(b.name)),
+        );
       })
-      .catch(() => setLoading(false));
+      .finally(() => setLoading(false));
   }, []);
 
   const markDirty = () => setDirty(true);
@@ -188,7 +198,7 @@ export default function AdminInventoryListPanel() {
             <table className="w-full">
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--off-white)' }}>
-                  {['', 'Product', 'Dose', 'Stock', 'Status', 'Notes', ''].map((h, i) => (
+                  {['', 'Product', 'Dose', 'Stock', 'Status', 'Linked Product', 'Notes', ''].map((h, i) => (
                     <th key={i} className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-light)' }}>
                       {h}
                     </th>
@@ -198,7 +208,7 @@ export default function AdminInventoryListPanel() {
               <tbody>
                 {filteredIndices.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-sm" style={{ color: 'var(--text-light)' }}>
+                    <td colSpan={8} className="py-12 text-center text-sm" style={{ color: 'var(--text-light)' }}>
                       {items.length === 0 ? 'No inventory items yet. Click "+ Add Row" to start.' : 'No items match your filters.'}
                     </td>
                   </tr>
@@ -260,6 +270,22 @@ export default function AdminInventoryListPanel() {
                           >
                             {STATUS_OPTIONS.map((o) => (
                               <option key={o.value} value={o.value}>{o.label}</option>
+                            ))}
+                          </select>
+                        </Cell>
+
+                        {/* Linked Product — binds this row to a product so purchases auto-decrement stock */}
+                        <Cell>
+                          <select
+                            value={item.product_id ?? ''}
+                            onChange={(e) => updateItem(idx, { product_id: e.target.value || null })}
+                            className="px-2 py-1.5 rounded-lg text-xs focus:outline-none max-w-48"
+                            style={{ background: 'var(--off-white)', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
+                            title={item.product_id ? 'Purchases of this product will auto-decrement stock' : 'Unlinked — manual only'}
+                          >
+                            <option value="">— Not linked —</option>
+                            {products.map((p) => (
+                              <option key={p.id} value={p.id}>{p.name}</option>
                             ))}
                           </select>
                         </Cell>

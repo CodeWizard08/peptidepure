@@ -9,6 +9,7 @@ type InventoryRow = {
   status: string;
   notes?: string | null;
   sort_order: number;
+  product_id?: string | null;
 };
 
 function getAdminSupabase() {
@@ -47,6 +48,7 @@ export async function PUT(request: Request) {
       status: item.status,
       notes: item.notes || null,
       sort_order: idx,
+      product_id: item.product_id || null,
     })
   );
 
