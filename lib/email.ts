@@ -131,6 +131,69 @@ export function newOrderAdminHtml(order: {
   `;
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  pending: 'Pending',
+  approved: 'Approved',
+  processing: 'Processing',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+};
+
+const STATUS_DESCRIPTIONS: Record<string, string> = {
+  pending: 'Your order has been received and is awaiting review.',
+  approved: 'Your order has been approved and is queued for fulfillment.',
+  processing: 'Your order is being prepared for shipment.',
+  completed: 'Your order is complete. Thank you for choosing PeptidePure™.',
+  cancelled: 'Your order has been cancelled. Contact us if this was unexpected.',
+};
+
+export function orderStatusUpdateHtml(opts: {
+  id: string;
+  customerName: string;
+  status: string;
+  trackingNumber?: string | null;
+}): string {
+  const statusLabel = STATUS_LABELS[opts.status] || opts.status;
+  const description = STATUS_DESCRIPTIONS[opts.status] || 'There is an update on your order.';
+
+  const trackingBlock = opts.trackingNumber
+    ? `
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:16px 0">
+        <p style="color:#6b7280;font-size:12px;margin:0 0 4px;text-transform:uppercase;letter-spacing:0.05em">Tracking Number</p>
+        <p style="color:#0B1F3A;font-size:16px;font-weight:700;margin:0;font-family:monospace">${esc(opts.trackingNumber)}</p>
+      </div>`
+    : '';
+
+  return `
+    <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px">
+      <div style="background:#0B1F3A;padding:24px;border-radius:12px 12px 0 0;text-align:center">
+        <h1 style="color:#fff;margin:0;font-size:20px">PeptidePure&#8482;</h1>
+        <p style="color:#C8952C;margin:4px 0 0;font-size:13px">Order Update</p>
+      </div>
+      <div style="background:#fff;padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
+        <p style="color:#0B1F3A;font-size:15px;font-weight:600">Hi ${esc(opts.customerName)},</p>
+        <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:8px 0 16px">${description}</p>
+
+        <div style="background:#FFF8EC;border-left:4px solid #C8952C;padding:14px 16px;margin:16px 0;border-radius:4px">
+          <p style="color:#6b7280;font-size:12px;margin:0 0 4px;text-transform:uppercase;letter-spacing:0.05em">Order Status</p>
+          <p style="color:#0B1F3A;font-size:18px;font-weight:700;margin:0">${esc(statusLabel)}</p>
+        </div>
+
+        ${trackingBlock}
+
+        <p style="color:#6b7280;font-size:13px;margin-top:16px">
+          Order ID: <strong style="color:#0B1F3A">${esc(opts.id.slice(0, 8).toUpperCase())}</strong>
+        </p>
+
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0" />
+        <p style="font-size:12px;color:#9ca3af">
+          Questions? Reply to this email or contact us at info@peptidepure.com
+        </p>
+      </div>
+    </div>
+  `;
+}
+
 export function formConfirmationHtml(formType: string, providerName?: string): string {
   const typeLabel = formType.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const name = esc(providerName || 'Clinician');

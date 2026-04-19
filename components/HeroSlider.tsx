@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 interface HeroSlide {
   video: string;
@@ -25,8 +26,18 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
   const [textKey, setTextKey] = useState(0);
   const [progressKey, setProgressKey] = useState(0);
   const [videosReady, setVideosReady] = useState<Set<number>>(new Set());
+  const [isSignedIn, setIsSignedIn] = useState(false);
   const animating = useRef(false);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data }) => setIsSignedIn(!!data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+      setIsSignedIn(!!session);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   const goTo = useCallback((index: number) => {
     if (animating.current) return;
@@ -140,17 +151,30 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
                   className="slide-text-enter"
                   style={{ animationDelay: '180ms' }}
                 >
-                  <Link
-                    href="/account"
-                    className="btn-primary inline-flex items-center gap-2"
-                    style={{ padding: '0.9rem 2.2rem', fontSize: '0.95rem' }}
-                  >
-                    Create Account
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span className="text-xs">+</span>
-                  </Link>
+                  {isSignedIn ? (
+                    <Link
+                      href="/peptides"
+                      className="btn-primary inline-flex items-center gap-2"
+                      style={{ padding: '0.9rem 2.2rem', fontSize: '0.95rem' }}
+                    >
+                      Browse Peptides
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/account"
+                      className="btn-primary inline-flex items-center gap-2"
+                      style={{ padding: '0.9rem 2.2rem', fontSize: '0.95rem' }}
+                    >
+                      Create Account
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span className="text-xs">+</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

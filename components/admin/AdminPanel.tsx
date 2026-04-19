@@ -10,9 +10,10 @@ import AdminFormsPanel from './AdminFormsPanel';
 import AdminContentPanel from './AdminContentPanel';
 import AdminInventoryPanel from './AdminInventoryPanel';
 import AdminInventoryListPanel from './AdminInventoryListPanel';
+import AdminBundlesPanel from './AdminBundlesPanel';
 import AdminCoaPanel from './AdminCoaPanel';
 
-type Section = 'dashboard' | 'orders' | 'products' | 'inventory' | 'inventory-list' | 'users' | 'forms' | 'content' | 'coa';
+type Section = 'dashboard' | 'orders' | 'products' | 'inventory' | 'inventory-list' | 'bundles' | 'users' | 'forms' | 'content' | 'coa';
 
 const NAV: { key: Section; label: string; icon: React.ReactNode }[] = [
   {
@@ -57,6 +58,15 @@ const NAV: { key: Section; label: string; icon: React.ReactNode }[] = [
     icon: (
       <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6m-6 4h6" />
+      </svg>
+    ),
+  },
+  {
+    key: 'bundles',
+    label: 'Bundle Components',
+    icon: (
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14-4H5m14 8H5m14 4H5" />
       </svg>
     ),
   },
@@ -265,6 +275,7 @@ export default function AdminPanel() {
         {activeSection === 'products' && <AdminProductsPanel />}
         {activeSection === 'inventory' && <AdminInventoryPanel />}
         {activeSection === 'inventory-list' && <AdminInventoryListPanel />}
+        {activeSection === 'bundles' && <AdminBundlesPanel />}
         {activeSection === 'users' && <AdminUsersPanel />}
         {activeSection === 'forms' && <AdminFormsPanel />}
         {activeSection === 'coa' && <AdminCoaPanel />}

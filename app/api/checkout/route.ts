@@ -50,7 +50,7 @@ export async function POST(request: Request) {
   const productIds = body.items.map((i) => i.productId);
   const { data: products, error: productsError } = await supabase
     .from('products')
-    .select('id, name, slug, price_cents, is_active, stock_quantity')
+    .select('id, name, slug, price_cents, is_active, stock_quantity, metadata')
     .in('id', productIds)
     .eq('is_active', true);
 
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
 
   const productMap = new Map(products.map((p) => [p.id, p]));
 
-  // Validate products and stock
+  // Validate products, stock, and MOQ (lead-time items require min 10 vials)
   for (const item of body.items) {
     const product = productMap.get(item.productId);
     if (!product) {
@@ -69,6 +69,13 @@ export async function POST(request: Request) {
     if (product.stock_quantity != null && item.quantity > product.stock_quantity) {
       return NextResponse.json(
         { error: `Insufficient stock for ${product.name}` },
+        { status: 400 }
+      );
+    }
+    const meta = (product.metadata ?? {}) as { inventory?: string };
+    if (meta.inventory === 'lead_time' && item.quantity < 10) {
+      return NextResponse.json(
+        { error: `${product.name} requires a minimum order of 10 vials (lead-time item)` },
         { status: 400 }
       );
     }

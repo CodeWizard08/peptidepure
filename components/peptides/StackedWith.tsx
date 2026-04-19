@@ -112,7 +112,7 @@ export default async function StackedWith({
                       alt={stackBaseName}
                       fill
                       sizes="96px"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-white/40 text-xs font-bold">

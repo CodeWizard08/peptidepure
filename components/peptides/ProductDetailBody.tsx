@@ -44,12 +44,29 @@ export default function ProductDetailBody({ product, baseName, variants, catConf
 
       {product.long_description && (
         <section style={{ background: 'var(--off-white)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
-          <div className="container-xl py-14">
+          <div className="container-xl py-10">
             <div className="max-w-3xl">
-              <h2 className="text-xl font-bold mb-8" style={{ color: 'var(--navy)' }}>About {baseName}</h2>
-              <div className="prose-product">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{product.long_description}</ReactMarkdown>
-              </div>
+              <details className="group">
+                <summary
+                  className="flex items-center justify-between cursor-pointer list-none rounded-xl px-5 py-4 transition-colors hover:bg-white"
+                  style={{ border: '1px solid var(--border)', background: 'white' }}
+                >
+                  <h2 className="text-lg font-bold" style={{ color: 'var(--navy)' }}>About {baseName}</h2>
+                  <span
+                    className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5"
+                    style={{ color: 'var(--gold)' }}
+                  >
+                    <span className="group-open:hidden">Read More</span>
+                    <span className="hidden group-open:inline">Close</span>
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-transform group-open:rotate-180">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="prose-product mt-5 px-2 pb-2">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{product.long_description}</ReactMarkdown>
+                </div>
+              </details>
             </div>
           </div>
         </section>

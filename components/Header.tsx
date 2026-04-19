@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import type { User } from '@supabase/supabase-js';
@@ -15,6 +15,8 @@ export default function Header() {
   const formsCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
   const moreCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [shopOpen, setShopOpen] = useState(false);
+  const shopCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mobileFormsOpen, setMobileFormsOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -22,6 +24,23 @@ export default function Header() {
 
   const supabase = createClient();
   const pathname = usePathname();
+  const router = useRouter();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const submitSearch = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    router.push(`/peptides?q=${encodeURIComponent(q)}`);
+    setSearchOpen(false);
+    setSearchQuery('');
+  }, [searchQuery, router]);
+
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+  }, [searchOpen]);
   const isHome = pathname === '/';
   const isAdminRoute = pathname.startsWith('/admin');
   const showBanner = !bannerDismissed && !isAdminRoute;
@@ -53,6 +72,7 @@ export default function Header() {
     setMobileFormsOpen(false);
     setFormsOpen(false);
     setMoreOpen(false);
+    setShopOpen(false);
   }, [pathname]);
 
   // Lock body scroll when mobile menu is open
@@ -141,18 +161,72 @@ export default function Header() {
 
             {/* Desktop Nav */}
             <nav className="hidden lg:flex items-center gap-1">
-              {mainNavLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-3.5 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                    pathname === link.href ? (glass ? 'bg-white/15' : 'bg-gray-100') : ''
-                  } ${glass ? 'hover:bg-white/10' : 'hover:bg-gray-50'}`}
-                  style={{ color: glass ? 'rgba(255,255,255,0.82)' : 'var(--text-dark)' }}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {mainNavLinks.map((link) =>
+                link.href === '/peptides' ? (
+                  <div
+                    key={link.href}
+                    className="relative"
+                    onMouseEnter={() => {
+                      if (shopCloseTimer.current) clearTimeout(shopCloseTimer.current);
+                      setShopOpen(true);
+                    }}
+                    onMouseLeave={() => {
+                      shopCloseTimer.current = setTimeout(() => setShopOpen(false), 150);
+                    }}
+                  >
+                    <Link
+                      href={link.href}
+                      className={`px-3.5 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center gap-1 ${
+                        pathname === link.href ? (glass ? 'bg-white/15' : 'bg-gray-100') : ''
+                      } ${glass ? 'hover:bg-white/10' : 'hover:bg-gray-50'}`}
+                      style={{ color: glass ? 'rgba(255,255,255,0.82)' : 'var(--text-dark)' }}
+                    >
+                      {link.label}
+                      <svg
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${shopOpen ? 'rotate-180' : ''}`}
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </Link>
+                    {shopOpen && (
+                      <div
+                        className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-xl py-1.5 z-50"
+                        style={{ border: '1px solid var(--border)', minWidth: '14rem' }}
+                      >
+                        {[
+                          { label: 'All Peptides', href: '/peptides' },
+                          { label: 'Injectable Peptides', href: '/peptides?shop=injectable' },
+                          { label: 'Oral Peptides', href: '/peptides?shop=oral' },
+                          { label: 'Peptide Buzz', href: '/peptides?shop=buzz' },
+                        ].map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                            style={{ color: 'var(--text-dark)' }}
+                            onClick={() => setShopOpen(false)}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: 'var(--gold)' }} />
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`px-3.5 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                      pathname === link.href ? (glass ? 'bg-white/15' : 'bg-gray-100') : ''
+                    } ${glass ? 'hover:bg-white/10' : 'hover:bg-gray-50'}`}
+                    style={{ color: glass ? 'rgba(255,255,255,0.82)' : 'var(--text-dark)' }}
+                  >
+                    {link.label}
+                  </Link>
+                )
+              )}
               {secondaryNavLinks.length > 0 && (
                 <div
                   className="relative"
@@ -263,6 +337,50 @@ export default function Header() {
 
             {/* Right actions — desktop */}
             <div className="hidden lg:flex items-center gap-3">
+              {/* Search — expands on click, submits to /peptides?q= */}
+              <form
+                onSubmit={submitSearch}
+                className="flex items-center transition-all duration-200"
+                style={{
+                  background: searchOpen ? (glass ? 'rgba(255,255,255,0.12)' : 'var(--off-white)') : 'transparent',
+                  border: `1px solid ${searchOpen ? (glass ? 'rgba(255,255,255,0.2)' : 'var(--border)') : 'transparent'}`,
+                  borderRadius: '8px',
+                  padding: searchOpen ? '4px 4px 4px 10px' : '0',
+                  width: searchOpen ? '240px' : 'auto',
+                }}
+              >
+                <svg
+                  className="w-4 h-4 shrink-0 cursor-pointer"
+                  style={{ color: glass ? 'rgba(255,255,255,0.70)' : 'var(--text-mid)' }}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  onClick={() => setSearchOpen((v) => !v)}
+                  role="button"
+                  aria-label="Search products"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" />
+                </svg>
+                {searchOpen && (
+                  <>
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onBlur={() => { if (!searchQuery) setSearchOpen(false); }}
+                      placeholder="Search peptides…"
+                      className="flex-1 px-2 py-1 text-sm bg-transparent focus:outline-none"
+                      style={{ color: glass ? 'white' : 'var(--text-dark)' }}
+                    />
+                    <button
+                      type="submit"
+                      className="px-2 py-1 text-xs font-semibold rounded"
+                      style={{ background: 'var(--gold)', color: 'white' }}
+                    >
+                      Go
+                    </button>
+                  </>
+                )}
+              </form>
               <Link
                 href="/account"
                 className={`flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md transition-all duration-200 ${
@@ -374,15 +492,15 @@ export default function Header() {
             <div className="container-xl flex items-center justify-center gap-3 py-2 px-4 relative">
               <p className="text-xs sm:text-sm text-center" style={{ color: 'rgba(255,255,255,0.9)' }}>
                 <span className="font-semibold" style={{ color: 'var(--gold)' }}>$1,000 minimum order</span>
-                <span className="mx-1.5 hidden sm:inline" style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
-                <span className="hidden sm:inline">Orders under $1,000 require manual processing. Email </span>
-                <a
-                  href="mailto:info@peptidepure.com"
+                <span className="mx-1.5" style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
+                <span className="hidden sm:inline">Orders under $1,000 require manual processing. </span>
+                <Link
+                  href="/contact"
                   className="underline underline-offset-2 hover:no-underline"
                   style={{ color: 'var(--gold)' }}
                 >
-                  info@peptidepure.com
-                </a>
+                  Contact us for questions
+                </Link>
               </p>
               <button
                 onClick={dismissBanner}
@@ -421,22 +539,62 @@ export default function Header() {
       >
         <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 64px)' }}>
           <div className="px-5 py-5 space-y-1">
+            {/* Mobile search */}
+            <form onSubmit={submitSearch} className="mb-3 flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--off-white)', border: '1px solid var(--border)' }}>
+              <svg className="w-4 h-4 shrink-0" style={{ color: 'var(--text-light)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" />
+              </svg>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search peptides…"
+                className="flex-1 text-sm bg-transparent focus:outline-none"
+                style={{ color: 'var(--text-dark)' }}
+              />
+              {searchQuery && (
+                <button type="submit" className="px-2.5 py-1 text-xs font-semibold rounded" style={{ background: 'var(--gold)', color: 'white' }}>
+                  Go
+                </button>
+              )}
+            </form>
+
             {mainNavLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="flex items-center gap-3 px-3 py-3 rounded-lg text-[15px] font-medium transition-colors"
-                style={{
-                  color: pathname === link.href ? 'var(--gold)' : 'var(--text-dark)',
-                  background: pathname === link.href ? 'var(--gold-pale)' : 'transparent',
-                }}
-                onClick={closeMobile}
-              >
-                {pathname === link.href && (
-                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: 'var(--gold)' }} />
+              <div key={link.href}>
+                <Link
+                  href={link.href}
+                  className="flex items-center gap-3 px-3 py-3 rounded-lg text-[15px] font-medium transition-colors"
+                  style={{
+                    color: pathname === link.href ? 'var(--gold)' : 'var(--text-dark)',
+                    background: pathname === link.href ? 'var(--gold-pale)' : 'transparent',
+                  }}
+                  onClick={closeMobile}
+                >
+                  {pathname === link.href && (
+                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: 'var(--gold)' }} />
+                  )}
+                  {link.label}
+                </Link>
+                {link.href === '/peptides' && (
+                  <div className="pl-6 pb-1 flex flex-wrap gap-1.5">
+                    {[
+                      { label: 'Injectable', href: '/peptides?shop=injectable' },
+                      { label: 'Oral', href: '/peptides?shop=oral' },
+                      { label: 'Peptide Buzz', href: '/peptides?shop=buzz' },
+                    ].map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={closeMobile}
+                        className="text-xs font-semibold px-2.5 py-1 rounded-full"
+                        style={{ background: 'var(--off-white)', color: 'var(--text-mid)', border: '1px solid var(--border)' }}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
                 )}
-                {link.label}
-              </Link>
+              </div>
             ))}
 
             {secondaryNavLinks.length > 0 && (

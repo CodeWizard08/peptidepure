@@ -24,9 +24,11 @@ export const metadata: Metadata = {
 export default async function PeptidesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; category?: string }>;
+  searchParams: Promise<{ page?: string; category?: string; q?: string; shop?: string }>;
 }) {
-  const { page: pageParam, category: categoryFilter } = await searchParams;
+  const { page: pageParam, category: categoryFilter, q: searchQueryRaw, shop: shopFilterRaw } = await searchParams;
+  const searchQuery = searchQueryRaw?.trim() || undefined;
+  const shopFilter = shopFilterRaw === 'oral' || shopFilterRaw === 'injectable' || shopFilterRaw === 'buzz' ? shopFilterRaw : undefined;
   const currentPage = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
   const from = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const to = from + PRODUCTS_PER_PAGE - 1;
@@ -59,6 +61,20 @@ export default async function PeptidesPage({
 
   if (categoryFilter) {
     query = query.eq('category', categoryFilter);
+  }
+
+  if (searchQuery) {
+    const pattern = `%${searchQuery.replace(/[%_]/g, '\\$&')}%`;
+    query = query.or(`name.ilike.${pattern},description.ilike.${pattern}`);
+  }
+
+  // Shop filter — Injectable (Lyophilized Powder), Oral (Oral tablets), Peptide Buzz (brand)
+  if (shopFilter === 'oral') {
+    query = query.filter('metadata->>form', 'ilike', '%Oral%');
+  } else if (shopFilter === 'injectable') {
+    query = query.filter('metadata->>form', 'ilike', '%Lyophilized%');
+  } else if (shopFilter === 'buzz') {
+    query = query.filter('metadata->>brand', 'eq', 'peptidebuzz');
   }
 
   const { data: products, count: totalCount } = await query;
@@ -98,6 +114,8 @@ export default async function PeptidesPage({
               products={(products ?? []) as Product[]}
               user={user}
               categoryFilter={categoryFilter}
+              searchQuery={searchQuery}
+              shopFilter={shopFilter}
               categoryMap={categoryMap}
               currentPage={currentPage}
               totalPages={totalPages}

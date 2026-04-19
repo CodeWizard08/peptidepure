@@ -23,12 +23,12 @@ export default function AddToCartButton({ product, inventory = 'in_stock', leadT
   const { addToCart } = useCart();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
-  const [showBackorderNotice, setShowBackorderNotice] = useState(false);
-
   const isOOS = inventory === 'oos';
   const isLeadTime = inventory === 'lead_time';
+  const minQty = isLeadTime ? 10 : 1;
+  const [quantity, setQuantity] = useState(minQty);
+  const [added, setAdded] = useState(false);
+  const [showBackorderNotice, setShowBackorderNotice] = useState(false);
 
   const supabase = createClient();
 
@@ -137,7 +137,7 @@ export default function AddToCartButton({ product, inventory = 'in_stock', leadT
           style={{ border: '1px solid var(--border)' }}
         >
           <button
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            onClick={() => setQuantity((q) => Math.max(minQty, q - 1))}
             className="px-3 py-2.5 text-sm font-bold hover:bg-gray-50 transition-colors"
             style={{ color: 'var(--text-mid)' }}
           >
@@ -197,7 +197,7 @@ export default function AddToCartButton({ product, inventory = 'in_stock', leadT
       {/* Persistent backorder label for lead time items */}
       {isLeadTime && !showBackorderNotice && (
         <p className="text-xs mt-2 font-medium" style={{ color: '#D97706' }}>
-          On Backorder — {leadTimeDays ?? 21}-day lead time
+          On Backorder — {leadTimeDays ?? 21}-day lead time · Minimum 10 vials
         </p>
       )}
 

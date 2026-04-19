@@ -204,7 +204,7 @@ export default function RegisterForm() {
           <div className="space-y-3 pt-1">
             {[
               { checked: regAgree1, setChecked: setRegAgree1, text: (<>I agree to the Peptide Pure LLC Provider{' '}<a href="/terms" target="_blank" rel="noopener noreferrer" className="underline font-semibold" style={{ color: 'var(--gold)' }} onClick={(e) => e.stopPropagation()}>Terms &amp; Conditions</a>{' '}(including Clinician Use Only and IRB restrictions).</>) },
-              { checked: regAgree2, setChecked: setRegAgree2, text: (<>The undersigned physician/provider agrees to participate as a site participant in the{' '}<a href="https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2025/12/IRB-Provider-Site-Participation-Agreement.pdf" target="_blank" rel="noopener noreferrer" className="underline font-semibold" style={{ color: 'var(--gold)' }} onClick={(e) => e.stopPropagation()}>IRB-approved observational registry</a>{' '}Mortensen Medical Research Network.</>) },
+              { checked: regAgree2, setChecked: setRegAgree2, text: (<>The undersigned physician/provider agrees to participate as a site participant in the{' '}<a href="/irb-consent" target="_blank" rel="noopener noreferrer" className="underline font-semibold" style={{ color: 'var(--gold)' }} onClick={(e) => e.stopPropagation()}>IRB-approved observational registry</a>{' '}Mortensen Medical Research Network.</>) },
             ].map(({ checked, setChecked, text }, i) => (
               <label key={i} className="flex gap-3 cursor-pointer">
                 <div className="mt-0.5 w-5 h-5 shrink-0 rounded-md flex items-center justify-center transition-all duration-200"

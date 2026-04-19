@@ -7,7 +7,7 @@
     { "icon": "✦", "text": "Batch-Level COA Traceability" },
     { "icon": "✦", "text": "MD-Owned & Operated" },
     { "icon": "✦", "text": "Clinician Use Only™" },
-    { "icon": "✦", "text": "Free Shipping Over $125" }
+    { "icon": "✦", "text": "Free Shipping" }
   ],
   "stats": {
     "sectionLabel": "Market Context",
@@ -67,10 +67,10 @@
     "ctaLabel": "Learn More",
     "ctaHref": "/how-it-works",
     "image": "/images/research.png",
-    "imageAlt": "PeptidePure vials — RETA, BPC-157 TB500, CJC-1295 Ipamorelin, TIRZ, Epithalon",
+    "imageAlt": "PeptidePure vials — Reta, BPC-157 TB500, CJC-1295 Ipamorelin, Tirz, Epithalon",
     "badgeStat": "99%+",
     "badgeLabel": "Purity Verified",
-    "compoundPills": ["RETA", "BPC-157", "TIRZ", "Epithalon"]
+    "compoundPills": ["Reta", "BPC-157", "Tirz", "Epithalon"]
   },
   "whyDifferent": {
     "sectionLabel": "Why PeptidePure™",
@@ -89,18 +89,18 @@
       },
       {
         "title": "Fast Shipping",
-        "desc": "U.S.A.-based fulfillment. Secure packaging with tracking. Free on orders over $125. Mon–Fri dispatch.",
-        "stat": "Free Over $125"
+        "desc": "U.S.A.-based fulfillment. Secure packaging with tracking. Free shipping on every order. Mon–Fri dispatch.",
+        "stat": "Always Free"
       }
     ]
   },
   "freeShipping": {
     "badgeLabel": "Fulfillment",
     "heading": "Free Shipping",
-    "headingHighlight": "On Orders $125+",
+    "headingHighlight": "On Every Order",
     "description": "U.S.A.-based fulfillment built for busy clinical practices — secure packaging, real-time tracking, and fast Mon–Fri dispatch so your protocols never miss a beat.",
     "metrics": [
-      { "value": "$0", "label": "Shipping", "sub": "over $125" },
+      { "value": "$0", "label": "Shipping", "sub": "always free" },
       { "value": "2–3", "label": "Business Days", "sub": "typical delivery" },
       { "value": "48h", "label": "Processing", "sub": "weekday cutoff" }
     ],
@@ -108,7 +108,7 @@
       { "title": "USA-Based", "sub": "Domestic fulfillment only — no international delays" },
       { "title": "Secure Packaging", "sub": "Clinical-grade materials that protect compound integrity" },
       { "title": "Full Tracking", "sub": "Real-time updates from dispatch to your door" },
-      { "title": "Mon–Fri Dispatch", "sub": "Orders placed by noon ship same business day" }
+      { "title": "Mon–Fri Dispatch", "sub": "Orders placed by noon begin processing same business day" }
     ],
     "complianceCard": {
       "title": "Clinician-First Logistics",

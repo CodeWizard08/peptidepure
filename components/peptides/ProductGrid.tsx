@@ -49,10 +49,18 @@ function InventoryBadge({ inventory, leadTime }: { inventory?: string; leadTime?
   );
 }
 
+const SHOP_LABELS: Record<string, string> = {
+  oral: 'Oral Peptides',
+  injectable: 'Injectable Peptides',
+  buzz: 'Peptide Buzz',
+};
+
 export default function ProductGrid({
   products,
   user,
   categoryFilter,
+  searchQuery,
+  shopFilter,
   categoryMap,
   currentPage,
   totalPages,
@@ -64,6 +72,8 @@ export default function ProductGrid({
   products: Product[];
   user: any;
   categoryFilter: string | undefined;
+  searchQuery?: string;
+  shopFilter?: string;
   categoryMap: Map<string, any[]>;
   currentPage: number;
   totalPages: number;
@@ -115,12 +125,21 @@ export default function ProductGrid({
           <div className="flex items-end justify-between mb-6">
             <div>
               <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--navy)' }}>
-                {categoryFilter ?? 'All Products'}
+                {searchQuery
+                  ? `Results for “${searchQuery}”`
+                  : shopFilter
+                    ? SHOP_LABELS[shopFilter]
+                    : (categoryFilter ?? 'All Products')}
               </h2>
               <p className="text-sm" style={{ color: 'var(--text-light)' }}>
                 Showing {from + 1}–{Math.min(from + PRODUCTS_PER_PAGE, totalProducts)} of {totalProducts} product{totalProducts !== 1 ? 's' : ''}
               </p>
             </div>
+            {searchQuery && (
+              <Link href="/peptides" className="text-xs font-semibold hover:underline" style={{ color: 'var(--gold)' }}>
+                Clear search ✕
+              </Link>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
@@ -147,7 +166,7 @@ export default function ProductGrid({
                         alt={product.name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-cover"
+                        className="object-contain p-4"
                       />
                     ) : (
                       <div className="flex flex-col items-center gap-2 relative z-10">
@@ -251,7 +270,7 @@ export default function ProductGrid({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <Pagination currentPage={currentPage} totalPages={totalPages} categoryFilter={categoryFilter} />
+            <Pagination currentPage={currentPage} totalPages={totalPages} categoryFilter={categoryFilter} searchQuery={searchQuery} shopFilter={shopFilter} />
           )}
         </>
       )}
@@ -276,10 +295,12 @@ export default function ProductGrid({
 
 /* ── Pagination ── */
 
-function buildPageUrl(page: number, category?: string) {
+function buildPageUrl(page: number, category?: string, searchQuery?: string, shopFilter?: string) {
   const params = new URLSearchParams();
   if (page > 1) params.set('page', String(page));
   if (category) params.set('category', category);
+  if (searchQuery) params.set('q', searchQuery);
+  if (shopFilter) params.set('shop', shopFilter);
   const qs = params.toString();
   return `/peptides${qs ? `?${qs}` : ''}`;
 }
@@ -300,16 +321,20 @@ function Pagination({
   currentPage,
   totalPages,
   categoryFilter,
+  searchQuery,
+  shopFilter,
 }: {
   currentPage: number;
   totalPages: number;
   categoryFilter: string | undefined;
+  searchQuery?: string;
+  shopFilter?: string;
 }) {
   return (
     <nav className="flex items-center justify-center gap-1.5 mb-14">
       {currentPage > 1 ? (
         <Link
-          href={buildPageUrl(currentPage - 1, categoryFilter)}
+          href={buildPageUrl(currentPage - 1, categoryFilter, searchQuery, shopFilter)}
           className="flex items-center gap-1 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100"
           style={{ color: 'var(--navy)' }}
         >
@@ -333,7 +358,7 @@ function Pagination({
         ) : (
           <Link
             key={p}
-            href={buildPageUrl(p as number, categoryFilter)}
+            href={buildPageUrl(p as number, categoryFilter, searchQuery, shopFilter)}
             className="min-w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-colors"
             style={{
               background: p === currentPage ? 'var(--navy)' : 'transparent',
@@ -347,7 +372,7 @@ function Pagination({
 
       {currentPage < totalPages ? (
         <Link
-          href={buildPageUrl(currentPage + 1, categoryFilter)}
+          href={buildPageUrl(currentPage + 1, categoryFilter, searchQuery, shopFilter)}
           className="flex items-center gap-1 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100"
           style={{ color: 'var(--navy)' }}
         >

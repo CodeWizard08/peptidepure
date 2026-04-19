@@ -36,7 +36,7 @@
   },
   "peptides": [
     {
-      "name": "Retatrutide",
+      "name": "Reta",
       "category": "Metabolic Optimization",
       "categoryColor": "#C8952C",
       "vial": "30 mg",
@@ -48,7 +48,7 @@
       "storage": "Refrigerate after reconstitution. Use within 28 days."
     },
     {
-      "name": "Tirzepatide (TIRZ)",
+      "name": "Tirz",
       "category": "Appetite & Glycemic Support",
       "categoryColor": "#C8952C",
       "vial": "30 mg",
@@ -60,7 +60,7 @@
       "storage": "Refrigerate after reconstitution. Use within 28 days."
     },
     {
-      "name": "Semaglutide (SEMA)",
+      "name": "Sema",
       "category": "Appetite & Glycemic Support",
       "categoryColor": "#C8952C",
       "vial": "15 mg",

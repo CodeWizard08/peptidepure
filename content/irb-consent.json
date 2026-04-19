@@ -1,0 +1,67 @@
+{
+  "hero": {
+    "sectionLabel": "Research",
+    "heading": "IRB Peptide Pure Ordering Consent",
+    "subtitle": "Site Participant Consent — Mortensen Medical Research Network"
+  },
+  "intro": "This document constitutes the informed consent for licensed healthcare providers to participate as a site in the IRB-approved observational registry operated by Mortensen Medical Research Network. By signing below, the provider agrees to the terms outlined herein for the duration of their participation in the registry.",
+  "sections": [
+    {
+      "title": "1. Purpose of the Registry",
+      "text": "The Mortensen Medical Research Network operates an IRB-approved observational registry to systematically collect real-world data on the safety, tolerability, and clinical outcomes of peptide therapies prescribed by participating clinicians within their normal scope of practice. The registry does not dictate prescribing decisions; it documents them."
+    },
+    {
+      "title": "2. Provider Responsibilities",
+      "text": "As a site participant, the undersigned provider agrees to:",
+      "items": [
+        "Prescribe peptide therapies only within the scope of their state license and clinical judgment.",
+        "Obtain informed consent from each patient enrolled in the observational protocol, using the registry's approved consent template.",
+        "Report adverse events to the registry within 24 hours of becoming aware of a Serious Adverse Event (SAE), and within 7 days for non-serious events.",
+        "Maintain accurate, timely records of patient outcomes at the intervals specified by the protocol.",
+        "Source all peptide products exclusively from Peptide Pure LLC or other 503A/503B licensed compounding pharmacies approved by the IRB."
+      ]
+    },
+    {
+      "title": "3. Patient Protections",
+      "text": "Patients enrolled by the provider are protected under the IRB-approved protocol, which includes:",
+      "items": [
+        "Voluntary informed consent documenting the investigational nature of the therapy.",
+        "The right to withdraw from the registry at any time without affecting continued care.",
+        "Confidentiality of all data collected, handled in accordance with HIPAA and 21 CFR Part 11.",
+        "Access to the provider's adverse event reporting channel for any safety concerns."
+      ]
+    },
+    {
+      "title": "4. Data Ownership & Use",
+      "text": "De-identified data collected through the registry may be used by Mortensen Medical Research Network and its collaborators for the following purposes:",
+      "items": [
+        "Publication in peer-reviewed journals and scientific conferences.",
+        "Regulatory submissions intended to support the legitimate clinical use of peptide therapies.",
+        "Aggregated safety and efficacy reporting to participating providers.",
+        "Quality improvement of the registry's protocols and consent procedures."
+      ],
+      "extra": "Providers retain rights to their own clinical records. The registry does not assert ownership over the provider's patient data outside the scope of what is submitted to the registry."
+    },
+    {
+      "title": "5. Non-Circumvention",
+      "text": "The provider agrees not to bypass the registry framework by sourcing peptide products from unlicensed or grey-market suppliers while representing treatments as part of the registry, or by directing patients to third-party clinics for the purpose of avoiding the registry's documentation requirements."
+    },
+    {
+      "title": "6. Term & Termination",
+      "text": "Participation in the registry continues for the duration of the IRB-approved protocol or until either party gives 30 days' written notice of withdrawal. Upon withdrawal, the provider retains access to patient data they submitted and remains bound by confidentiality obligations for data obtained through the registry."
+    },
+    {
+      "title": "7. Regulatory & Legal Acknowledgement",
+      "text": "The provider acknowledges that:",
+      "items": [
+        "The peptide therapies discussed in the registry are not FDA-approved for the indications studied.",
+        "Participation in the registry does not constitute FDA approval, endorsement, or validation of these therapies.",
+        "The provider remains solely responsible for clinical decision-making and for compliance with applicable state and federal laws, including DEA regulations where relevant."
+      ]
+    },
+    {
+      "title": "8. Contact",
+      "text": "Questions about the registry, this consent, or safety reporting should be directed to Mortensen Medical Research Network through the contact form on this site. For urgent SAE reporting, contact the designated registry safety line provided upon registration."
+    }
+  ]
+}

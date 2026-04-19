@@ -114,7 +114,7 @@ export default function ProductHero({
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 42vw"
-                    className="object-cover"
+                    className="object-contain p-8"
                   />
                 ) : (
                   <div className="flex flex-col items-center gap-3">

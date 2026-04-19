@@ -64,7 +64,7 @@ export default function LoginForm() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>
-            <strong style={{ color: 'var(--navy)' }}>Previous WordPress customers:</strong>{' '}
+            <strong style={{ color: 'var(--navy)' }}>Previous website customers:</strong>{' '}
             Please register a new account using the same email address. Your order history will be linked automatically.
           </span>
         </div>

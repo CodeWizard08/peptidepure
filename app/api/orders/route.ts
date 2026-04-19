@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   const productIds = body.items.map((i) => i.productId);
   const { data: products, error: productsError } = await supabase
     .from('products')
-    .select('id, name, slug, price_cents, is_active, stock_quantity')
+    .select('id, name, slug, price_cents, is_active, stock_quantity, metadata')
     .in('id', productIds)
     .eq('is_active', true);
 
@@ -80,6 +80,14 @@ export async function POST(request: Request) {
     if (product.stock_quantity != null && item.quantity > product.stock_quantity) {
       return NextResponse.json(
         { error: `Insufficient stock for ${product.name}. Available: ${product.stock_quantity}` },
+        { status: 400 }
+      );
+    }
+    // MOQ: lead-time products require 10+ vials (21-day lead time for ordering and COA testing)
+    const meta = (product.metadata ?? {}) as { inventory?: string };
+    if (meta.inventory === 'lead_time' && item.quantity < 10) {
+      return NextResponse.json(
+        { error: `${product.name} requires a minimum order of 10 vials (lead-time item)` },
         { status: 400 }
       );
     }

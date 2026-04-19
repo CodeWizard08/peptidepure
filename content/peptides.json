@@ -9,7 +9,7 @@
       "name": "Metabolic / Weight Loss Peptides",
       "subtitle": "Endocrine System",
       "color": "#C8952C",
-      "items": ["AOD-9604", "Cagrilintide", "Cagrilintide + SEMA", "GLP-1 (SEMA)", "GLP-1 / GIP (TIRZ)", "GLP-1 / GIP / G (RETA)", "Mazdutide", "Melanotan II", "SLU-PP-332", "Survodutide"]
+      "items": ["AOD-9604", "Cagrilintide", "Cagrilintide + Sema", "GLP-1 (Sema)", "GLP-1 / GIP (Tirz)", "GLP-1 / GIP / G (Reta)", "Mazdutide", "Melanotan II", "SLU-PP-332", "Survodutide"]
     },
     {
       "name": "MSK / Tissue Repair Peptides",
@@ -51,9 +51,9 @@
       "retail": "~$25,000+",
       "tier": "Foundation",
       "desc": "Entry-level bundle for new clinicians",
-      "focus": "Weight loss (TIRZ & RETA) + Longevity/Repair (MOTS-c, GHK-Cu, BPC-157, Epithalon)",
+      "focus": "Weight loss (Tirz & Reta) + Longevity/Repair (MOTS-c, GHK-Cu, BPC-157, Epithalon)",
       "detail": "Enough vials for initial patient trials or small stocking.",
-      "bonus": "1 free TIRZ 15mg",
+      "bonus": "1 free Tirz 15mg",
       "highlight": false
     },
     {
@@ -65,7 +65,7 @@
       "desc": "Mid-tier bundle for growing clinics",
       "focus": "Higher volume in weight loss, mitochondrial health, longevity, and tissue repair",
       "detail": "Scales up for ongoing patient treatments.",
-      "bonus": "1 free TIRZ 15mg + 1 free RETA 15mg",
+      "bonus": "1 free Tirz 15mg + 1 free Reta 15mg",
       "highlight": true
     },
     {
@@ -77,7 +77,7 @@
       "desc": "High-volume bundle for established clinics",
       "focus": "Bulk supply in metabolic optimization, longevity, and repair",
       "detail": "Substantial stock for multiple patients.",
-      "bonus": "2 free TIRZ 15mg + 2 free RETA 15mg",
+      "bonus": "2 free Tirz 15mg + 2 free Reta 15mg",
       "highlight": false
     }
   ],
@@ -103,7 +103,7 @@
         "name": "Metabolic Health & Body Composition Comparison Protocol",
         "tags": ["Metabolism/Weight Loss", "Protocol Package"],
         "image": "https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2026/01/Bundle-Vial-Mockups-4.png",
-        "peptides": ["TIRZ 10mg", "RETA 10mg", "SEMA 15mg", "AOD-9604 2mg", "MOTS-c 10mg"],
+        "peptides": ["Tirz 10mg", "Reta 10mg", "Sema 15mg", "AOD-9604 2mg", "MOTS-c 10mg"],
         "description": "Compare GLP-1/GIP agonists alongside metabolic peptides for body composition optimization."
       },
       {

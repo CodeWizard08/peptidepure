@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/admin-auth';
 import { createClient } from '@supabase/supabase-js';
+import { sendEmail, orderStatusUpdateHtml } from '@/lib/email';
 
 function getAdminSupabase() {
   return createClient(
@@ -65,6 +66,13 @@ export async function PATCH(request: Request) {
 
   const supabase = getAdminSupabase();
 
+  // Fetch previous state so we can decide whether to email the customer.
+  const { data: prevOrder } = await supabase
+    .from('orders')
+    .select('id, status, tracking_number, shipping_address')
+    .eq('id', orderId)
+    .single();
+
   const updates: Record<string, unknown> = {};
   if (status) updates.status = status;
   if (trackingNumber !== undefined) updates.tracking_number = trackingNumber;
@@ -78,12 +86,36 @@ export async function PATCH(request: Request) {
     .from('orders')
     .update(updates)
     .eq('id', orderId)
-    .select('id, status, tracking_number, clinician_notes')
+    .select('id, status, tracking_number, clinician_notes, shipping_address')
     .single();
 
   if (error) {
     console.error('Order update error:', error);
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
+  }
+
+  // Email the customer when status or tracking number has changed (not clinician notes).
+  const statusChanged = status && prevOrder?.status !== status;
+  const trackingChanged =
+    trackingNumber !== undefined &&
+    (prevOrder?.tracking_number ?? '') !== (trackingNumber ?? '') &&
+    trackingNumber;
+
+  if (statusChanged || trackingChanged) {
+    const shipping = (order.shipping_address ?? {}) as { name?: string; email?: string };
+    if (shipping.email) {
+      const subjectPrefix = trackingChanged && !statusChanged ? 'Tracking added' : 'Order update';
+      sendEmail({
+        to: shipping.email,
+        subject: `${subjectPrefix} — PeptidePure™ #${order.id.slice(0, 8).toUpperCase()}`,
+        html: orderStatusUpdateHtml({
+          id: order.id,
+          customerName: shipping.name || 'Clinician',
+          status: order.status,
+          trackingNumber: order.tracking_number,
+        }),
+      }).catch((err) => console.error('Order update email failed:', err));
+    }
   }
 
   return NextResponse.json({ order });
