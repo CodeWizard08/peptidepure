@@ -10,8 +10,8 @@ DO $$
 DECLARE
   rec record;
 BEGIN
-  FOR rec IN (
-    VALUES
+  FOR rec IN
+    SELECT * FROM (VALUES
       -- sku,                                  10-19, 20-49, 50+
       ('5-amino-1mq-5mg',                      5000,  4800,  4500),
       ('5-amino-1mq-50mg',                     7700,  7300,  6900),
@@ -57,7 +57,7 @@ BEGIN
       ('TA1-10mg',                             8300,  7900,  7500),
       ('TZ-15mg',                             13200, 12500, 11900)
     ) AS t(sku, tier1, tier2, tier3)
-  ) LOOP
+  LOOP
     UPDATE products
     SET metadata = jsonb_set(
       jsonb_set(
