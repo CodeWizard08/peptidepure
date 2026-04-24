@@ -60,6 +60,21 @@ export default function RegisterForm() {
         await supabase.storage.from('licenses').upload(`${data.user.id}/signature.png`, blob, { contentType: 'image/png', upsert: true });
       } catch { /* non-fatal */ }
     }
+    // Fire-and-forget admin notification — failure shouldn't block user onboarding.
+    fetch('/api/notify/new-signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName: regName,
+        email: regEmail,
+        clinic: regClinic,
+        phone: regPhone,
+        npi: regNpi,
+        credential: regCredential,
+        hasLicense: !!regFile,
+        hasSignature: !!regSignature,
+      }),
+    }).catch(() => { /* non-fatal */ });
     setRegLoading(false);
     if (warnings.length > 0) setRegWarning(warnings.join(' '));
     setRegSuccess(true);

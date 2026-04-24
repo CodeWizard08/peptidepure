@@ -194,6 +194,48 @@ export function orderStatusUpdateHtml(opts: {
   `;
 }
 
+export function newSignupAdminHtml(opts: {
+  fullName: string;
+  email: string;
+  clinic: string;
+  phone: string;
+  npi: string;
+  credential: string;
+  hasLicense: boolean;
+  hasSignature: boolean;
+}): string {
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding:6px 8px;font-weight:600;font-size:13px;color:#0B1F3A;white-space:nowrap">${esc(label)}</td><td style="padding:6px 8px;font-size:13px;color:#374151">${esc(value)}</td></tr>`;
+
+  return `
+    <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px">
+      <div style="background:#0B1F3A;padding:24px;border-radius:12px 12px 0 0;text-align:center">
+        <h1 style="color:#fff;margin:0;font-size:20px">PeptidePure&#8482;</h1>
+        <p style="color:#C8952C;margin:4px 0 0;font-size:13px">New Clinician Signup</p>
+      </div>
+      <div style="background:#fff;padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
+        <p style="color:#0B1F3A;font-size:15px;font-weight:600;margin:0 0 4px">A new clinician just signed up.</p>
+        <p style="color:#6b7280;font-size:13px;margin:0 0 16px">Review their credentials in the admin panel and onboard them.</p>
+
+        <table style="width:100%;border-collapse:collapse;background:#f9fafb;border-radius:8px;overflow:hidden">
+          ${row('Name', opts.fullName)}
+          ${row('Email', opts.email)}
+          ${row('Clinic', opts.clinic)}
+          ${row('Phone', opts.phone || '—')}
+          ${row('NPI', opts.npi)}
+          ${row('Credential', opts.credential)}
+          ${row('License uploaded', opts.hasLicense ? 'Yes' : 'No')}
+          ${row('Signature captured', opts.hasSignature ? 'Yes' : 'No')}
+        </table>
+
+        <p style="font-size:12px;color:#9ca3af;margin-top:20px">
+          Open the admin panel → Users to approve or review credentials.
+        </p>
+      </div>
+    </div>
+  `;
+}
+
 export function formConfirmationHtml(formType: string, providerName?: string): string {
   const typeLabel = formType.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const name = esc(providerName || 'Clinician');
