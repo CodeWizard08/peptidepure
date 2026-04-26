@@ -38,8 +38,6 @@ const US_STATES = [
   'VA','WA','WV','WI','WY','DC',
 ];
 
-const MIN_ORDER_CENTS = 100_000; // $1,000
-
 export default function CheckoutPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -135,11 +133,6 @@ export default function CheckoutPage() {
     }
     if (!/^\d{5}(-\d{4})?$/.test(zip.trim())) {
       setError('Please enter a valid ZIP code (e.g. 90210 or 90210-1234).');
-      return;
-    }
-
-    if (cartTotal < MIN_ORDER_CENTS) {
-      setError('Minimum order is $1,000. For smaller orders, please email info@peptidepure.com.');
       return;
     }
 
@@ -554,27 +547,6 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    {cartTotal < MIN_ORDER_CENTS && (
-                      <div
-                        className="text-sm px-4 py-3 rounded-xl mt-4"
-                        style={{
-                          background: 'rgba(200,149,44,0.06)',
-                          border: '1px solid rgba(200,149,44,0.2)',
-                          color: 'var(--text-mid)',
-                        }}
-                      >
-                        <p className="font-semibold mb-1" style={{ color: 'var(--navy)' }}>
-                          $1,000 minimum order
-                        </p>
-                        <p className="text-xs leading-relaxed">
-                          For orders under $1,000, email{' '}
-                          <a href="mailto:info@peptidepure.com" className="font-semibold hover:underline" style={{ color: 'var(--gold)' }}>
-                            info@peptidepure.com
-                          </a>
-                        </p>
-                      </div>
-                    )}
-
                     {error && (
                       <div
                         className="text-sm px-4 py-3 rounded-xl mt-4"
@@ -590,9 +562,9 @@ export default function CheckoutPage() {
 
                     <button
                       type="submit"
-                      disabled={submitting || cartTotal < MIN_ORDER_CENTS || (paymentMethod === 'credit_card' && !acceptJsLoaded)}
+                      disabled={submitting || (paymentMethod === 'credit_card' && !acceptJsLoaded)}
                       className="btn-primary w-full text-center mt-5"
-                      style={(submitting || cartTotal < MIN_ORDER_CENTS) ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
+                      style={submitting ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
                     >
                       {submitting ? 'Processing…' : 'Place Order'}
                     </button>
