@@ -14,6 +14,7 @@ const PAGES = [
   { key: 'footer', label: 'Footer' },
   { key: 'privacy', label: 'Privacy Policy' },
   { key: 'terms', label: 'Terms & Conditions' },
+  { key: 'legality', label: 'Legality & Compliance' },
   { key: 'shipping', label: 'Shipping & Payments' },
   { key: 'refunds', label: 'Refunds & Returns' },
   { key: 'accessibility', label: 'Accessibility' },

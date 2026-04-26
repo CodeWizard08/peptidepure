@@ -1,0 +1,134 @@
+{
+  "hero": {
+    "sectionLabel": "Transparency",
+    "heading": "Legality & Compliance",
+    "subtitle": "Our commitment to transparency about the regulatory landscape for compounded peptides, IRB-approved research, and practitioner protections."
+  },
+  "intro": [
+    "Peptide Pure Research Network (PPRN) operates at the intersection of cutting-edge regenerative medicine and an evolving regulatory landscape. We believe you deserve complete transparency about what that means, including the grey areas.",
+    "This page explains the legal frameworks under which we operate, the protections in place for participants, and the regulatory realities practitioners should understand before enrolling patients."
+  ],
+  "introCallout": {
+    "type": "info",
+    "title": "IMPORTANT DISCLOSURE",
+    "body": "This page is for informational and educational purposes only. It does not constitute legal advice. If you have legal questions about your practice's regulatory exposure, consult a healthcare attorney."
+  },
+  "sections": [
+    {
+      "heading": "Regulatory Framework",
+      "blocks": [
+        { "type": "subheading", "text": "FDA & Compounding Pharmacy Law (503A / 503B)" },
+        { "type": "paragraph", "text": "Peptide therapies prescribed through PPRN-affiliated practitioners are sourced from licensed compounding pharmacies operating under Section 503A or Section 503B of the Federal Food, Drug, and Cosmetic Act (FD&C Act)." },
+        { "type": "bullets", "items": [
+          "**503A pharmacies** compound medications pursuant to valid, patient-specific prescriptions from licensed practitioners.",
+          "**503B outsourcing facilities** operate under direct FDA oversight and may distribute compounded medications without patient-specific prescriptions.",
+          "Both pathways are **legal, federally recognized frameworks** for providing non-commercially-available drug formulations."
+        ] },
+        { "type": "paragraph", "text": "However, compounding pharmacies may not compound drugs that are \"essentially a copy\" of a commercially available FDA-approved product unless that product appears on the FDA Drug Shortage List at the time of compounding, distribution, and dispensing." },
+
+        { "type": "subheading", "text": "IRB-Approved Research Protocol" },
+        { "type": "paragraph", "text": "All peptide therapies administered through PPRN are conducted under an Institutional Review Board (IRB)-approved research protocol:" },
+        { "type": "stat-grid", "items": [
+          { "label": "Protocol", "value": "PPRN-001-2025" },
+          { "label": "IRB Approval", "value": "IRCM-2025-467" },
+          { "label": "Principal Investigator", "value": "M. Scott Mortensen, PA-C" }
+        ] },
+        { "type": "paragraph", "text": "IRB oversight provides an additional layer of patient protection, requiring informed consent, adverse event reporting, data integrity standards, and periodic review of outcomes. This is the same framework used by academic medical centers conducting clinical research." },
+
+        { "type": "subheading", "text": "21 CFR Part 11 & HIPAA Compliance" },
+        { "type": "paragraph", "text": "PPRN data collection systems are designed for compliance with 21 CFR Part 11 (electronic records and signatures) and HIPAA privacy and security rules. Patient data is encrypted, access-controlled, and auditable." }
+      ]
+    },
+    {
+      "heading": "The Grey Area: What You Need to Know",
+      "blocks": [
+        { "type": "subheading", "text": "GLP-1 Receptor Agonists (Sema & Tirz)" },
+        { "type": "paragraph", "text": "This is the most legally contentious area in compounding pharmacy today." },
+        { "type": "paragraph", "text": "The FDA removed tirzepatide from the Drug Shortage List in October 2024 and semaglutide in February 2025. Once a drug is off the shortage list, compounding pharmacies lose their legal basis to compound \"essentially a copy\" of the branded product." },
+        { "type": "callout", "variant": "warning", "title": "CEASE-AND-DESIST RISK", "body": "**Novo Nordisk** (Ozempic/Wegovy) has filed over 130 lawsuits across 40+ states against compounding pharmacies and telehealth companies. As of February 2026, Novo escalated with a sweeping patent infringement suit against Hims & Hers.\n\n**Eli Lilly** (Mounjaro/Zepbound) has filed dozens of similar lawsuits and cease-and-desist campaigns targeting clinics, compounding pharmacies, and medical spas.\n\nBoth companies are sending hundreds of cease-and-desist letters demanding immediate cessation of compounding activities, with recipients given days to respond or face civil litigation and regulatory referral." },
+        { "type": "paragraph", "text": "Some compounding pharmacies and legal advocates are fighting back. The Outsourcing Facilities Association filed suit against the FDA in February 2025, challenging the semaglutide shortage resolution. Some pharmacies are reformulating with different salt forms (e.g., semaglutide sodium vs. semaglutide acetate) to argue their products are not \"essentially a copy.\" Courts are still deciding these questions." },
+        { "type": "callout", "variant": "info", "title": "PPRN POSITION", "body": "PPRN does not take a position on whether compounded GLP-1s will remain legally available long-term. We do take the position that practitioners should enter this space with eyes open." },
+
+        { "type": "subheading", "text": "Non-GLP-1 Peptides (BPC-157, CJC-1295, Thymosin, etc.)" },
+        { "type": "paragraph", "text": "The FDA maintains a categorization system for bulk drug substances used in compounding:" },
+        { "type": "bullets", "items": [
+          "**Category 1:** Eligible for compounding. FDA will not take enforcement action.",
+          "**Category 2:** FDA has identified significant safety concerns. Cannot be compounded unless FDA publishes a final rule authorizing use. **BPC-157 is currently in Category 2.**",
+          "**Category 3:** Under evaluation. Status pending."
+        ] },
+        { "type": "paragraph", "text": "Additionally, the FDA expanded Import Alert 66-78 in 2025 to add 12 more unapproved peptides. \"Research use only\" peptides purchased from unregulated online vendors are illegal to administer to patients and expose practitioners to criminal liability." },
+        { "type": "callout", "variant": "info", "title": "PPRN SOURCING POLICY", "body": "PPRN protocols only use peptides sourced from licensed 503A or 503B compounding pharmacies. We do not use, recommend, or condone \"research-grade\" or \"grey market\" peptides." }
+      ]
+    },
+    {
+      "heading": "Legal Structures & Protections",
+      "blocks": [
+        { "type": "subheading", "text": "Non-Profit Research Organization (501(c)(3))" },
+        { "type": "paragraph", "text": "Peptide Pure Research Network operates under Mortensen Medical, a 501(c)(3) non-profit research organization. This structure:" },
+        { "type": "bullets", "items": [
+          "Separates research activities from commercial interests",
+          "Provides institutional backing for IRB-approved protocols",
+          "Ensures that patient safety and scientific integrity, not profit, drive treatment decisions",
+          "Aligns with FDA expectations for legitimate clinical research"
+        ] },
+
+        { "type": "subheading", "text": "Private Membership Association (PMA)" },
+        { "type": "paragraph", "text": "As an alternative or supplemental legal framework, some practitioners in the peptide and regenerative medicine space operate under a Private Membership Association (PMA) structure." },
+        { "type": "paragraph", "text": "A PMA is grounded in the First and Fourteenth Amendment right to free association, as affirmed in *Griswold v. Connecticut* (1965) and subsequent Supreme Court decisions. Within a PMA:" },
+        { "type": "bullets", "items": [
+          "Members voluntarily join a private association and consent to receive services outside the scope of public regulatory frameworks.",
+          "The association operates as a private contract between consenting adults, not a public-facing commercial entity.",
+          "Services provided within the association may not be subject to the same licensing and regulatory requirements as publicly offered medical services."
+        ] },
+        { "type": "callout", "variant": "info", "title": "PRACTITIONER GUIDANCE", "body": "PPRN recommends that practitioners who wish to explore a PMA structure consult a healthcare attorney with specific experience in private association law and FDA enforcement." }
+      ]
+    },
+    {
+      "heading": "How PPRN Protects Practitioners",
+      "blocks": [
+        { "type": "paragraph", "text": "Participating in PPRN provides practitioners with multiple layers of legal and professional protection:" },
+        { "type": "bullets", "items": [
+          "**IRB-Approved Protocol:** Demonstrates that treatments are part of a legitimate, supervised research framework — not ad hoc prescribing.",
+          "**Informed Consent Templates:** Standardized, IRB-reviewed consent forms that document patient understanding of risks, benefits, and the investigational nature of therapies.",
+          "**Adverse Event Reporting:** Structured AE reporting to the IRB within 24 hours for SAEs, demonstrating active safety monitoring.",
+          "**Data Capture Standards:** 21 CFR Part 11-aligned data collection showing scientific rigor, not just commercial distribution.",
+          "**Licensed Pharmacy Sources Only:** All peptides sourced from 503A/503B pharmacies, never grey-market or research-only suppliers.",
+          "**Medical Director Oversight:** Collaborative Practice Agreement with a licensed physician Medical Director providing supervision and accountability."
+        ] }
+      ]
+    },
+    {
+      "heading": "The Bottom Line",
+      "blocks": [
+        { "type": "paragraph", "text": "Peptide therapy exists in a regulatory grey area. We are honest about that because we believe trust is built through transparency, not through making claims that are too good to be true." },
+
+        { "type": "subheading", "text": "What we can tell you:" },
+        { "type": "bullets", "items": [
+          "Every peptide prescribed through PPRN is sourced from a licensed, regulated pharmacy.",
+          "Every treatment is conducted under an IRB-approved research protocol with proper informed consent.",
+          "Every adverse event is reported and tracked.",
+          "Our goal is to generate the clinical evidence that will either validate these therapies for mainstream adoption or identify risks that justify restricting them."
+        ] },
+
+        { "type": "subheading", "text": "What we cannot tell you:" },
+        { "type": "bullets", "items": [
+          "That compounded GLP-1 agonists will remain legally available in their current form. The legal landscape is shifting rapidly.",
+          "That a PMA structure will definitively protect you from FDA enforcement. It may help, but it has not been battle-tested for this specific use case.",
+          "That peptide therapy is \"FDA-approved.\" It is not. It is investigational, and participants should understand that clearly."
+        ] },
+
+        { "type": "paragraph", "text": "If you have legal questions about your practice's exposure, we encourage you to consult a healthcare attorney. PPRN is a research network, not a law firm." }
+      ]
+    }
+  ],
+  "cta": {
+    "label": "Questions?",
+    "heading": "Contact Our Team",
+    "subtitle": "Reach out with any questions about our research protocols, regulatory framework, or practitioner enrollment.",
+    "primaryLabel": "info@peptidepure.com",
+    "primaryHref": "mailto:info@peptidepure.com",
+    "secondaryLabel": "Contact Form",
+    "secondaryHref": "/contact"
+  },
+  "lastUpdated": "Last updated: March 2026"
+}
