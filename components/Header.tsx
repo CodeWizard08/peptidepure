@@ -142,8 +142,8 @@ export default function Header() {
         style={
           glass
             ? {
-                background: 'rgba(11,31,58,0.18)',
-                backdropFilter: 'blur(14px)',
+                background: 'rgba(11,31,58,0.1)',
+                backdropFilter: 'blur(3px)',
                 WebkitBackdropFilter: 'blur(14px)',
                 borderBottom: '1px solid rgba(255,255,255,0.08)',
               }

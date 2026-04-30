@@ -90,7 +90,7 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
       {/* Gradient overlays */}
       <div
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(110deg, rgba(11,31,58,0.92) 0%, rgba(11,31,58,0.7) 25%, rgba(11,31,58,0.2) 50%)', zIndex: 1 }}
+        style={{ background: 'linear-gradient(110deg, rgba(11,31,58,0.92) 0%, rgba(11,31,58,0.7) 25%, rgba(11,31,58,0.2) 80%)', zIndex: 1 }}
       />
       <div
         className="absolute inset-x-0 bottom-0 h-48"
@@ -187,41 +187,6 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </Link>
-                  {!isSignedIn && (
-                    <Link
-                      href="/account"
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold tracking-wide transition-colors hover:opacity-80"
-                      style={{ color: 'rgba(255,255,255,0.92)' }}
-                    >
-                      Create Clinician Account
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  )}
-                </div>
-
-                {/* Trust strip — credentialing signals shown on every slide */}
-                <div
-                  key={`trust-${textKey}`}
-                  className="slide-text-enter flex flex-wrap items-center gap-x-5 gap-y-2"
-                  style={{ animationDelay: '240ms' }}
-                >
-                  {[
-                    '>99% Purity',
-                    'cGMP / ISO 9001',
-                    '503A · 503B Sourced',
-                    'IRB-Aligned',
-                  ].map((item) => (
-                    <div key={item} className="flex items-center gap-1.5">
-                      <svg width="11" height="11" fill="none" stroke="var(--gold)" strokeWidth="2.6" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-[11px] font-semibold tracking-wide" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                        {item}
-                      </span>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
@@ -241,7 +206,7 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
                 {slides.map((s, i) => (
                   <div
                     key={i}
-                    className="absolute inset-0 transition-opacity duration-700"
+                    className="absolute inset-0 transition-opacity rounded-lg duration-700"
                     style={{ opacity: i === current ? 1 : 0 }}
                   >
                     <Image
