@@ -135,7 +135,7 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
                   style={{
                     fontFamily: 'var(--font-display)',
                     fontWeight: 600,
-                    fontSize: 'clamp(2.5rem, 5.4vw, 4.5rem)',
+                    fontSize: 'clamp(2rem, 4.2vw, 3.5rem)',
                     animationDelay: '40ms',
                     letterSpacing: '-0.02em',
                     textShadow: '0 2px 28px rgba(0,0,0,0.5)',
@@ -149,7 +149,7 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
                   key={`sub-${textKey}`}
                   className="slide-text-enter font-semibold leading-snug mb-5"
                   style={{
-                    fontSize: 'clamp(1.05rem, 1.85vw, 1.4rem)',
+                    fontSize: 'clamp(0.95rem, 1.5vw, 1.15rem)',
                     animationDelay: '90ms',
                     color: 'var(--gold-light)',
                     textShadow: '0 1px 14px rgba(0,0,0,0.45)',
