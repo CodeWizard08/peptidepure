@@ -111,10 +111,10 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
               />
 
               <div className="flex flex-col min-w-0">
-                {/* Eyebrow / kicker — surfaces the slide tag as a clinical-grade context label */}
+                {/* Eyebrow / kicker — clinical context label */}
                 <div
                   key={`tag-${textKey}`}
-                  className="slide-text-enter inline-flex items-center gap-2 mb-4 self-start px-3 py-1.5 rounded-full"
+                  className="slide-text-enter inline-flex items-center gap-2 mb-5 self-start px-3 py-1.5 rounded-full"
                   style={{
                     animationDelay: '0ms',
                     background: 'rgba(200,149,44,0.12)',
@@ -128,114 +128,96 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
                   </span>
                 </div>
 
-                {/* Heading — gold italic display, with shadow for legibility over the video */}
+                {/* Heading — brand display serif, white for highest legibility, no italic */}
                 <h1
                   key={`h1-${textKey}`}
-                  className="slide-text-enter font-black leading-[1.02] mb-5"
+                  className="slide-text-enter text-white leading-[1.05] mb-5"
                   style={{
-                    fontSize: 'clamp(2.75rem, 6vw, 5.25rem)',
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: 600,
+                    fontSize: 'clamp(2.5rem, 5.4vw, 4.5rem)',
                     animationDelay: '40ms',
-                    letterSpacing: '-0.03em',
-                    fontStyle: 'italic',
-                    color: 'var(--gold)',
-                    textShadow: '0 2px 24px rgba(0,0,0,0.45)',
+                    letterSpacing: '-0.02em',
+                    textShadow: '0 2px 28px rgba(0,0,0,0.5)',
                   }}
                 >
                   {slide.heading}
                 </h1>
 
-                {/* Subtitle — clean white, no italic, more contrast for readability */}
+                {/* Subtitle — gold accent for visual separation, body sans, semibold */}
                 <p
                   key={`sub-${textKey}`}
-                  className="slide-text-enter font-semibold leading-snug mb-4"
+                  className="slide-text-enter font-semibold leading-snug mb-5"
                   style={{
-                    fontSize: 'clamp(1.05rem, 1.9vw, 1.35rem)',
+                    fontSize: 'clamp(1.05rem, 1.85vw, 1.4rem)',
                     animationDelay: '90ms',
-                    color: 'rgba(255,255,255,0.95)',
-                    textShadow: '0 1px 12px rgba(0,0,0,0.4)',
+                    color: 'var(--gold-light)',
+                    textShadow: '0 1px 14px rgba(0,0,0,0.45)',
                   }}
                 >
                   {slide.subtitle}
                 </p>
 
-                {/* Separator */}
-                <div
-                  key={`sep-${textKey}`}
-                  className="slide-text-enter mb-5 h-px w-14 rounded-full"
-                  style={{ background: 'rgba(200,149,44,0.55)', animationDelay: '130ms' }}
-                />
-
                 {/* Description — readable supporting copy */}
                 <p
                   key={`desc-${textKey}`}
-                  className="slide-text-enter text-[15px] leading-relaxed mb-8 max-w-md"
+                  className="slide-text-enter text-[15px] leading-relaxed mb-7 max-w-md"
                   style={{
-                    animationDelay: '160ms',
-                    color: 'rgba(255,255,255,0.78)',
+                    animationDelay: '140ms',
+                    color: 'rgba(255,255,255,0.82)',
                     textShadow: '0 1px 8px rgba(0,0,0,0.35)',
                   }}
                 >
                   {slide.description}
                 </p>
 
-                {/* CTAs — primary + secondary */}
+                {/* CTAs — Browse Peptides primary (lower-friction), account creation secondary */}
                 <div
                   key={`cta-${textKey}`}
-                  className="slide-text-enter flex flex-wrap items-center gap-3 mb-7"
-                  style={{ animationDelay: '210ms' }}
+                  className="slide-text-enter flex flex-wrap items-center gap-x-5 gap-y-3 mb-7"
+                  style={{ animationDelay: '190ms' }}
                 >
-                  {isSignedIn ? (
-                    <Link
-                      href="/peptides"
-                      className="btn-primary inline-flex items-center gap-2"
-                      style={{ padding: '0.95rem 2.2rem', fontSize: '0.95rem' }}
-                    >
-                      Browse Peptides
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
-                    </Link>
-                  ) : (
+                  <Link
+                    href="/peptides"
+                    className="btn-primary inline-flex items-center gap-2"
+                    style={{ padding: '0.95rem 2.2rem', fontSize: '0.95rem' }}
+                  >
+                    Browse Peptides
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </Link>
+                  {!isSignedIn && (
                     <Link
                       href="/account"
-                      className="btn-primary inline-flex items-center gap-2"
-                      style={{ padding: '0.95rem 2.2rem', fontSize: '0.95rem' }}
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold tracking-wide transition-colors hover:opacity-80"
+                      style={{ color: 'rgba(255,255,255,0.92)' }}
                     >
                       Create Clinician Account
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
                   )}
-                  <Link
-                    href="/how-it-works"
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold tracking-wide px-1 py-2 transition-colors hover:opacity-80"
-                    style={{ color: 'rgba(255,255,255,0.9)' }}
-                  >
-                    How It Works
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
                 </div>
 
-                {/* Trust strip — credentialing signals that match the brand voice */}
+                {/* Trust strip — credentialing signals shown on every slide */}
                 <div
                   key={`trust-${textKey}`}
                   className="slide-text-enter flex flex-wrap items-center gap-x-5 gap-y-2"
-                  style={{ animationDelay: '260ms' }}
+                  style={{ animationDelay: '240ms' }}
                 >
                   {[
+                    '>99% Purity',
                     'cGMP / ISO 9001',
                     '503A · 503B Sourced',
                     'IRB-Aligned',
-                    'Clinician Only™',
                   ].map((item) => (
                     <div key={item} className="flex items-center gap-1.5">
                       <svg width="11" height="11" fill="none" stroke="var(--gold)" strokeWidth="2.6" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-[11px] font-semibold tracking-wide" style={{ color: 'rgba(255,255,255,0.72)' }}>
+                      <span className="text-[11px] font-semibold tracking-wide" style={{ color: 'rgba(255,255,255,0.75)' }}>
                         {item}
                       </span>
                     </div>
@@ -244,31 +226,33 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
               </div>
             </div>
 
-            {/* ── Right: Product image ── */}
+            {/* ── Right: Product image — floating, no decorative frame, soft halo ── */}
             <div className="hidden lg:flex justify-center items-center">
-              <div className="relative w-full" style={{ maxWidth: '520px', height: '450px' }}>
-                {/* Decorative border ring */}
+              <div className="relative w-full" style={{ maxWidth: '560px', height: '480px' }}>
+                {/* Soft radial halo behind the product — pulls focus without a hard frame */}
                 <div
-                  className="absolute inset-0 rounded-3xl pointer-events-none"
+                  className="absolute inset-0 pointer-events-none"
                   style={{
-                    border: '2px solid rgba(200,149,44,0.35)',
-                    boxShadow: 'inset 0 0 30px rgba(200,149,44,0.08), 0 0 40px rgba(200,149,44,0.06)',
+                    background: 'radial-gradient(ellipse at center, rgba(200,149,44,0.18) 0%, rgba(200,149,44,0.04) 45%, transparent 70%)',
+                    filter: 'blur(8px)',
                   }}
                 />
-                {/* Corner accents */}
-                <div className="absolute -top-1 -left-1 w-8 h-8 pointer-events-none" style={{ borderTop: '3px solid var(--gold)', borderLeft: '3px solid var(--gold)', borderRadius: '16px 0 0 0' }} />
-                <div className="absolute -top-1 -right-1 w-8 h-8 pointer-events-none" style={{ borderTop: '3px solid var(--gold)', borderRight: '3px solid var(--gold)', borderRadius: '0 16px 0 0' }} />
-                <div className="absolute -bottom-1 -left-1 w-8 h-8 pointer-events-none" style={{ borderBottom: '3px solid var(--gold)', borderLeft: '3px solid var(--gold)', borderRadius: '0 0 0 16px' }} />
-                <div className="absolute -bottom-1 -right-1 w-8 h-8 pointer-events-none" style={{ borderBottom: '3px solid var(--gold)', borderRight: '3px solid var(--gold)', borderRadius: '0 0 16px 0' }} />
-                {/* Inner glow background */}
-                <div
-                  className="absolute inset-0 rounded-3xl pointer-events-none"
-                  style={{ background: 'radial-gradient(ellipse at center, rgba(200,149,44,0.06) 0%, transparent 70%)' }}
-                />
-                {/* Product images */}
+                {/* Product images — full-bleed contain, deeper drop shadow for "floating" feel */}
                 {slides.map((s, i) => (
-                  <div key={i} className="absolute inset-4 transition-opacity duration-700 rounded-2xl overflow-hidden" style={{ opacity: i === current ? 1 : 0 }}>
-                    <Image src={s.image} alt={s.tag} fill className="object-contain object-center drop-shadow-2xl" sizes="480px" priority={i === 0} />
+                  <div
+                    key={i}
+                    className="absolute inset-0 transition-opacity duration-700"
+                    style={{ opacity: i === current ? 1 : 0 }}
+                  >
+                    <Image
+                      src={s.image}
+                      alt={s.tag}
+                      fill
+                      className="object-contain object-center"
+                      style={{ filter: 'drop-shadow(0 30px 60px rgba(0,0,0,0.45)) drop-shadow(0 0 40px rgba(200,149,44,0.15))' }}
+                      sizes="560px"
+                      priority={i === 0}
+                    />
                   </div>
                 ))}
               </div>
@@ -296,26 +280,48 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
         </button>
       ))}
 
-      {/* ── Bottom navigation ── */}
+      {/* ── Bottom navigation — promoted to card-style selectors ── */}
       <div className="absolute bottom-0 left-0 right-0" style={{ zIndex: 20 }}>
         <div className="container-xl pb-8 flex items-end justify-between gap-4">
-          <div className="flex items-center gap-2">
-            {slides.map((s, i) => (
-              <button
-                key={i}
-                onClick={() => goTo(i)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-300"
-                style={{ background: i === current ? 'rgba(200,149,44,0.2)' : 'rgba(255,255,255,0.07)', border: i === current ? '1px solid rgba(200,149,44,0.5)' : '1px solid rgba(255,255,255,0.10)' }}
-              >
-                <span className="w-1.5 h-1.5 rounded-full transition-colors" style={{ background: i === current ? 'var(--gold)' : 'rgba(255,255,255,0.38)' }} />
-                <span className="text-xs font-semibold tracking-wide hidden sm:block transition-colors" style={{ color: i === current ? 'var(--gold-light)' : 'rgba(255,255,255,0.45)' }}>
-                  {s.tag}
-                </span>
-              </button>
-            ))}
+          <div className="flex items-stretch gap-2 sm:gap-3 flex-wrap">
+            {slides.map((s, i) => {
+              const active = i === current;
+              return (
+                <button
+                  key={i}
+                  onClick={() => goTo(i)}
+                  className="group flex flex-col items-start gap-1.5 px-4 py-2.5 rounded-xl transition-all duration-300 text-left min-w-0"
+                  style={{
+                    background: active ? 'rgba(200,149,44,0.18)' : 'rgba(255,255,255,0.06)',
+                    border: active ? '1px solid rgba(200,149,44,0.55)' : '1px solid rgba(255,255,255,0.10)',
+                    backdropFilter: 'blur(8px)',
+                    minWidth: '120px',
+                  }}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="w-1.5 h-1.5 rounded-full transition-colors shrink-0"
+                      style={{ background: active ? 'var(--gold)' : 'rgba(255,255,255,0.4)' }}
+                    />
+                    <span
+                      className="text-[10px] font-bold uppercase tracking-[0.14em] transition-colors"
+                      style={{ color: active ? 'var(--gold)' : 'rgba(255,255,255,0.55)' }}
+                    >
+                      0{i + 1}
+                    </span>
+                  </div>
+                  <span
+                    className="text-xs sm:text-sm font-semibold transition-colors truncate w-full"
+                    style={{ color: active ? 'white' : 'rgba(255,255,255,0.7)' }}
+                  >
+                    {s.tag}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
-          <div className="text-xs font-mono tracking-widest pb-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
+          <div className="text-xs font-mono tracking-widest pb-2 hidden sm:block" style={{ color: 'rgba(255,255,255,0.45)' }}>
             <span style={{ color: 'rgba(255,255,255,0.80)' }}>{String(current + 1).padStart(2, '0')}</span>
             {' / '}
             {String(slides.length).padStart(2, '0')}

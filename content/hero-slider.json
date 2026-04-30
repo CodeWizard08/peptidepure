@@ -2,36 +2,36 @@
   "duration": 8000,
   "slides": [
     {
+      "video": "/images/videos/4.mp4",
+      "image": "/images/HERO-BANNER-1.webp",
+      "tag": "Clinical-Grade Peptides",
+      "heading": "Sourced Right. Studied Right. Delivered Right.",
+      "subtitle": ">99% purity, IRB-aligned, clinician-only.",
+      "description": "Peptide Pure supports licensed clinicians and investigators with compliant sourcing, protocol education, and observational research — so you can practice peptide medicine without the gray-market risk."
+    },
+    {
       "video": "/images/videos/1.mp4",
       "image": "/images/product-line-up.webp",
       "tag": "For Clinicians",
-      "heading": "For Clinicians",
-      "subtitle": "White Label Solutions for Practitioners Researchers & Wellness Brands",
-      "description": "Bulk Orders and Customization Available"
+      "heading": "Built for Practices, Not the Black Market.",
+      "subtitle": "White-label solutions for practitioners, researchers, and wellness brands.",
+      "description": "Bulk orders and custom formulations — backed by per-batch COAs and 503A/503B sourcing."
     },
     {
       "video": "/images/videos/2.mp4",
       "image": "/images/oral-peptides.png",
-      "tag": "Capsules",
-      "heading": "Peptide Capsules",
-      "subtitle": "Not all peptides require injection",
+      "tag": "Oral Peptide Capsules",
+      "heading": "Not Every Peptide Needs a Needle.",
+      "subtitle": "Clinically dosed oral capsules for easier patient adherence.",
       "description": "BPC-157 · KPV · SLU-PP-332 · Tirz · 5-Amino-1MQ"
     },
     {
       "video": "/images/videos/3.mp4",
       "image": "/images/pepti.jpg",
-      "tag": "Custom",
-      "heading": "Custom products",
-      "subtitle": "Diversify your product line",
-      "description": "Nasal Sprays (rapid neuro-absorption) Topical Patches (steady transdermal delivery) Oral Pouches (sublingual, fast-dissolving)"
-    },
-    {
-      "video": "/images/videos/4.mp4",
-      "image": "/images/HERO-BANNER-1.webp",
-      "tag": "Peptides",
-      "heading": "Peptides",
-      "subtitle": "Our mission: low cost, high purity, fully compliant",
-      "description": "Peptide Pure supports licensed clinicians and investigators through compliant sourcing, protocol education, and IRB-aligned observational research exploring emerging compounds and wellness strategies."
+      "tag": "Custom Formulations",
+      "heading": "Diversify Your Product Line.",
+      "subtitle": "Nasal sprays, transdermal patches, sublingual pouches — formulated for your protocol.",
+      "description": "Rapid neuro-absorption, steady transdermal delivery, or fast-dissolving sublingual options — built around the patient experience you want to deliver."
     }
   ]
 }
