@@ -1,13 +1,13 @@
 /**
  * AI Protocol Builder Stub
  *
- * Placeholder for the future Meridian DISCOVER protocol engine. Even before
- * the AI engine ships, this card communicates the vision: bloodwork +
- * goals + biomarkers → personalized protocol.
+ * Placeholder for the future Plumb DISCOVER protocol engine (formerly
+ * "Meridian"). Even before the AI engine ships, this card communicates the
+ * vision: bloodwork + goals + biomarkers → personalized protocol.
  *
- * Functionality is intentionally aspirational — clicking the goal chips
- * scrolls to the catalog filtered to that goal (via URL hash). When the
- * AI engine ships, the same UI hooks into Meridian without redesigning.
+ * Two destinations:
+ *   - plumb.health  — clinician-facing, professional (primary CTA)
+ *   - killer.health — patient-facing free education (secondary CTA)
  */
 
 import Link from 'next/link';
@@ -59,7 +59,7 @@ export default function AIProtocolBuilderStub() {
                 }}
               >
                 <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--gold)' }} />
-                Coming to Meridian
+                Coming soon · plumb.health
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">
                 AI Protocol Engine
@@ -70,7 +70,7 @@ export default function AIProtocolBuilderStub() {
               Build a personalized protocol from your patient&rsquo;s labs &amp; goals
             </h2>
             <p className="text-sm text-white/65 leading-relaxed mb-6 max-w-xl">
-              Upload bloodwork, select goals, and Meridian&rsquo;s AI engine will recommend
+              Upload bloodwork, select goals, and Plumb&rsquo;s AI engine will recommend
               evidence-based peptide protocols matched to your patient&rsquo;s biomarkers and
               wearable data. Closed-loop optimization across the entire ecosystem.
             </p>
@@ -101,22 +101,54 @@ export default function AIProtocolBuilderStub() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/contact?topic=meridian-waitlist"
+              <a
+                href="https://plumb.health"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all hover:shadow-lg"
                 style={{
                   background: 'var(--gold)',
                   color: 'var(--navy)',
                 }}
               >
-                Join the Meridian Waitlist
+                Join the Plumb Waitlist
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" className="transition-transform group-hover:translate-x-0.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6 21 12m0 0-7.5 6M21 12H3" />
                 </svg>
-              </Link>
+              </a>
               <span className="text-[11px] text-white/45">
                 Free for verified clinicians at launch
               </span>
+            </div>
+
+            {/* Patient-facing companion: killer.health (free education) */}
+            <div
+              className="mt-5 flex items-center gap-3 px-4 py-2.5 rounded-xl"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px dashed rgba(255,255,255,0.14)',
+              }}
+            >
+              <div
+                className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
+                style={{ background: 'rgba(200,149,44,0.12)', border: '1px solid rgba(200,149,44,0.3)' }}
+              >
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--gold)" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                </svg>
+              </div>
+              <p className="text-xs text-white/70 flex-1 min-w-0">
+                Looking for a free option to share with patients?{' '}
+                <a
+                  href="https://killer.health"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold underline underline-offset-2 hover:no-underline whitespace-nowrap"
+                  style={{ color: 'var(--gold-light)' }}
+                >
+                  Try killer.health →
+                </a>
+              </p>
             </div>
           </div>
 

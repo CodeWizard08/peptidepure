@@ -1,7 +1,7 @@
 /**
  * DiscoverTagsBlock
  *
- * Surfaces a peptide's Meridian-aligned tags:
+ * Surfaces a peptide's Plumb-aligned tags:
  *   - GOALS: what patient goals this peptide addresses
  *   - BIOMARKERS: labs that shift on therapy
  *   - WEARABLES: wearable signals that respond
@@ -39,14 +39,14 @@ export default function DiscoverTagsBlock({
               className="text-xs font-bold uppercase tracking-[0.18em] mb-2"
               style={{ color: 'var(--gold)' }}
             >
-              Meridian DISCOVER
+              Plumb DISCOVER
             </p>
             <h2 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--navy)' }}>
               What {baseName} targets
             </h2>
             <p className="text-base mt-3 max-w-xl" style={{ color: 'var(--text-mid)' }}>
               Patient goals, biomarkers, and wearable signals this peptide addresses.
-              Powers the future Meridian AI protocol engine.
+              Powers the future Plumb AI protocol engine.
             </p>
           </div>
           <span
@@ -58,7 +58,7 @@ export default function DiscoverTagsBlock({
             }}
           >
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--gold)' }} />
-            Coming to Meridian
+            Coming soon · plumb.health
           </span>
         </div>
 
