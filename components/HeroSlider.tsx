@@ -90,7 +90,7 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
       {/* Gradient overlays */}
       <div
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(110deg, rgba(11,31,58,0.92) 0%, rgba(11,31,58,0.7) 45%, rgba(11,31,58,0.2) 100%)', zIndex: 1 }}
+        style={{ background: 'linear-gradient(110deg, rgba(11,31,58,0.92) 0%, rgba(11,31,58,0.7) 25%, rgba(11,31,58,0.2) 50%)', zIndex: 1 }}
       />
       <div
         className="absolute inset-x-0 bottom-0 h-48"
@@ -111,20 +111,49 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
               />
 
               <div className="flex flex-col min-w-0">
-                {/* Heading */}
+                {/* Eyebrow / kicker — surfaces the slide tag as a clinical-grade context label */}
+                <div
+                  key={`tag-${textKey}`}
+                  className="slide-text-enter inline-flex items-center gap-2 mb-4 self-start px-3 py-1.5 rounded-full"
+                  style={{
+                    animationDelay: '0ms',
+                    background: 'rgba(200,149,44,0.12)',
+                    border: '1px solid rgba(200,149,44,0.35)',
+                    backdropFilter: 'blur(6px)',
+                  }}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--gold)' }} />
+                  <span className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--gold)' }}>
+                    {slide.tag}
+                  </span>
+                </div>
+
+                {/* Heading — gold italic display, with shadow for legibility over the video */}
                 <h1
                   key={`h1-${textKey}`}
-                  className="slide-text-enter font-black text-white leading-[1.04] mb-5"
-                  style={{ fontSize: 'clamp(2.5rem, 5.5vw, 4.8rem)', animationDelay: '0ms', letterSpacing: '-0.025em', fontStyle: 'italic' }}
+                  className="slide-text-enter font-black leading-[1.02] mb-5"
+                  style={{
+                    fontSize: 'clamp(2.75rem, 6vw, 5.25rem)',
+                    animationDelay: '40ms',
+                    letterSpacing: '-0.03em',
+                    fontStyle: 'italic',
+                    color: 'var(--gold)',
+                    textShadow: '0 2px 24px rgba(0,0,0,0.45)',
+                  }}
                 >
-                  <span style={{ color: 'var(--gold)' }}>{slide.heading}</span>
+                  {slide.heading}
                 </h1>
 
-                {/* Subtitle */}
+                {/* Subtitle — clean white, no italic, more contrast for readability */}
                 <p
                   key={`sub-${textKey}`}
-                  className="slide-text-enter font-bold leading-snug mb-4"
-                  style={{ fontSize: 'clamp(1rem, 1.8vw, 1.25rem)', animationDelay: '60ms', color: 'rgba(255,255,255,0.85)', fontStyle: 'italic' }}
+                  className="slide-text-enter font-semibold leading-snug mb-4"
+                  style={{
+                    fontSize: 'clamp(1.05rem, 1.9vw, 1.35rem)',
+                    animationDelay: '90ms',
+                    color: 'rgba(255,255,255,0.95)',
+                    textShadow: '0 1px 12px rgba(0,0,0,0.4)',
+                  }}
                 >
                   {slide.subtitle}
                 </p>
@@ -133,29 +162,33 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
                 <div
                   key={`sep-${textKey}`}
                   className="slide-text-enter mb-5 h-px w-14 rounded-full"
-                  style={{ background: 'rgba(200,149,44,0.45)', animationDelay: '100ms' }}
+                  style={{ background: 'rgba(200,149,44,0.55)', animationDelay: '130ms' }}
                 />
 
-                {/* Description */}
+                {/* Description — readable supporting copy */}
                 <p
                   key={`desc-${textKey}`}
-                  className="slide-text-enter text-sm leading-relaxed mb-8 max-w-md"
-                  style={{ animationDelay: '130ms', color: 'rgba(255,255,255,0.55)' }}
+                  className="slide-text-enter text-[15px] leading-relaxed mb-8 max-w-md"
+                  style={{
+                    animationDelay: '160ms',
+                    color: 'rgba(255,255,255,0.78)',
+                    textShadow: '0 1px 8px rgba(0,0,0,0.35)',
+                  }}
                 >
                   {slide.description}
                 </p>
 
-                {/* CTA */}
+                {/* CTAs — primary + secondary */}
                 <div
                   key={`cta-${textKey}`}
-                  className="slide-text-enter"
-                  style={{ animationDelay: '180ms' }}
+                  className="slide-text-enter flex flex-wrap items-center gap-3 mb-7"
+                  style={{ animationDelay: '210ms' }}
                 >
                   {isSignedIn ? (
                     <Link
                       href="/peptides"
                       className="btn-primary inline-flex items-center gap-2"
-                      style={{ padding: '0.9rem 2.2rem', fontSize: '0.95rem' }}
+                      style={{ padding: '0.95rem 2.2rem', fontSize: '0.95rem' }}
                     >
                       Browse Peptides
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,15 +199,47 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
                     <Link
                       href="/account"
                       className="btn-primary inline-flex items-center gap-2"
-                      style={{ padding: '0.9rem 2.2rem', fontSize: '0.95rem' }}
+                      style={{ padding: '0.95rem 2.2rem', fontSize: '0.95rem' }}
                     >
-                      Create Account
+                      Create Clinician Account
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
-                      <span className="text-xs">+</span>
                     </Link>
                   )}
+                  <Link
+                    href="/how-it-works"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold tracking-wide px-1 py-2 transition-colors hover:opacity-80"
+                    style={{ color: 'rgba(255,255,255,0.9)' }}
+                  >
+                    How It Works
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+
+                {/* Trust strip — credentialing signals that match the brand voice */}
+                <div
+                  key={`trust-${textKey}`}
+                  className="slide-text-enter flex flex-wrap items-center gap-x-5 gap-y-2"
+                  style={{ animationDelay: '260ms' }}
+                >
+                  {[
+                    'cGMP / ISO 9001',
+                    '503A · 503B Sourced',
+                    'IRB-Aligned',
+                    'Clinician Only™',
+                  ].map((item) => (
+                    <div key={item} className="flex items-center gap-1.5">
+                      <svg width="11" height="11" fill="none" stroke="var(--gold)" strokeWidth="2.6" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-[11px] font-semibold tracking-wide" style={{ color: 'rgba(255,255,255,0.72)' }}>
+                        {item}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
