@@ -7,7 +7,8 @@
     { "label": "Buy Peptides", "href": "/peptides" },
     { "label": "How It Works", "href": "/how-it-works" },
     { "label": "COA Library", "href": "/coa" },
-    { "label": "Dosing & Safety", "href": "/peptide-dosing-safety" }
+    { "label": "Dosing & Safety", "href": "/peptide-dosing-safety" },
+    { "label": "Peptide Buzz™ (OTC) →", "href": "https://peptide.buzz" }
   ],
   "legalLinks": [
     { "label": "Privacy Policy", "href": "/privacy" },

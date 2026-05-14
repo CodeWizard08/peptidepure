@@ -73,17 +73,33 @@ export default function Footer({ content }: { content: FooterContent }) {
           <div className="col-span-6 sm:col-span-6 md:col-span-2 lg:col-span-2">
             <ColumnHeader>Quick Links</ColumnHeader>
             <ul className="space-y-2.5 mt-3">
-              {content.quickLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 group"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-gold transition-colors" style={{ flexShrink: 0 }} />
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {content.quickLinks.map((link) => {
+                const external = /^https?:\/\//i.test(link.href);
+                const linkClass = 'text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 group';
+                const dot = (
+                  <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-gold transition-colors" style={{ flexShrink: 0 }} />
+                );
+                return (
+                  <li key={link.href}>
+                    {external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={linkClass}
+                      >
+                        {dot}
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link href={link.href} className={linkClass}>
+                        {dot}
+                        {link.label}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
 

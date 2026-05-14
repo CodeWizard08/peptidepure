@@ -114,10 +114,23 @@ export default function AdminOrdersPanel({ embedded = false }: { embedded?: bool
             style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
           />
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {['all', ...STATUS_OPTIONS].map((s) => (
-            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className="px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide transition-colors" style={{ background: statusFilter === s ? 'var(--navy)' : 'white', color: statusFilter === s ? 'white' : 'var(--text-mid)', border: `1px solid ${statusFilter === s ? 'var(--navy)' : 'var(--border)'}` }}>{s}</button>
-          ))}
+        <div className="flex items-center gap-2 flex-wrap justify-between">
+          <div className="flex items-center gap-2 flex-wrap">
+            {['all', ...STATUS_OPTIONS].map((s) => (
+              <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className="px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide transition-colors" style={{ background: statusFilter === s ? 'var(--navy)' : 'white', color: statusFilter === s ? 'white' : 'var(--text-mid)', border: `1px solid ${statusFilter === s ? 'var(--navy)' : 'var(--border)'}` }}>{s}</button>
+            ))}
+          </div>
+          <a
+            href={`/api/admin/orders/export${statusFilter !== 'all' ? `?status=${encodeURIComponent(statusFilter)}` : ''}`}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+            style={{ background: 'var(--gold)', color: 'var(--navy)' }}
+            title="Download all matching orders as CSV (for 3PL handoff, accounting, etc.)"
+          >
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0-3-3m3 3 3-3M4 16a8 8 0 1 1 16 0" />
+            </svg>
+            Export CSV
+          </a>
         </div>
       </div>
       <div className={embedded ? 'px-4 sm:px-8 pb-12' : 'container-xl pb-12'}>
