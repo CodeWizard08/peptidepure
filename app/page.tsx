@@ -19,6 +19,7 @@ import ThreeStepProcess from '@/components/home/ThreeStepProcess';
 import USAResearchSection from '@/components/home/USAResearchSection';
 import WhyDifferentSection from '@/components/home/WhyDifferentSection';
 import FreeShippingSection from '@/components/home/FreeShippingSection';
+import PeptideBuzzCollection from '@/components/home/PeptideBuzzCollection';
 import FinalCTA from '@/components/home/FinalCTA';
 import { getContent } from '@/lib/content';
 import type { HeroSliderContent, HomeContent } from '@/lib/content-types';
@@ -35,6 +36,7 @@ export default async function HomePage() {
       <ThreeStepProcess content={content.threeSteps} />
       <USAResearchSection content={content.usaResearch} />
       <WhyDifferentSection content={content.whyDifferent} />
+      <PeptideBuzzCollection />
       <FreeShippingSection content={content.freeShipping} />
       <FinalCTA content={content.finalCta} />
 
