@@ -11,6 +11,10 @@
 -- branded fallback in the meantime.
 --
 -- Safe to re-run: ON CONFLICT (slug) DO NOTHING.
+-- Intentionally NON-AUTHORITATIVE on re-run — once a slug exists, this seed
+-- is a no-op for that row. Admin edits to pricing, copy, or metadata in the
+-- Products panel win and are never overwritten. To force a full reset, run
+-- DELETE WHERE sku IN (...) before re-applying this migration.
 
 INSERT INTO products (
   name, slug, description, category, subcategory,

@@ -43,6 +43,22 @@ function formatCents(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
+// next/image throws at runtime for hostnames not in next.config.ts's allowlist.
+// Allow relative paths and the Supabase storage host we already permit; fall
+// back to the branded text treatment for anything else so the home page can't
+// be broken by an admin pasting a random CDN URL into the Products panel.
+const ALLOWED_IMAGE_HOSTS = new Set(['dzbvaswimmaxfvambivu.supabase.co', 'peptidepure.com']);
+
+function isImageRenderable(url: string): boolean {
+  if (url.startsWith('/')) return true;
+  try {
+    const u = new URL(url);
+    return ALLOWED_IMAGE_HOSTS.has(u.hostname);
+  } catch {
+    return false;
+  }
+}
+
 function Card({ p }: { p: BuzzProduct }) {
   const meta = (p.metadata ?? {}) as Record<string, unknown>;
   const collection = (meta.collection as string) ?? 'default';
@@ -84,7 +100,7 @@ function Card({ p }: { p: BuzzProduct }) {
             backgroundSize: '18px 18px',
           }}
         />
-        {p.image_url ? (
+        {p.image_url && isImageRenderable(p.image_url) ? (
           <Image
             src={p.image_url}
             alt={p.name}

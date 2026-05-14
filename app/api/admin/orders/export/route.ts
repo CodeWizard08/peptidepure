@@ -10,13 +10,19 @@ function getAdminSupabase() {
 }
 
 // One CSV cell. Wraps in double quotes if value contains comma, quote, or newline.
-// Doubles internal quotes per RFC 4180.
+// Doubles internal quotes per RFC 4180. Prefixes leading =/+/-/@ with a single
+// quote so Excel and Sheets don't interpret the cell as a formula (CWE-1236).
 function csvCell(v: unknown): string {
   if (v === null || v === undefined) return '';
-  const s = typeof v === 'string' ? v : String(v);
+  let s = typeof v === 'string' ? v : String(v);
+  if (/^[=+\-@]/.test(s)) s = `'${s}`;
   if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }
+
+// Allowed status filter values; anything else is rejected. Keeps the value
+// safe to interpolate into Content-Disposition without further escaping.
+const ALLOWED_STATUSES = new Set(['all', 'pending', 'approved', 'processing', 'completed', 'cancelled']);
 
 function csvRow(cells: unknown[]): string {
   return cells.map(csvCell).join(',');
@@ -51,7 +57,8 @@ export async function GET(request: Request) {
   if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
-  const status = searchParams.get('status');
+  const rawStatus = searchParams.get('status');
+  const status = rawStatus && ALLOWED_STATUSES.has(rawStatus) ? rawStatus : null;
 
   const supabase = getAdminSupabase();
   let query = supabase
