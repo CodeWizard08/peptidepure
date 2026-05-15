@@ -1,6 +1,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Any href starting with a scheme other than the site's own routing should
+// open in a new tab with rel=noopener/noreferrer. Internal app routes
+// (/contact, /peptides, etc.) still use Next's Link.
+function isExternal(href: string): boolean {
+  return /^(?:https?:|mailto:|tel:)/i.test(href);
+}
+
 interface FooterContent {
   brandDescription: string;
   trustBadges: string[];
@@ -73,33 +80,14 @@ export default function Footer({ content }: { content: FooterContent }) {
           <div className="col-span-6 sm:col-span-6 md:col-span-2 lg:col-span-2">
             <ColumnHeader>Quick Links</ColumnHeader>
             <ul className="space-y-2.5 mt-3">
-              {content.quickLinks.map((link) => {
-                const external = /^https?:\/\//i.test(link.href);
-                const linkClass = 'text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 group';
-                const dot = (
-                  <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-gold transition-colors" style={{ flexShrink: 0 }} />
-                );
-                return (
-                  <li key={link.href}>
-                    {external ? (
-                      <a
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={linkClass}
-                      >
-                        {dot}
-                        {link.label}
-                      </a>
-                    ) : (
-                      <Link href={link.href} className={linkClass}>
-                        {dot}
-                        {link.label}
-                      </Link>
-                    )}
-                  </li>
-                );
-              })}
+              {content.quickLinks.map((link) => (
+                <li key={link.href}>
+                  <FooterLink href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 group">
+                    <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-gold transition-colors" style={{ flexShrink: 0 }} />
+                    {link.label}
+                  </FooterLink>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -109,13 +97,10 @@ export default function Footer({ content }: { content: FooterContent }) {
             <ul className="space-y-2.5 mt-3">
               {content.legalLinks.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 group"
-                  >
+                  <FooterLink href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 group">
                     <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-gold transition-colors" style={{ flexShrink: 0 }} />
                     {link.label}
-                  </Link>
+                  </FooterLink>
                 </li>
               ))}
             </ul>
@@ -144,12 +129,12 @@ export default function Footer({ content }: { content: FooterContent }) {
                       {item.label}
                     </p>
                     {item.href ? (
-                      <a
+                      <FooterLink
                         href={item.href}
                         className="text-sm text-gray-200 hover:text-white transition-colors font-medium"
                       >
                         {item.value}
-                      </a>
+                      </FooterLink>
                     ) : (
                       <p className="text-sm text-gray-200 font-medium">{item.value}</p>
                     )}
@@ -182,18 +167,47 @@ export default function Footer({ content }: { content: FooterContent }) {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 order-1 sm:order-2">
             {content.bottomLinks.map((link) => (
-              <Link
+              <FooterLink
                 key={link.href}
                 href={link.href}
                 className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
               >
                 {link.label}
-              </Link>
+              </FooterLink>
             ))}
           </div>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterLink({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  if (isExternal(href)) {
+    // mailto:/tel: don't need target=_blank, but http(s):// links do
+    const newTab = /^https?:/i.test(href);
+    return (
+      <a
+        href={href}
+        className={className}
+        {...(newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      >
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
   );
 }
 

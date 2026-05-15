@@ -43,22 +43,24 @@ function formatCents(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
-// next/image throws at runtime for hostnames not in next.config.ts's allowlist.
-// Allow relative paths and the Supabase storage host we already permit; fall
-// back to the branded text treatment for anything else so the home page can't
-// be broken by an admin pasting a random CDN URL into the Products panel.
-const ALLOWED_IMAGE_HOSTS = new Set([
-  'dzbvaswimmaxfvambivu.supabase.co',
-  'peptidepure.com',
-  'www.peptide.buzz',
-  'peptide.buzz',
-]);
+// Mirrors next.config.ts images.remotePatterns. Must stay in sync — both
+// gate runtime rendering, and a mismatch causes next/image to throw at render
+// time for URLs that pass this guard but not the build-time config.
+// Each entry locks down protocol + hostname + path prefix to match.
+const ALLOWED_IMAGE_PATTERNS: Array<{ protocol: string; hostname: string; pathPrefix: string }> = [
+  { protocol: 'https:', hostname: 'dzbvaswimmaxfvambivu.supabase.co', pathPrefix: '/storage/v1/object/public/' },
+  { protocol: 'https:', hostname: 'peptidepure.com',                  pathPrefix: '/wp-content/uploads/' },
+  { protocol: 'https:', hostname: 'www.peptide.buzz',                 pathPrefix: '/img/' },
+  { protocol: 'https:', hostname: 'peptide.buzz',                     pathPrefix: '/img/' },
+];
 
 function isImageRenderable(url: string): boolean {
   if (url.startsWith('/')) return true;
   try {
     const u = new URL(url);
-    return ALLOWED_IMAGE_HOSTS.has(u.hostname);
+    return ALLOWED_IMAGE_PATTERNS.some(
+      (p) => u.protocol === p.protocol && u.hostname === p.hostname && u.pathname.startsWith(p.pathPrefix),
+    );
   } catch {
     return false;
   }

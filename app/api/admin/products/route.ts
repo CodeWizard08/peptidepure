@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { isAuthenticated } from '@/lib/admin-auth';
 import { createClient } from '@supabase/supabase-js';
 
@@ -7,6 +8,13 @@ function getAdminSupabase() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
+}
+
+// Bust the static cache on routes that surface product rows after a mutation
+// so admin edits show up immediately instead of waiting for revalidate.
+function revalidateProductRoutes() {
+  revalidatePath('/');
+  revalidatePath('/peptides');
 }
 
 export async function GET() {
@@ -90,6 +98,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
   }
 
+  revalidateProductRoutes();
   return NextResponse.json({ product }, { status: 201 });
 }
 
@@ -135,6 +144,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
   }
 
+  revalidateProductRoutes();
   return NextResponse.json({ product });
 }
 
@@ -160,5 +170,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });
   }
 
+  revalidateProductRoutes();
   return NextResponse.json({ success: true });
 }
