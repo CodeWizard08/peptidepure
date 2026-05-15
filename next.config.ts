@@ -18,6 +18,16 @@ const nextConfig: NextConfig = {
         hostname: 'peptidepure.com',
         pathname: '/wp-content/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.peptide.buzz',
+        pathname: '/img/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'peptide.buzz',
+        pathname: '/img/**',
+      },
     ],
   },
   async headers() {

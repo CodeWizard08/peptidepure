@@ -47,7 +47,12 @@ function formatCents(cents: number): string {
 // Allow relative paths and the Supabase storage host we already permit; fall
 // back to the branded text treatment for anything else so the home page can't
 // be broken by an admin pasting a random CDN URL into the Products panel.
-const ALLOWED_IMAGE_HOSTS = new Set(['dzbvaswimmaxfvambivu.supabase.co', 'peptidepure.com']);
+const ALLOWED_IMAGE_HOSTS = new Set([
+  'dzbvaswimmaxfvambivu.supabase.co',
+  'peptidepure.com',
+  'www.peptide.buzz',
+  'peptide.buzz',
+]);
 
 function isImageRenderable(url: string): boolean {
   if (url.startsWith('/')) return true;
