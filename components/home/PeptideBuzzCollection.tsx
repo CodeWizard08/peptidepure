@@ -66,13 +66,25 @@ function isImageRenderable(url: string): boolean {
   }
 }
 
-function Card({ p }: { p: BuzzProduct }) {
+function Card({ p, isClinician }: { p: BuzzProduct; isClinician: boolean }) {
   const meta = (p.metadata ?? {}) as Record<string, unknown>;
   const collection = (meta.collection as string) ?? 'default';
   const accent = COLLECTION_ACCENT[collection] ?? COLLECTION_ACCENT.default;
   const amount = meta.amount as string | undefined;
   const form = meta.form as string | undefined;
   const upsellCents = meta.upsell_cents as number | undefined;
+
+  // Visitors see retail as the primary price; verified clinicians see bulk
+  // (price_cents) primary with retail struck through. If retail isn't set we
+  // fall back to whatever single price we have so the card never shows $0.
+  const showBulk = isClinician;
+  const primaryCents = showBulk
+    ? p.price_cents
+    : (upsellCents ?? p.price_cents);
+  const struckCents = showBulk && upsellCents && upsellCents !== p.price_cents
+    ? upsellCents
+    : null;
+  const priceLabel = showBulk ? 'Clinic bulk · per unit' : 'Retail · per unit';
 
   return (
     <Link
@@ -146,15 +158,15 @@ function Card({ p }: { p: BuzzProduct }) {
         <div className="mt-auto flex items-end justify-between gap-3 pt-2">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              Clinic bulk · per unit
+              {priceLabel}
             </p>
             <div className="flex items-baseline gap-2">
               <span className="text-xl font-bold" style={{ color: accent.chip }}>
-                {formatCents(p.price_cents)}
+                {formatCents(primaryCents)}
               </span>
-              {upsellCents && (
+              {struckCents !== null && (
                 <span className="text-xs line-through" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                  {formatCents(upsellCents)}
+                  {formatCents(struckCents)}
                 </span>
               )}
             </div>
@@ -176,20 +188,54 @@ function Card({ p }: { p: BuzzProduct }) {
 
 export default async function PeptideBuzzCollection() {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from('products')
-    .select('id, name, slug, description, price_cents, image_url, metadata')
-    .eq('is_active', true)
-    .filter('metadata->>brand', 'eq', 'peptidebuzz')
-    .order('sort_order', { ascending: true })
-    .limit(8);
+  const [{ data }, { data: userData }] = await Promise.all([
+    supabase
+      .from('products')
+      .select('id, name, slug, description, price_cents, image_url, metadata')
+      .eq('is_active', true)
+      .filter('metadata->>brand', 'eq', 'peptidebuzz')
+      .order('sort_order', { ascending: true })
+      .limit(8),
+    supabase.auth.getUser(),
+  ]);
 
   const products = (data ?? []) as BuzzProduct[];
   if (products.length === 0) return null;
+  const isClinician = !!userData.user;
 
   return (
     <section className="py-20" style={{ background: '#0a1628', borderTop: '1px solid rgba(200,149,44,0.15)' }}>
       <div className="container-xl">
+        {/* Verified-clinician pricing banner — only renders when signed in */}
+        {isClinician && (
+          <div
+            className="mb-8 flex flex-wrap items-center justify-between gap-3 px-5 py-3 rounded-2xl"
+            style={{
+              background: 'linear-gradient(90deg, rgba(200,149,44,0.18) 0%, rgba(200,149,44,0.05) 100%)',
+              border: '1px solid rgba(200,149,44,0.4)',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full"
+                style={{ background: 'rgba(200,149,44,0.25)', border: '1px solid rgba(200,149,44,0.5)' }}
+              >
+                <svg width="14" height="14" fill="none" stroke="var(--gold)" strokeWidth="2.4" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: 'var(--gold)' }}>
+                  Clinic bulk pricing active
+                </p>
+                <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                  Verified clinician — wholesale per-unit pricing shown on every Peptide Buzz product.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">
           <div className="max-w-2xl">
             <p
@@ -207,12 +253,12 @@ export default async function PeptideBuzzCollection() {
               className="text-white leading-tight mb-3"
               style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 'clamp(1.75rem, 3.2vw, 2.5rem)' }}
             >
-              Bulk OTC Wellness, Built for Your Clinic
+              {isClinician ? 'Bulk OTC Wellness, Built for Your Clinic' : 'OTC Peptide Wellness — Retail & Bulk'}
             </h2>
             <p className="text-sm md:text-base leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
-              Patient-friendly oral pouches and topical peptides — formulated and tested under the same Peptide Pure
-              standards. Stock your retail shelf, offer patient takeaway, or bundle into protocol packages with
-              clinic-bulk pricing.
+              {isClinician
+                ? 'Patient-friendly oral pouches and topical peptides — formulated and tested under the same Peptide Pure standards. Stock your retail shelf, offer patient takeaway, or bundle into protocol packages with clinic-bulk pricing.'
+                : 'Patient-friendly oral pouches and topical peptides — formulated and tested under the same Peptide Pure standards. Retail pricing shown below; verified clinicians see bulk pricing on login.'}
             </p>
           </div>
           <Link
@@ -229,9 +275,24 @@ export default async function PeptideBuzzCollection() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {products.slice(0, 4).map((p) => (
-            <Card key={p.id} p={p} />
+            <Card key={p.id} p={p} isClinician={isClinician} />
           ))}
         </div>
+
+        {!isClinician && (
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-center">
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              Selling to clinics? Verified clinicians unlock per-unit bulk pricing — ~8–10× ROI when re-sold at retail.
+            </span>
+            <Link
+              href="/account"
+              className="text-xs font-semibold underline underline-offset-2 hover:no-underline"
+              style={{ color: 'var(--gold-light)' }}
+            >
+              Sign in →
+            </Link>
+          </div>
+        )}
 
         {products.length > 4 && (
           <p className="mt-6 text-center text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>

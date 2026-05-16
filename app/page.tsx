@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import HeroSlider from '@/components/HeroSlider';
 
-// Revalidate the home page every 5 minutes. Keeps the Peptide Buzz showcase
-// (which reads live from products table) cheap without making admin edits
-// invisible for an unreasonable amount of time.
-export const revalidate = 300;
+// PeptideBuzzCollection now reads auth state to flip pricing (retail for
+// visitors, bulk for verified clinicians), so the home page must render
+// per-request. revalidatePath('/') on admin product/content saves still
+// busts any dynamic cache layers that exist (Vercel data cache, etc).
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Clinician-Only Peptide Sourcing Platform',
