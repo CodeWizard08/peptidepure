@@ -55,9 +55,13 @@ export default function ProductHero({
   const amount = meta.amount as string | undefined;
   const form = meta.form as string | undefined;
   const dosing = meta.dosing as { recommended_dose?: string; route?: string; frequency?: string; notes?: string } | undefined;
+  const retailCents = meta.upsell_cents as number | undefined;
 
   const isOOS = inventory === 'oos';
   const isLeadTime = inventory === 'lead_time';
+  // Peptide Buzz products are OTC — show retail price publicly instead of the
+  // clinician sign-in gate. Bulk pricing still requires a verified clinician.
+  const isBuzz = brand === 'peptidebuzz';
   const hasMultipleVariants = variants.length > 1;
 
   return (
@@ -312,15 +316,21 @@ export default function ProductHero({
               </div>
             )}
 
-            {/* CTAs — gated by clinician auth */}
+            {/* CTAs — gated by clinician auth, with an OTC retail path for Peptide Buzz */}
             {isClinician ? (
               <>
                 <div className="mb-3 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'var(--gold-pale)', color: 'var(--gold)', border: '1px solid rgba(200,149,44,0.3)' }}>
                   <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
-                  Clinician pricing applied
+                  {isBuzz ? 'Clinic bulk pricing applied' : 'Clinician pricing applied'}
                 </div>
+                {isBuzz && retailCents && retailCents !== product.price_cents && (
+                  <p className="text-xs mb-3" style={{ color: 'var(--text-light)' }}>
+                    Retail price <span className="line-through">{formatCents(retailCents)}</span>{' '}
+                    · Your clinic price <span className="font-bold" style={{ color: 'var(--gold)' }}>{formatCents(product.price_cents)}</span> per unit
+                  </p>
+                )}
                 <AddToCartButton
                   product={{
                     id: product.id,
@@ -333,6 +343,44 @@ export default function ProductHero({
                   leadTimeDays={leadTimeDays}
                 />
               </>
+            ) : isBuzz ? (
+              // OTC retail card — visitors see retail price and a peptide.buzz
+              // checkout link; a softer prompt invites clinicians to sign in
+              // for clinic bulk pricing.
+              <div
+                className="rounded-2xl p-5 mb-6"
+                style={{ background: 'white', border: '1px solid var(--border)', boxShadow: '0 4px 16px rgba(11,31,58,0.06)' }}
+              >
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] mb-1" style={{ color: 'var(--gold)' }}>
+                  Retail · per unit
+                </p>
+                <p className="text-3xl font-bold mb-1" style={{ color: 'var(--navy)' }}>
+                  {formatCents(retailCents ?? product.price_cents)}
+                </p>
+                {amount && (
+                  <p className="text-xs mb-4" style={{ color: 'var(--text-light)' }}>
+                    {amount}{form ? ` · ${form}` : ''}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <a
+                    href="https://peptide.buzz"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors"
+                    style={{ background: 'var(--gold)', color: 'var(--navy)' }}
+                  >
+                    Shop on peptide.buzz →
+                  </a>
+                </div>
+                <p className="text-xs" style={{ color: 'var(--text-mid)' }}>
+                  Selling to patients in your clinic?{' '}
+                  <Link href="/account" className="font-semibold underline underline-offset-2 hover:no-underline" style={{ color: 'var(--gold)' }}>
+                    Sign in
+                  </Link>{' '}
+                  for clinic-bulk per-unit pricing — designed for ~8–10× ROI when resold at retail.
+                </p>
+              </div>
             ) : (
               <div
                 className="rounded-2xl p-5 mb-6"
