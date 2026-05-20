@@ -11,9 +11,10 @@ import AdminContentPanel from './AdminContentPanel';
 import AdminInventoryPanel from './AdminInventoryPanel';
 import AdminInventoryListPanel from './AdminInventoryListPanel';
 import AdminBundlesPanel from './AdminBundlesPanel';
+import AdminProtocolsPanel from './AdminProtocolsPanel';
 import AdminCoaPanel from './AdminCoaPanel';
 
-type Section = 'dashboard' | 'orders' | 'products' | 'inventory' | 'inventory-list' | 'bundles' | 'users' | 'forms' | 'content' | 'coa';
+type Section = 'dashboard' | 'orders' | 'products' | 'inventory' | 'inventory-list' | 'bundles' | 'protocols' | 'users' | 'forms' | 'content' | 'coa';
 
 const NAV: { key: Section; label: string; icon: React.ReactNode }[] = [
   {
@@ -67,6 +68,15 @@ const NAV: { key: Section; label: string; icon: React.ReactNode }[] = [
     icon: (
       <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14-4H5m14 8H5m14 4H5" />
+      </svg>
+    ),
+  },
+  {
+    key: 'protocols',
+    label: 'Protocols',
+    icon: (
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
   },
@@ -276,6 +286,7 @@ export default function AdminPanel() {
         {activeSection === 'inventory' && <AdminInventoryPanel />}
         {activeSection === 'inventory-list' && <AdminInventoryListPanel />}
         {activeSection === 'bundles' && <AdminBundlesPanel />}
+        {activeSection === 'protocols' && <AdminProtocolsPanel />}
         {activeSection === 'users' && <AdminUsersPanel />}
         {activeSection === 'forms' && <AdminFormsPanel />}
         {activeSection === 'coa' && <AdminCoaPanel />}
