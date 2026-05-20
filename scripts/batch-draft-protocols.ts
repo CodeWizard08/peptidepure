@@ -216,12 +216,26 @@ async function main() {
     const t = TOPICS[i];
     const num = `[${String(i + 1).padStart(3, '0')}/${TOPICS.length}]`;
 
-    // Skip if slug already exists
-    const { data: existing } = await supabase
+    // Skip if slug already has substantive body content. Status check guards
+    // against re-drafting something an admin already published — codex flagged
+    // that a previous version could clobber `published` rows back to `draft`.
+    const { data: existing, error: lookupErr } = await supabase
       .from('protocols')
-      .select('id, body_md')
+      .select('id, body_md, status')
       .eq('slug', t.slug)
       .maybeSingle();
+
+    if (lookupErr) {
+      console.log(`${num} FAIL ${t.slug} (lookup: ${lookupErr.message})`);
+      failed++;
+      continue;
+    }
+
+    if (existing && existing.status === 'published') {
+      console.log(`${num} SKIP ${t.slug} (already published — never reset published rows)`);
+      skipped++;
+      continue;
+    }
 
     if (existing && existing.body_md && existing.body_md.trim().length > 200) {
       console.log(`${num} SKIP ${t.slug} (already has body content)`);
@@ -241,79 +255,106 @@ async function main() {
       .filter((s) => s !== null)
       .join('\n');
 
-    try {
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-7',
-        max_tokens: 8000,
-        thinking: { type: 'adaptive' },
-        output_config: { effort: 'high' },
-        system: [
-          {
-            type: 'text',
-            text: SYSTEM_PROMPT,
-            cache_control: { type: 'ephemeral' },
-          },
-        ],
-        messages: [{ role: 'user', content: userPrompt }],
-      });
+    // Bounded retry loop — Claude rate limits or transient failures shouldn't
+    // skip the topic entirely. Up to 3 attempts with growing backoff.
+    let lastError: unknown = null;
+    let didSucceed = false;
 
-      const markdown = response.content
-        .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-        .map((b) => b.text)
-        .join('\n')
-        .trim();
-
-      if (!markdown) {
-        console.log(`${num} FAIL ${t.slug} (no text content, stop_reason=${response.stop_reason})`);
-        failed++;
-        continue;
-      }
-
-      // Upsert into protocols. If slug exists (empty body case), update body_md.
-      // Otherwise insert as new draft.
-      if (existing) {
-        await supabase
-          .from('protocols')
-          .update({
-            body_md: markdown,
-            title: t.title,
-            category: t.category,
-            peptides: t.peptides,
-            summary: t.summary ?? null,
-          })
-          .eq('id', existing.id);
-      } else {
-        await supabase.from('protocols').insert({
-          slug: t.slug,
-          title: t.title,
-          category: t.category,
-          peptides: t.peptides,
-          summary: t.summary ?? null,
-          body_md: markdown,
-          status: 'draft',
-          sort_order: 100 + i,
+    for (let attempt = 1; attempt <= 3 && !didSucceed; attempt++) {
+      try {
+        const response = await anthropic.messages.create({
+          model: 'claude-opus-4-7',
+          max_tokens: 8000,
+          thinking: { type: 'adaptive' },
+          output_config: { effort: 'high' },
+          system: [
+            {
+              type: 'text',
+              text: SYSTEM_PROMPT,
+              cache_control: { type: 'ephemeral' },
+            },
+          ],
+          messages: [{ role: 'user', content: userPrompt }],
         });
+
+        const markdown = response.content
+          .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+          .map((b) => b.text)
+          .join('\n')
+          .trim();
+
+        // Treat very short responses as a refusal/error so re-runs retry the
+        // topic instead of silently saving a junk page.
+        if (!markdown || markdown.length < 300) {
+          console.log(`${num} FAIL ${t.slug} (attempt ${attempt}: short/empty content len=${markdown.length}, stop_reason=${response.stop_reason})`);
+          lastError = new Error(`Short response (${markdown.length} chars, stop_reason=${response.stop_reason})`);
+          await new Promise((r) => setTimeout(r, 3000 * attempt));
+          continue;
+        }
+
+        // Persist. Capture and surface Supabase errors — codex flagged that
+        // ignoring these silently reports DB failures as success.
+        const dbResult = existing
+          ? await supabase
+              .from('protocols')
+              .update({
+                body_md: markdown,
+                title: t.title,
+                category: t.category,
+                peptides: t.peptides,
+                summary: t.summary ?? null,
+                status: 'draft',
+              })
+              .eq('id', existing.id)
+          : await supabase.from('protocols').insert({
+              slug: t.slug,
+              title: t.title,
+              category: t.category,
+              peptides: t.peptides,
+              summary: t.summary ?? null,
+              body_md: markdown,
+              status: 'draft',
+              sort_order: 100 + i,
+            });
+
+        if (dbResult.error) {
+          console.log(`${num} FAIL ${t.slug} (db: ${dbResult.error.message})`);
+          lastError = dbResult.error;
+          break; // a DB error won't be fixed by retrying Claude
+        }
+
+        totalCacheReads += response.usage.cache_read_input_tokens ?? 0;
+        totalInputTokens += response.usage.input_tokens;
+        totalOutputTokens += response.usage.output_tokens;
+        drafted++;
+        didSucceed = true;
+
+        const cacheNote = (response.usage.cache_read_input_tokens ?? 0) > 0 ? ' [cache hit]' : '';
+        const retryNote = attempt > 1 ? ` (attempt ${attempt})` : '';
+        console.log(`${num} ✓ ${t.slug} (${markdown.length.toLocaleString()} chars, ${response.usage.output_tokens} out tokens)${cacheNote}${retryNote}`);
+
+        // Pacing between successful topics — keep RPM low and the prompt cache warm
+        await new Promise((r) => setTimeout(r, 1200));
+      } catch (err) {
+        lastError = err;
+        if (err instanceof Anthropic.RateLimitError) {
+          console.log(`${num} … rate limited (attempt ${attempt}), sleeping 60s`);
+          await new Promise((r) => setTimeout(r, 60_000));
+        } else if (err instanceof Anthropic.APIError && err.status >= 500) {
+          console.log(`${num} … server error (attempt ${attempt}, status=${err.status}), sleeping 15s`);
+          await new Promise((r) => setTimeout(r, 15_000));
+        } else {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.log(`${num} FAIL ${t.slug} (non-retryable: ${msg})`);
+          break; // non-retryable
+        }
       }
+    }
 
-      totalCacheReads += response.usage.cache_read_input_tokens ?? 0;
-      totalInputTokens += response.usage.input_tokens;
-      totalOutputTokens += response.usage.output_tokens;
-      drafted++;
-
-      const cacheNote = (response.usage.cache_read_input_tokens ?? 0) > 0 ? ' [cache hit]' : '';
-      console.log(`${num} ✓ ${t.slug} (${markdown.length.toLocaleString()} chars, ${response.usage.output_tokens} out tokens)${cacheNote}`);
-
-      // Pacing — avoid bumping into RPM limits and keep prompt cache warm
-      await new Promise((r) => setTimeout(r, 1200));
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.log(`${num} FAIL ${t.slug}: ${msg}`);
+    if (!didSucceed) {
+      const msg = lastError instanceof Error ? lastError.message : String(lastError);
+      console.log(`${num} GIVE-UP ${t.slug} after 3 attempts: ${msg}`);
       failed++;
-      // Back off if we hit a rate limit
-      if (err instanceof Anthropic.RateLimitError) {
-        console.log('   Rate-limited, sleeping 60s …');
-        await new Promise((r) => setTimeout(r, 60_000));
-      }
     }
   }
 

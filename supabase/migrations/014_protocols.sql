@@ -60,7 +60,7 @@ INSERT INTO protocols (slug, title, category, summary, peptides, image_url, stat
     'Compare multi-peptide regenerative formulation (GLOW) vs higher-dose GHK-Cu monotherapy, with optional glutathione support.',
     ARRAY['BPC-157 10mg','GHK-Cu 50mg','TB4 (TB-500) 10mg','Glutathione 1500mg'],
     'https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2026/01/IMG_1351.jpeg',
-    'published', 1
+    'draft', 1
   ),
   (
     'soft-tissue-repair',
@@ -69,7 +69,7 @@ INSERT INTO protocols (slug, title, category, summary, peptides, image_url, stat
     'Focused tissue repair protocol combining BPC-157 and TB-500 for musculoskeletal and soft-tissue recovery.',
     ARRAY['BPC-157 10mg','TB4 (TB-500) 10mg','BPC-157/TB500 10mg'],
     'https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2026/01/BPC-TB4-COMBOS.jpeg',
-    'published', 2
+    'draft', 2
   ),
   (
     'metabolic-health-body-composition',
@@ -78,7 +78,7 @@ INSERT INTO protocols (slug, title, category, summary, peptides, image_url, stat
     'Compare GLP-1/GIP agonists alongside metabolic peptides for body composition optimization.',
     ARRAY['Tirz 10mg','Reta 10mg','Sema 15mg','AOD-9604 2mg','MOTS-c 10mg'],
     'https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2026/01/Bundle-Vial-Mockups-4.png',
-    'published', 3
+    'draft', 3
   ),
   (
     'lean-mass-growth-hormone',
@@ -87,7 +87,7 @@ INSERT INTO protocols (slug, title, category, summary, peptides, image_url, stat
     'Growth hormone optimization using synergistic GHRH/GHRP combinations for lean mass and recovery.',
     ARRAY['CJC-1295/Ipamorelin 10mg','Ipamorelin 5mg','Tesamorelin 10mg','Sermorelin 10mg'],
     'https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2026/01/Bundle-Vial-Mockups-Lean-Mass-Growth-Hormone-Optimization-Protocol.png',
-    'published', 4
+    'draft', 4
   ),
   (
     'libido-sexual-response',
@@ -96,7 +96,7 @@ INSERT INTO protocols (slug, title, category, summary, peptides, image_url, stat
     'Compare PT-141 against oxytocin and melanotan-II for libido, sexual response, and mood support.',
     ARRAY['PT-141 10mg','Oxytocin 5mg','Melanotan-II 10mg'],
     'https://dzbvaswimmaxfvambivu.supabase.co/storage/v1/object/public/peptides/wp-content/uploads/2026/01/PT141-OXY-MT2.jpeg',
-    'published', 5
+    'draft', 5
   ),
   (
     'neuroplasticity-circadian',
@@ -105,7 +105,7 @@ INSERT INTO protocols (slug, title, category, summary, peptides, image_url, stat
     'Neuroplasticity support and circadian rhythm regulation through targeted cognitive peptides.',
     ARRAY['Cerebrolysin 60mg','NA-Selank Amidate 30mg','Selank 10mg','Semax 10mg','DSIP 10mg'],
     null,
-    'published', 6
+    'draft', 6
   ),
   (
     'mitochondrial-support',
@@ -114,7 +114,7 @@ INSERT INTO protocols (slug, title, category, summary, peptides, image_url, stat
     'Mitochondrial function and cellular energy support combining MOTS-c, SS-31, and NAD+.',
     ARRAY['MOTS-c 10mg','SS-31 10mg','NAD+ 1000mg','Glutathione 1500mg'],
     null,
-    'published', 7
+    'draft', 7
   ),
   (
     'longevity',
@@ -123,6 +123,6 @@ INSERT INTO protocols (slug, title, category, summary, peptides, image_url, stat
     'Multi-mechanism longevity stack combining cellular aging, neuroprotection, and tissue support peptides.',
     ARRAY['Epithalon 10mg','GHK-Cu 50mg','MOTS-c 10mg','Pinealon 10mg','NAD+ 1000mg'],
     null,
-    'published', 8
+    'draft', 8
   )
 ON CONFLICT (slug) DO NOTHING;

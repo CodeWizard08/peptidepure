@@ -43,25 +43,36 @@ export default function ProductHero({
   baseName: string;
   variants: Variant[];
   catConfig: CatConfig;
-  meta: Record<string, any>;
+  meta: Record<string, any> | null;
   isClinician?: boolean;
 }) {
-  const inventory = (meta.inventory as string) ?? 'in_stock';
-  const leadTimeDays = meta.lead_time_days as number | null;
-  const patientPrice = (meta.patient_price_cents as number | null) ?? product.price_cents * 2;
-  const volumePricing = meta.volume_pricing as Record<string, number> | null;
-  const brand = (meta.brand as string) ?? 'peptidepure';
-  const strength = meta.strength as string | undefined;
-  const amount = meta.amount as string | undefined;
-  const form = meta.form as string | undefined;
-  const dosing = meta.dosing as { recommended_dose?: string; route?: string; frequency?: string; notes?: string } | undefined;
-  const retailCents = meta.upsell_cents as number | undefined;
+  // Normalize meta — callers occasionally pass null when the products row has
+  // no metadata column populated. Treat as empty object to avoid null deref.
+  const safeMeta = meta ?? {};
+  const inventory = (safeMeta.inventory as string) ?? 'in_stock';
+  const leadTimeDays = safeMeta.lead_time_days as number | null;
+  const patientPrice = (safeMeta.patient_price_cents as number | null) ?? product.price_cents * 2;
+  const volumePricing = safeMeta.volume_pricing as Record<string, number> | null;
+  const brand = (safeMeta.brand as string) ?? 'peptidepure';
+  const strength = safeMeta.strength as string | undefined;
+  const amount = safeMeta.amount as string | undefined;
+  const form = safeMeta.form as string | undefined;
+  const dosing = safeMeta.dosing as { recommended_dose?: string; route?: string; frequency?: string; notes?: string } | undefined;
+  const retailCents = safeMeta.upsell_cents as number | undefined;
 
   const isOOS = inventory === 'oos';
   const isLeadTime = inventory === 'lead_time';
   // Peptide Buzz products are OTC — show retail price publicly instead of the
   // clinician sign-in gate. Bulk pricing still requires a verified clinician.
   const isBuzz = brand === 'peptidebuzz';
+  // Display price the visitor sees on the OTC card — retail if available,
+  // else the bulk price as a fallback (still positive). Hides the price
+  // entirely if neither is set (e.g. pre-launch SKUs with price_cents=0).
+  const visitorDisplayCents = retailCents && retailCents > 0
+    ? retailCents
+    : product.price_cents > 0
+      ? product.price_cents
+      : null;
   const hasMultipleVariants = variants.length > 1;
 
   return (
@@ -351,12 +362,25 @@ export default function ProductHero({
                 className="rounded-2xl p-5 mb-6"
                 style={{ background: 'white', border: '1px solid var(--border)', boxShadow: '0 4px 16px rgba(11,31,58,0.06)' }}
               >
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] mb-1" style={{ color: 'var(--gold)' }}>
-                  Retail · per unit
-                </p>
-                <p className="text-3xl font-bold mb-1" style={{ color: 'var(--navy)' }}>
-                  {formatCents(retailCents ?? product.price_cents)}
-                </p>
+                {visitorDisplayCents !== null ? (
+                  <>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] mb-1" style={{ color: 'var(--gold)' }}>
+                      Retail · per unit
+                    </p>
+                    <p className="text-3xl font-bold mb-1" style={{ color: 'var(--navy)' }}>
+                      {formatCents(visitorDisplayCents)}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] mb-1" style={{ color: 'var(--gold)' }}>
+                      Coming Soon
+                    </p>
+                    <p className="text-2xl font-bold mb-1" style={{ color: 'var(--navy)' }}>
+                      Pre-Launch
+                    </p>
+                  </>
+                )}
                 {amount && (
                   <p className="text-xs mb-4" style={{ color: 'var(--text-light)' }}>
                     {amount}{form ? ` · ${form}` : ''}

@@ -90,20 +90,41 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { id, ...fields } = body;
+  const id = body.id;
   if (!id || typeof id !== 'string') return NextResponse.json({ error: 'id is required' }, { status: 400 });
 
-  if (fields.status !== undefined && (typeof fields.status !== 'string' || !VALID_STATUSES.has(fields.status))) {
+  if (body.status !== undefined && (typeof body.status !== 'string' || !VALID_STATUSES.has(body.status))) {
     return NextResponse.json({ error: 'status must be draft|published|archived' }, { status: 400 });
   }
-  if (fields.slug !== undefined && (typeof fields.slug !== 'string' || !/^[a-z0-9-]+$/.test(fields.slug))) {
+  if (body.slug !== undefined && (typeof body.slug !== 'string' || !/^[a-z0-9-]+$/.test(body.slug))) {
     return NextResponse.json({ error: 'slug must be lowercase alphanumeric + hyphens' }, { status: 400 });
+  }
+
+  // Explicit allowlist — never forward arbitrary keys from the request body.
+  // Prevents accidental (or hostile) mutation of id, created_at, updated_at,
+  // or future schema additions.
+  const update: Record<string, unknown> = {};
+  if (typeof body.title === 'string') update.title = body.title;
+  if (typeof body.slug === 'string') update.slug = body.slug;
+  if (body.category !== undefined) update.category = body.category ?? null;
+  if (body.summary !== undefined) update.summary = body.summary ?? null;
+  if (typeof body.body_md === 'string') update.body_md = body.body_md;
+  if (Array.isArray(body.peptides)) update.peptides = body.peptides.filter((p) => typeof p === 'string');
+  if (body.image_url !== undefined) update.image_url = body.image_url ?? null;
+  if (typeof body.status === 'string') update.status = body.status;
+  if (typeof body.sort_order === 'number') update.sort_order = body.sort_order;
+  if (body.metadata !== undefined && typeof body.metadata === 'object' && body.metadata !== null) {
+    update.metadata = body.metadata;
+  }
+
+  if (Object.keys(update).length === 0) {
+    return NextResponse.json({ error: 'No updatable fields provided' }, { status: 400 });
   }
 
   const supabase = getAdminSupabase();
   const { data, error } = await supabase
     .from('protocols')
-    .update(fields)
+    .update(update)
     .eq('id', id)
     .select('*')
     .single();
