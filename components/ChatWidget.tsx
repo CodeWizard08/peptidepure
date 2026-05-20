@@ -10,12 +10,16 @@ interface Message {
   content: string;
 }
 
+// Suggested queries tuned for clinicians. Mix of practical / clinical /
+// patient-facing framings so the Sherpa is useful at the chairside, on
+// the desktop, and in patient-handout authoring contexts.
 const SUGGESTIONS = [
-  'BPC-157 dosing protocol',
-  'Reconstitution formula',
-  'TIRZ + semaglutide stack',
-  'TB-500 injection site',
-  'CJC-1295 vs Ipamorelin',
+  'BPC-157 for shoulder pain',
+  'Post-op tendon recovery stack',
+  'Reconstitute a 10mg vial',
+  'Tirz vs Reta for weight loss',
+  'GHK-Cu for skin & scalp',
+  'GLP-1 discontinuation taper',
 ];
 
 const BOT_ICON = (
@@ -264,7 +268,7 @@ export default function ChatWidget() {
       {/* Floating button */}
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="Open PeptidePure AI assistant"
+        aria-label="Open AI Sherpa — peptide research assistant"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-transform hover:scale-105 active:scale-95"
         style={{ background: 'var(--navy)', border: '2px solid var(--gold)' }}
       >
@@ -321,14 +325,14 @@ export default function ChatWidget() {
               </svg>
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-white font-semibold text-sm leading-tight tracking-wide">PeptidePure AI</div>
+              <div className="text-white font-semibold text-sm leading-tight tracking-wide">AI Sherpa</div>
               <div className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {streaming ? (
                   <span className="flex items-center gap-1.5">
                     <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                     Typing…
                   </span>
-                ) : 'Clinical peptide assistant'}
+                ) : 'Clinical peptide research assistant'}
               </div>
             </div>
             <button
@@ -356,9 +360,9 @@ export default function ChatWidget() {
                     <path d="M8 15h.01M12 15h.01M16 15h.01" />
                   </svg>
                 </div>
-                <p className="font-semibold text-sm mb-1" style={{ color: 'var(--navy)' }}>PeptidePure AI</p>
+                <p className="font-semibold text-sm mb-1" style={{ color: 'var(--navy)' }}>AI Sherpa</p>
                 <p className="text-xs mb-6 max-w-xs" style={{ color: 'var(--text-light)' }}>
-                  Ask me about peptide protocols, dosing, reconstitution, or clinical stacks.
+                  Your peptide research assistant. Ask about protocols, dosing, reconstitution, stacks, or how to brief a patient.
                 </p>
                 {loggedIn ? (
                   <div className="flex flex-wrap gap-2 justify-center">
@@ -444,7 +448,7 @@ export default function ChatWidget() {
             ) : (
               <div className="text-center py-1">
                 <p className="text-xs mb-3" style={{ color: 'var(--text-mid)' }}>
-                  Sign in to chat with our clinical AI assistant.
+                  Sign in to chat with the AI Sherpa — your peptide research assistant.
                 </p>
                 <a
                   href="/account"

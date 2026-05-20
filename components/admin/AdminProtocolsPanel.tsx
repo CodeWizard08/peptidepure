@@ -11,11 +11,14 @@ type Protocol = {
   category: string | null;
   summary: string | null;
   body_md: string;
+  patient_md: string;
   peptides: string[];
   image_url: string | null;
   status: Status;
   sort_order: number;
 };
+
+type Audience = 'clinician' | 'patient';
 
 const EMPTY: Protocol = {
   id: '',
@@ -24,6 +27,7 @@ const EMPTY: Protocol = {
   category: '',
   summary: '',
   body_md: '',
+  patient_md: '',
   peptides: [],
   image_url: '',
   status: 'draft',
@@ -49,7 +53,8 @@ export default function AdminProtocolsPanel() {
   const [selected, setSelected] = useState<Protocol | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [drafting, setDrafting] = useState(false);
+  const [drafting, setDrafting] = useState<Audience | null>(null);
+  const [activeAudience, setActiveAudience] = useState<Audience>('clinician');
   const [draftInstructions, setDraftInstructions] = useState('');
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -88,11 +93,11 @@ export default function AdminProtocolsPanel() {
     setSelected({ ...selected, [k]: v });
   };
 
-  const draftWithClaude = async () => {
+  const draftWithClaude = async (audience: Audience) => {
     if (!selected) return;
     if (!selected.title.trim()) { showToast('error', 'Title required before drafting'); return; }
 
-    setDrafting(true);
+    setDrafting(audience);
     try {
       const res = await fetch('/api/admin/protocols/draft', {
         method: 'POST',
@@ -103,20 +108,24 @@ export default function AdminProtocolsPanel() {
           peptides: selected.peptides,
           category: selected.category,
           instructions: draftInstructions,
+          audience,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Draft failed');
-      setSelected({ ...selected, body_md: data.markdown });
+      const targetField: keyof Protocol = audience === 'patient' ? 'patient_md' : 'body_md';
+      setSelected({ ...selected, [targetField]: data.markdown });
+      setActiveAudience(audience);
       const u = data.usage;
       const tokenSummary = u
         ? ` · ${u.input_tokens}→${u.output_tokens} tokens${u.cache_read_input_tokens > 0 ? ` (${u.cache_read_input_tokens} cached)` : ''}`
         : '';
-      showToast('success', `Claude drafted ${data.markdown.length.toLocaleString()} chars${tokenSummary}`);
+      const label = audience === 'patient' ? 'patient version' : 'clinician version';
+      showToast('success', `Claude drafted ${label} (${data.markdown.length.toLocaleString()} chars)${tokenSummary}`);
     } catch (err) {
       showToast('error', err instanceof Error ? err.message : 'Draft failed');
     } finally {
-      setDrafting(false);
+      setDrafting(null);
     }
   };
 
@@ -135,6 +144,7 @@ export default function AdminProtocolsPanel() {
         category: selected.category?.trim() || null,
         summary: selected.summary?.trim() || null,
         body_md: selected.body_md ?? '',
+        patient_md: selected.patient_md ?? '',
         peptides: selected.peptides,
         image_url: selected.image_url?.trim() || null,
         status: selected.status,
@@ -324,47 +334,120 @@ export default function AdminProtocolsPanel() {
                 />
               </Field>
 
-              {/* Draft with Claude */}
+              {/* Draft with Claude — generates clinician OR patient version */}
               <div className="rounded-xl p-4" style={{ background: 'linear-gradient(135deg, var(--gold-pale) 0%, white 100%)', border: '1px solid rgba(200,149,44,0.35)' }}>
-                <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="flex items-start justify-between gap-3 mb-3">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: 'var(--gold)' }}>Draft with Claude</p>
                     <p className="text-xs mt-1" style={{ color: 'var(--text-mid)' }}>
-                      Generates a full markdown protocol body using the title, category, peptides, and summary above. Edit it after.
+                      Two versions: clinician (technical, dosing schedules, evidence notes) and patient (plain language, what to expect, when to call). Each is independently drafted, edited, and saved.
                     </p>
                   </div>
-                  <button
-                    onClick={draftWithClaude}
-                    disabled={drafting || !selected.title.trim()}
-                    className="shrink-0 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
-                    style={{ background: drafting || !selected.title.trim() ? 'var(--text-light)' : 'var(--navy)', opacity: drafting ? 0.7 : 1 }}
-                  >
-                    {drafting ? 'Drafting…' : 'Draft with Claude'}
-                  </button>
                 </div>
                 <textarea
                   value={draftInstructions}
                   onChange={(e) => setDraftInstructions(e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 mt-2 rounded-lg text-xs focus:outline-none"
+                  className="w-full px-3 py-2 mb-3 rounded-lg text-xs focus:outline-none"
                   style={{ background: 'white', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
-                  placeholder="Optional: extra instructions (e.g. 'emphasize post-op recovery', 'include hormone monitoring schedule', 'patient is 45yo female')…"
+                  placeholder="Optional: extra instructions (e.g. 'emphasize post-op recovery', 'patient is 45yo female')…"
                 />
-                <p className="text-[11px] mt-2" style={{ color: 'var(--text-light)' }}>
-                  Drafting overwrites the markdown body below. Save as draft first if you want to keep prior content.
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => draftWithClaude('clinician')}
+                    disabled={!!drafting || !selected.title.trim()}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
+                    style={{ background: !!drafting || !selected.title.trim() ? 'var(--text-light)' : 'var(--navy)' }}
+                  >
+                    {drafting === 'clinician' ? 'Drafting clinician…' : 'Draft Clinician Version'}
+                  </button>
+                  <button
+                    onClick={() => draftWithClaude('patient')}
+                    disabled={!!drafting || !selected.title.trim()}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+                    style={{
+                      background: !!drafting || !selected.title.trim() ? 'var(--text-light)' : 'var(--gold)',
+                      color: 'var(--navy)',
+                    }}
+                  >
+                    {drafting === 'patient' ? 'Drafting patient…' : 'Draft Patient Version'}
+                  </button>
+                </div>
+                <p className="text-[11px] mt-3" style={{ color: 'var(--text-light)' }}>
+                  Drafting overwrites the corresponding textarea below. Save before re-drafting if you want to keep prior content.
                 </p>
               </div>
 
-              <Field label="Body (markdown — supports **bold**, *italic*, headings, lists)">
-                <textarea
-                  value={selected.body_md}
-                  onChange={(e) => updateField('body_md', e.target.value)}
-                  rows={20}
-                  className="w-full px-3 py-2 rounded-lg text-sm font-mono focus:outline-none"
-                  style={{ background: 'var(--off-white)', border: '1px solid var(--border)', color: 'var(--text-dark)', lineHeight: 1.5 }}
-                  placeholder={'## Overview\n\nProtocol description…'}
-                />
-              </Field>
+              {/* Audience tab switcher for the body editor */}
+              <div className="flex items-center gap-1 p-1 rounded-xl w-fit" style={{ background: 'var(--off-white)', border: '1px solid var(--border)' }}>
+                <button
+                  onClick={() => setActiveAudience('clinician')}
+                  className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                  style={{
+                    background: activeAudience === 'clinician' ? 'white' : 'transparent',
+                    color: activeAudience === 'clinician' ? 'var(--navy)' : 'var(--text-mid)',
+                    boxShadow: activeAudience === 'clinician' ? '0 1px 3px rgba(11,31,58,0.08)' : 'none',
+                  }}
+                >
+                  Clinician Body{selected.body_md.trim() ? ' ✓' : ''}
+                </button>
+                <button
+                  onClick={() => setActiveAudience('patient')}
+                  className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                  style={{
+                    background: activeAudience === 'patient' ? 'white' : 'transparent',
+                    color: activeAudience === 'patient' ? 'var(--navy)' : 'var(--text-mid)',
+                    boxShadow: activeAudience === 'patient' ? '0 1px 3px rgba(11,31,58,0.08)' : 'none',
+                  }}
+                >
+                  Patient Body{selected.patient_md.trim() ? ' ✓' : ''}
+                </button>
+              </div>
+
+              {activeAudience === 'clinician' ? (
+                <Field label="Clinician body (markdown — technical, dosing, evidence, contraindications)">
+                  <textarea
+                    value={selected.body_md}
+                    onChange={(e) => updateField('body_md', e.target.value)}
+                    rows={20}
+                    className="w-full px-3 py-2 rounded-lg text-sm font-mono focus:outline-none"
+                    style={{ background: 'var(--off-white)', border: '1px solid var(--border)', color: 'var(--text-dark)', lineHeight: 1.5 }}
+                    placeholder={'## Overview\n\nProtocol description…'}
+                  />
+                </Field>
+              ) : (
+                <Field label="Patient body (markdown — plain language, what to expect, when to call)">
+                  <textarea
+                    value={selected.patient_md}
+                    onChange={(e) => updateField('patient_md', e.target.value)}
+                    rows={20}
+                    className="w-full px-3 py-2 rounded-lg text-sm font-mono focus:outline-none"
+                    style={{ background: 'var(--off-white)', border: '1px solid var(--border)', color: 'var(--text-dark)', lineHeight: 1.5 }}
+                    placeholder={'## What This Protocol Is For\n\nIn plain language…'}
+                  />
+                </Field>
+              )}
+
+              {/* Share link helper — only when both versions exist + protocol is saved */}
+              {selected.id && selected.patient_md.trim() && selected.status === 'published' && (
+                <div className="rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs" style={{ background: 'var(--gold-pale)', border: '1px solid rgba(200,149,44,0.3)' }}>
+                  <div>
+                    <p className="font-semibold" style={{ color: 'var(--navy)' }}>Patient handout link</p>
+                    <p className="font-mono mt-0.5" style={{ color: 'var(--text-mid)' }}>
+                      /protocols/{selected.slug}?view=patient
+                    </p>
+                  </div>
+                  <a
+                    href={`/protocols/${selected.slug}?view=patient`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 rounded-lg font-semibold"
+                    style={{ background: 'var(--gold)', color: 'var(--navy)' }}
+                  >
+                    Open patient view →
+                  </a>
+                </div>
+              )}
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                 {selected.id && (

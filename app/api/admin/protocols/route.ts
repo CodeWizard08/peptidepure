@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
       category: (body.category as string | null) ?? null,
       summary: (body.summary as string | null) ?? null,
       body_md: (body.body_md as string | null) ?? '',
+      patient_md: (body.patient_md as string | null) ?? '',
       peptides: Array.isArray(body.peptides) ? body.peptides : [],
       image_url: (body.image_url as string | null) ?? null,
       status,
@@ -109,6 +110,7 @@ export async function PATCH(request: NextRequest) {
   if (body.category !== undefined) update.category = body.category ?? null;
   if (body.summary !== undefined) update.summary = body.summary ?? null;
   if (typeof body.body_md === 'string') update.body_md = body.body_md;
+  if (typeof body.patient_md === 'string') update.patient_md = body.patient_md;
   if (Array.isArray(body.peptides)) update.peptides = body.peptides.filter((p) => typeof p === 'string');
   if (body.image_url !== undefined) update.image_url = body.image_url ?? null;
   if (typeof body.status === 'string') update.status = body.status;

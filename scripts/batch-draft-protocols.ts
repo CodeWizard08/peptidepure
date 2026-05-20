@@ -143,8 +143,10 @@ const TOPICS: Topic[] = [
   { title: 'Vagus Nerve & Gut-Brain Axis Protocol', slug: 'vagus-gut-brain-axis', category: 'Cognitive & Mood', peptides: ['BPC-157 10mg', 'Selank 10mg', 'oral BPC-157 500mcg'], summary: 'Multi-mechanism protocol targeting the gut-brain axis for IBS, functional dyspepsia, and stress-related GI dysfunction.' },
 ];
 
-// ─── System prompt (must match /api/admin/protocols/draft) ──────────────────
-const SYSTEM_PROMPT = `You are a senior clinical writer authoring peptide protocols for licensed clinicians on the Peptide Pure Research Network — an IRB-aligned observational registry sourcing exclusively from 503A/503B compounding pharmacies.
+// ─── System prompts (must match /api/admin/protocols/draft) ─────────────────
+type Audience = 'clinician' | 'patient';
+
+const CLINICIAN_SYSTEM_PROMPT = `You are a senior clinical writer authoring peptide protocols for licensed clinicians on the Peptide Pure Research Network — an IRB-aligned observational registry sourcing exclusively from 503A/503B compounding pharmacies.
 
 Audience: MDs, DOs, NPs, PAs, NDs, and other licensed prescribers. Write at a clinical-research level. Cite mechanism of action where well-established. Be honest about evidence gaps.
 
@@ -184,6 +186,45 @@ Style:
 - When uncertain about a specific dose, write a range and flag it.
 - Markdown only — no HTML.`;
 
+const PATIENT_SYSTEM_PROMPT = `You are a clinician-supervised patient educator writing a friendly, plain-language summary of a peptide protocol for patients.
+
+Audience: a curious, motivated patient with a smartphone — not a doctor. Eighth-grade reading level. Warm, direct, honest tone. Skip the medical jargon (and if you must use a word like "subcutaneous," define it once in parentheses on first use).
+
+This is content the patient's doctor will hand them — so the doctor's voice still comes through. It explains WHAT the protocol does, WHY it's being prescribed, WHAT to expect day-to-day, and WHEN to call the office.
+
+Required structure (use markdown):
+
+## What This Protocol Is For
+2-3 short paragraphs: what condition or goal the protocol addresses, in everyday language. Talk about results the patient cares about (energy, recovery, weight, mood, sleep) — not biochemistry.
+
+## What You'll Be Taking
+Plain English for each peptide: nickname, what it does in one sentence, how often you'll take it. NO mechanism-of-action paragraphs.
+
+## How to Use It
+Step-by-step. Reconstitution if relevant (short, with the "ask the office" reminder). Injection or oral instructions. Storage. What time of day. With or without food. Skip-a-dose guidance.
+
+## What to Expect
+Realistic timeline (week 1, week 4, week 8, week 12) — what changes the patient should notice. Use "you'll likely notice / some people notice / give it the full N weeks" framing rather than guaranteed outcomes.
+
+## Common Side Effects
+The 3-5 most common, with the "what to do if you notice this" guidance for each. Plain language ("upset stomach" not "GI distress"). Reassure where appropriate that mild side effects usually settle within 1-2 weeks.
+
+## When to Call the Office
+Specific symptoms that mean stop and call. Make this easy to scan — short bullet list.
+
+## A Note About This Protocol
+Two sentences. Honest framing: this is supervised through Peptide Pure's research network, not FDA-approved for these uses, your doctor is monitoring you, this is not a magic bullet.
+
+## Questions for Your Next Visit
+3-4 thoughtful questions the patient can bring up at their next visit — encourages partnership and follow-up.
+
+Style:
+- Second person ("you"). Friendly but professional.
+- Use Sema / Tirz / Reta (not the brand names like Ozempic, Mounjaro, Wegovy, or Zepbound, and not the full chemical names).
+- No emojis. No "Don't worry!" / "Amazing!" / sycophancy.
+- Avoid scaring the patient — but be honest. If something is investigational, say so once, simply.
+- Markdown only — no HTML.`;
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 async function main() {
   if (!process.env.ANTHROPIC_API_KEY) {
@@ -202,65 +243,40 @@ async function main() {
     { auth: { persistSession: false } },
   );
 
-  console.log(`Starting batch draft of ${TOPICS.length} protocols.`);
-  console.log(`First call writes the cache (~1.25× input cost); calls 2-N read it (~0.1× input cost).\n`);
+  // ONLY_AUDIENCE env var lets you re-run for one audience after a partial
+  // failure. Default is 'both' — drafts clinician + patient per topic.
+  const onlyAudience = process.env.ONLY_AUDIENCE as Audience | undefined;
+  const audiences: Audience[] = onlyAudience ? [onlyAudience] : ['clinician', 'patient'];
+  console.log(`Starting batch draft of ${TOPICS.length} protocols for: ${audiences.join(' + ')}.`);
+  console.log(`First call per audience writes the cache; subsequent calls in the same audience read it (~0.1× input cost).\n`);
 
-  let drafted = 0;
-  let skipped = 0;
-  let failed = 0;
+  // Per-audience counters
+  const stats = {
+    clinician: { drafted: 0, skipped: 0, failed: 0 },
+    patient: { drafted: 0, skipped: 0, failed: 0 },
+  };
   let totalCacheReads = 0;
   let totalInputTokens = 0;
   let totalOutputTokens = 0;
 
-  for (let i = 0; i < TOPICS.length; i++) {
-    const t = TOPICS[i];
-    const num = `[${String(i + 1).padStart(3, '0')}/${TOPICS.length}]`;
-
-    // Skip if slug already has substantive body content. Status check guards
-    // against re-drafting something an admin already published — codex flagged
-    // that a previous version could clobber `published` rows back to `draft`.
-    const { data: existing, error: lookupErr } = await supabase
-      .from('protocols')
-      .select('id, body_md, status')
-      .eq('slug', t.slug)
-      .maybeSingle();
-
-    if (lookupErr) {
-      console.log(`${num} FAIL ${t.slug} (lookup: ${lookupErr.message})`);
-      failed++;
-      continue;
-    }
-
-    if (existing && existing.status === 'published') {
-      console.log(`${num} SKIP ${t.slug} (already published — never reset published rows)`);
-      skipped++;
-      continue;
-    }
-
-    if (existing && existing.body_md && existing.body_md.trim().length > 200) {
-      console.log(`${num} SKIP ${t.slug} (already has body content)`);
-      skipped++;
-      continue;
-    }
-
+  // Single Claude draft attempt with bounded retry. Returns markdown or null.
+  async function draftOnce(t: Topic, audience: Audience, label: string): Promise<string | null> {
+    const systemPrompt = audience === 'patient' ? PATIENT_SYSTEM_PROMPT : CLINICIAN_SYSTEM_PROMPT;
+    const firstHeading = audience === 'patient' ? '## What This Protocol Is For' : '## Overview';
     const userPrompt = [
       `Draft the protocol for: **${t.title}**`,
       ``,
       `**Category:** ${t.category}`,
-      t.summary ? `**Clinical summary the page already shows:** ${t.summary}` : null,
+      t.summary ? `**Short summary the patient/clinician will already see at the top of the page:** ${t.summary}` : null,
       `**Peptides in this stack:**\n${t.peptides.map((p) => `- ${p}`).join('\n')}`,
       ``,
-      `Write the full protocol body in markdown, following the required structure exactly. Do not repeat the page title — start at the "## Overview" heading.`,
+      `Write the full protocol body in markdown for the ${audience === 'patient' ? 'PATIENT' : 'CLINICIAN'} audience, following the required structure exactly. Do not repeat the page title — start at the "${firstHeading}" heading.`,
     ]
       .filter((s) => s !== null)
       .join('\n');
 
-    // Bounded retry loop — Claude rate limits or transient failures shouldn't
-    // skip the topic entirely. Up to 3 attempts with growing backoff.
     let lastError: unknown = null;
-    let didSucceed = false;
-
-    for (let attempt = 1; attempt <= 3 && !didSucceed; attempt++) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         const response = await anthropic.messages.create({
           model: 'claude-opus-4-7',
@@ -270,7 +286,7 @@ async function main() {
           system: [
             {
               type: 'text',
-              text: SYSTEM_PROMPT,
+              text: systemPrompt,
               cache_control: { type: 'ephemeral' },
             },
           ],
@@ -283,87 +299,131 @@ async function main() {
           .join('\n')
           .trim();
 
-        // Treat very short responses as a refusal/error so re-runs retry the
-        // topic instead of silently saving a junk page.
         if (!markdown || markdown.length < 300) {
-          console.log(`${num} FAIL ${t.slug} (attempt ${attempt}: short/empty content len=${markdown.length}, stop_reason=${response.stop_reason})`);
-          lastError = new Error(`Short response (${markdown.length} chars, stop_reason=${response.stop_reason})`);
+          console.log(`${label} FAIL ${t.slug}/${audience} (attempt ${attempt}: short/empty len=${markdown.length}, stop_reason=${response.stop_reason})`);
+          lastError = new Error(`Short response (${markdown.length} chars)`);
           await new Promise((r) => setTimeout(r, 3000 * attempt));
           continue;
-        }
-
-        // Persist. Capture and surface Supabase errors — codex flagged that
-        // ignoring these silently reports DB failures as success.
-        const dbResult = existing
-          ? await supabase
-              .from('protocols')
-              .update({
-                body_md: markdown,
-                title: t.title,
-                category: t.category,
-                peptides: t.peptides,
-                summary: t.summary ?? null,
-                status: 'draft',
-              })
-              .eq('id', existing.id)
-          : await supabase.from('protocols').insert({
-              slug: t.slug,
-              title: t.title,
-              category: t.category,
-              peptides: t.peptides,
-              summary: t.summary ?? null,
-              body_md: markdown,
-              status: 'draft',
-              sort_order: 100 + i,
-            });
-
-        if (dbResult.error) {
-          console.log(`${num} FAIL ${t.slug} (db: ${dbResult.error.message})`);
-          lastError = dbResult.error;
-          break; // a DB error won't be fixed by retrying Claude
         }
 
         totalCacheReads += response.usage.cache_read_input_tokens ?? 0;
         totalInputTokens += response.usage.input_tokens;
         totalOutputTokens += response.usage.output_tokens;
-        drafted++;
-        didSucceed = true;
 
         const cacheNote = (response.usage.cache_read_input_tokens ?? 0) > 0 ? ' [cache hit]' : '';
         const retryNote = attempt > 1 ? ` (attempt ${attempt})` : '';
-        console.log(`${num} ✓ ${t.slug} (${markdown.length.toLocaleString()} chars, ${response.usage.output_tokens} out tokens)${cacheNote}${retryNote}`);
-
-        // Pacing between successful topics — keep RPM low and the prompt cache warm
-        await new Promise((r) => setTimeout(r, 1200));
+        console.log(`${label} ✓ ${t.slug}/${audience} (${markdown.length.toLocaleString()} chars, ${response.usage.output_tokens} out tokens)${cacheNote}${retryNote}`);
+        return markdown;
       } catch (err) {
         lastError = err;
         if (err instanceof Anthropic.RateLimitError) {
-          console.log(`${num} … rate limited (attempt ${attempt}), sleeping 60s`);
+          console.log(`${label} … rate limited (attempt ${attempt}), sleeping 60s`);
           await new Promise((r) => setTimeout(r, 60_000));
         } else if (err instanceof Anthropic.APIError && err.status >= 500) {
-          console.log(`${num} … server error (attempt ${attempt}, status=${err.status}), sleeping 15s`);
+          console.log(`${label} … server error ${err.status} (attempt ${attempt}), sleeping 15s`);
           await new Promise((r) => setTimeout(r, 15_000));
         } else {
           const msg = err instanceof Error ? err.message : String(err);
-          console.log(`${num} FAIL ${t.slug} (non-retryable: ${msg})`);
-          break; // non-retryable
+          console.log(`${label} FAIL ${t.slug}/${audience} (non-retryable: ${msg})`);
+          return null;
         }
       }
     }
+    const msg = lastError instanceof Error ? lastError.message : String(lastError);
+    console.log(`${label} GIVE-UP ${t.slug}/${audience} after 3 attempts: ${msg}`);
+    return null;
+  }
 
-    if (!didSucceed) {
-      const msg = lastError instanceof Error ? lastError.message : String(lastError);
-      console.log(`${num} GIVE-UP ${t.slug} after 3 attempts: ${msg}`);
-      failed++;
+  for (let i = 0; i < TOPICS.length; i++) {
+    const t = TOPICS[i];
+    const num = `[${String(i + 1).padStart(3, '0')}/${TOPICS.length}]`;
+
+    // Look up existing row — we need status + both body fields to decide
+    // what to draft. Skip published rows entirely; never reset them.
+    const { data: existing, error: lookupErr } = await supabase
+      .from('protocols')
+      .select('id, body_md, patient_md, status')
+      .eq('slug', t.slug)
+      .maybeSingle();
+
+    if (lookupErr) {
+      console.log(`${num} FAIL ${t.slug} (lookup: ${lookupErr.message})`);
+      for (const a of audiences) stats[a].failed++;
+      continue;
+    }
+
+    if (existing && existing.status === 'published') {
+      console.log(`${num} SKIP ${t.slug} (already published — never reset published rows)`);
+      for (const a of audiences) stats[a].skipped++;
+      continue;
+    }
+
+    // Ensure the row exists before drafting either audience. If the row is new
+    // (no existing.id), insert a stub with the metadata so subsequent saves
+    // can UPDATE by id.
+    let rowId = existing?.id;
+    if (!rowId) {
+      const { data: inserted, error: insErr } = await supabase
+        .from('protocols')
+        .insert({
+          slug: t.slug,
+          title: t.title,
+          category: t.category,
+          peptides: t.peptides,
+          summary: t.summary ?? null,
+          status: 'draft',
+          sort_order: 100 + i,
+        })
+        .select('id')
+        .single();
+      if (insErr || !inserted) {
+        console.log(`${num} FAIL ${t.slug} (insert stub: ${insErr?.message ?? 'no row returned'})`);
+        for (const a of audiences) stats[a].failed++;
+        continue;
+      }
+      rowId = inserted.id;
+    }
+
+    for (const audience of audiences) {
+      const field: 'body_md' | 'patient_md' = audience === 'patient' ? 'patient_md' : 'body_md';
+      const currentValue = audience === 'patient' ? existing?.patient_md : existing?.body_md;
+
+      if (currentValue && currentValue.trim().length > 200) {
+        console.log(`${num} SKIP ${t.slug}/${audience} (already populated)`);
+        stats[audience].skipped++;
+        continue;
+      }
+
+      const markdown = await draftOnce(t, audience, num);
+      if (!markdown) {
+        stats[audience].failed++;
+        continue;
+      }
+
+      const dbResult = await supabase
+        .from('protocols')
+        .update({ [field]: markdown, status: 'draft' })
+        .eq('id', rowId);
+
+      if (dbResult.error) {
+        console.log(`${num} FAIL ${t.slug}/${audience} (db: ${dbResult.error.message})`);
+        stats[audience].failed++;
+        continue;
+      }
+
+      stats[audience].drafted++;
+      await new Promise((r) => setTimeout(r, 1200));
     }
   }
 
-  console.log(`\nDone. Drafted: ${drafted} · Skipped: ${skipped} · Failed: ${failed}`);
+  console.log(`\nDone.`);
+  for (const a of audiences) {
+    console.log(`  ${a}: drafted ${stats[a].drafted} · skipped ${stats[a].skipped} · failed ${stats[a].failed}`);
+  }
   console.log(`Tokens: ${totalInputTokens.toLocaleString()} in (${totalCacheReads.toLocaleString()} cache reads) · ${totalOutputTokens.toLocaleString()} out`);
 
-  // Rough cost estimate at Opus 4.7 standard rates
   const inputCost = ((totalInputTokens - totalCacheReads) * 5 + totalCacheReads * 0.5) / 1_000_000;
-  const cacheWriteCost = (totalCacheReads > 0 ? 600 * 6.25 : 0) / 1_000_000; // first ~600 token system prompt at 1.25× write
+  const cacheWriteCost = (totalCacheReads > 0 ? audiences.length * 700 * 6.25 : 0) / 1_000_000;
   const outputCost = (totalOutputTokens * 25) / 1_000_000;
   console.log(`Approx Claude spend: $${(inputCost + cacheWriteCost + outputCost).toFixed(2)}`);
 }
