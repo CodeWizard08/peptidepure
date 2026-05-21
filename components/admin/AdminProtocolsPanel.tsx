@@ -8,14 +8,17 @@ type Protocol = {
   id: string;
   slug: string;
   title: string;
+  subtitle: string | null;
   category: string | null;
   summary: string | null;
   body_md: string;
   patient_md: string;
   peptides: string[];
+  tags: string[];
   image_url: string | null;
   status: Status;
   sort_order: number;
+  protocol_meta: Record<string, unknown>;
 };
 
 type Audience = 'clinician' | 'patient';
@@ -24,14 +27,17 @@ const EMPTY: Protocol = {
   id: '',
   slug: '',
   title: '',
+  subtitle: '',
   category: '',
   summary: '',
   body_md: '',
   patient_md: '',
   peptides: [],
+  tags: [],
   image_url: '',
   status: 'draft',
   sort_order: 0,
+  protocol_meta: {},
 };
 
 const STATUS_COLOR: Record<Status, { bg: string; color: string }> = {
@@ -54,8 +60,12 @@ export default function AdminProtocolsPanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [drafting, setDrafting] = useState<Audience | null>(null);
+  const [extractingMeta, setExtractingMeta] = useState(false);
   const [activeAudience, setActiveAudience] = useState<Audience>('clinician');
   const [draftInstructions, setDraftInstructions] = useState('');
+  const [sourceContent, setSourceContent] = useState('');
+  const [metaJsonText, setMetaJsonText] = useState('');
+  const [metaJsonError, setMetaJsonError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const showToast = useCallback((type: 'success' | 'error', message: string) => {
@@ -81,11 +91,17 @@ export default function AdminProtocolsPanel() {
   const startNew = () => {
     setSelected({ ...EMPTY });
     setDraftInstructions('');
+    setSourceContent('');
+    setMetaJsonText('{}');
+    setMetaJsonError(null);
   };
 
   const startEdit = (p: Protocol) => {
     setSelected({ ...p });
     setDraftInstructions('');
+    setSourceContent('');
+    setMetaJsonText(JSON.stringify(p.protocol_meta ?? {}, null, 2));
+    setMetaJsonError(null);
   };
 
   const updateField = <K extends keyof Protocol>(k: K, v: Protocol[K]) => {
@@ -109,6 +125,7 @@ export default function AdminProtocolsPanel() {
           category: selected.category,
           instructions: draftInstructions,
           audience,
+          sourceContent: sourceContent.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -121,7 +138,8 @@ export default function AdminProtocolsPanel() {
         ? ` · ${u.input_tokens}→${u.output_tokens} tokens${u.cache_read_input_tokens > 0 ? ` (${u.cache_read_input_tokens} cached)` : ''}`
         : '';
       const label = audience === 'patient' ? 'patient version' : 'clinician version';
-      showToast('success', `Claude drafted ${label} (${data.markdown.length.toLocaleString()} chars)${tokenSummary}`);
+      const mode = sourceContent.trim() ? 'rewrote' : 'drafted';
+      showToast('success', `Claude ${mode} ${label} (${data.markdown.length.toLocaleString()} chars)${tokenSummary}`);
     } catch (err) {
       showToast('error', err instanceof Error ? err.message : 'Draft failed');
     } finally {
@@ -136,19 +154,42 @@ export default function AdminProtocolsPanel() {
     const slug = selected.slug.trim() || slugify(selected.title);
     if (!/^[a-z0-9-]+$/.test(slug)) { showToast('error', 'Slug must be lowercase alphanumeric + hyphens'); return; }
 
+    // Parse the metadata JSON before submitting so the user gets a clear error.
+    let metaParsed: Record<string, unknown> = {};
+    try {
+      const trimmed = metaJsonText.trim() || '{}';
+      const parsed = JSON.parse(trimmed);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        metaParsed = parsed;
+        setMetaJsonError(null);
+      } else {
+        setMetaJsonError('Metadata must be a JSON object');
+        showToast('error', 'Metadata must be a JSON object');
+        return;
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Invalid JSON';
+      setMetaJsonError(msg);
+      showToast('error', `Metadata JSON: ${msg}`);
+      return;
+    }
+
     setSaving(true);
     try {
       const payload = {
         title: selected.title.trim(),
         slug,
+        subtitle: selected.subtitle?.trim() || null,
         category: selected.category?.trim() || null,
         summary: selected.summary?.trim() || null,
         body_md: selected.body_md ?? '',
         patient_md: selected.patient_md ?? '',
         peptides: selected.peptides,
+        tags: selected.tags,
         image_url: selected.image_url?.trim() || null,
         status: selected.status,
         sort_order: selected.sort_order,
+        protocol_meta: metaParsed,
       };
       const res = selected.id
         ? await fetch('/api/admin/protocols', {
@@ -165,11 +206,37 @@ export default function AdminProtocolsPanel() {
       if (!res.ok) throw new Error(data.error || 'Save failed');
       showToast('success', `Saved · ${selected.status}`);
       setSelected(data.protocol);
+      setMetaJsonText(JSON.stringify(data.protocol?.protocol_meta ?? {}, null, 2));
       await refresh();
     } catch (err) {
       showToast('error', err instanceof Error ? err.message : 'Save failed');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const extractMetaWithClaude = async () => {
+    if (!selected?.id) { showToast('error', 'Save the protocol first'); return; }
+    setExtractingMeta(true);
+    try {
+      const res = await fetch('/api/admin/protocols/extract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selected.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Extraction failed');
+      setSelected(data.protocol);
+      setMetaJsonText(JSON.stringify(data.protocol?.protocol_meta ?? {}, null, 2));
+      setMetaJsonError(null);
+      const u = data.usage;
+      const tokens = u ? ` · ${u.input_tokens}→${u.output_tokens} tokens` : '';
+      showToast('success', `Metadata extracted${tokens}`);
+      await refresh();
+    } catch (err) {
+      showToast('error', err instanceof Error ? err.message : 'Extraction failed');
+    } finally {
+      setExtractingMeta(false);
     }
   };
 
@@ -313,6 +380,28 @@ export default function AdminProtocolsPanel() {
                 />
               </Field>
 
+              <Field label="Subtitle (tagline under the title — e.g. 'Dual GIP/GLP-1 Receptor Agonist | Weight Loss & Diabetes')">
+                <input
+                  type="text"
+                  value={selected.subtitle ?? ''}
+                  onChange={(e) => updateField('subtitle', e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
+                  style={{ background: 'var(--off-white)', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
+                  placeholder="Receptor / mechanism class | Primary indications"
+                />
+              </Field>
+
+              <Field label="Tags (one per line — e.g. 'Injectable', 'FDA Approved', 'Weight Loss')">
+                <textarea
+                  value={selected.tags.join('\n')}
+                  onChange={(e) => updateField('tags', e.target.value.split('\n').map((s) => s.trim()).filter(Boolean))}
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-lg text-sm font-mono focus:outline-none"
+                  style={{ background: 'var(--off-white)', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
+                  placeholder="Injectable&#10;FDA Approved&#10;Weight Loss"
+                />
+              </Field>
+
               <Field label="Peptides (one per line, e.g. 'Tirz 10mg')">
                 <textarea
                   value={selected.peptides.join('\n')}
@@ -338,12 +427,51 @@ export default function AdminProtocolsPanel() {
               <div className="rounded-xl p-4" style={{ background: 'linear-gradient(135deg, var(--gold-pale) 0%, white 100%)', border: '1px solid rgba(200,149,44,0.35)' }}>
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: 'var(--gold)' }}>Draft with Claude</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: 'var(--gold)' }}>
+                      {sourceContent.trim() ? 'Upgrade with Claude (rewrite from source)' : 'Draft with Claude'}
+                    </p>
                     <p className="text-xs mt-1" style={{ color: 'var(--text-mid)' }}>
                       Two versions: clinician (technical, dosing schedules, evidence notes) and patient (plain language, what to expect, when to call). Each is independently drafted, edited, and saved.
                     </p>
                   </div>
                 </div>
+
+                {/* Source content — paste pep-pedia (or any reference) here to rewrite */}
+                <details className="mb-3 rounded-lg" style={{ background: 'white', border: '1px solid var(--border)' }}>
+                  <summary className="cursor-pointer px-3 py-2 text-xs font-semibold flex items-center justify-between" style={{ color: 'var(--navy)' }}>
+                    <span>
+                      Source content (paste from pep-pedia or similar — optional)
+                      {sourceContent.trim() && (
+                        <span className="ml-2 inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'var(--gold-pale)', color: 'var(--gold)' }}>
+                          {sourceContent.trim().length.toLocaleString()} chars
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-[10px] font-normal" style={{ color: 'var(--text-light)' }}>
+                      Claude will rewrite into Peptide Pure voice, not copy
+                    </span>
+                  </summary>
+                  <div className="px-3 pb-3">
+                    <textarea
+                      value={sourceContent}
+                      onChange={(e) => setSourceContent(e.target.value)}
+                      rows={8}
+                      className="w-full px-3 py-2 rounded-lg text-xs font-mono focus:outline-none"
+                      style={{ background: 'var(--off-white)', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
+                      placeholder="Paste the source article here (e.g. copied from pep-pedia.org). Claude treats it as factual reference, restructures into our required headings, and rewrites in our voice — no plagiarism."
+                    />
+                    {sourceContent.trim() && (
+                      <button
+                        onClick={() => setSourceContent('')}
+                        className="mt-2 text-[11px] font-semibold underline"
+                        style={{ color: 'var(--text-light)' }}
+                      >
+                        Clear source
+                      </button>
+                    )}
+                  </div>
+                </details>
+
                 <textarea
                   value={draftInstructions}
                   onChange={(e) => setDraftInstructions(e.target.value)}
@@ -359,7 +487,9 @@ export default function AdminProtocolsPanel() {
                     className="px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
                     style={{ background: !!drafting || !selected.title.trim() ? 'var(--text-light)' : 'var(--navy)' }}
                   >
-                    {drafting === 'clinician' ? 'Drafting clinician…' : 'Draft Clinician Version'}
+                    {drafting === 'clinician'
+                      ? (sourceContent.trim() ? 'Rewriting clinician…' : 'Drafting clinician…')
+                      : (sourceContent.trim() ? 'Upgrade Clinician Version' : 'Draft Clinician Version')}
                   </button>
                   <button
                     onClick={() => draftWithClaude('patient')}
@@ -370,11 +500,15 @@ export default function AdminProtocolsPanel() {
                       color: 'var(--navy)',
                     }}
                   >
-                    {drafting === 'patient' ? 'Drafting patient…' : 'Draft Patient Version'}
+                    {drafting === 'patient'
+                      ? (sourceContent.trim() ? 'Rewriting patient…' : 'Drafting patient…')
+                      : (sourceContent.trim() ? 'Upgrade Patient Version' : 'Draft Patient Version')}
                   </button>
                 </div>
                 <p className="text-[11px] mt-3" style={{ color: 'var(--text-light)' }}>
-                  Drafting overwrites the corresponding textarea below. Save before re-drafting if you want to keep prior content.
+                  {sourceContent.trim()
+                    ? 'Rewrite uses the source as a factual reference, restructures into our required headings, and produces original wording in Peptide Pure voice. Overwrites the corresponding textarea below.'
+                    : 'Drafting overwrites the corresponding textarea below. Save before re-drafting if you want to keep prior content.'}
                 </p>
               </div>
 
@@ -427,6 +561,52 @@ export default function AdminProtocolsPanel() {
                   />
                 </Field>
               )}
+
+              {/* Structured metadata (drives the pep-pedia-style detail page sections) */}
+              <div className="rounded-xl p-4" style={{ background: 'var(--off-white)', border: '1px solid var(--border)' }}>
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: 'var(--navy)' }}>
+                      Structured Metadata
+                    </p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-mid)' }}>
+                      Drives the hero stat band, Quick Start sidebar, dosing table, interactions, reconstitution, references, etc. on the protocol detail page. Use the button to (re)generate from the clinician body via Claude, then edit the JSON directly if needed.
+                    </p>
+                  </div>
+                  <button
+                    onClick={extractMetaWithClaude}
+                    disabled={extractingMeta || !selected.id || !selected.body_md.trim()}
+                    className="shrink-0 px-3.5 py-2 rounded-lg text-xs font-semibold text-white transition-all"
+                    style={{
+                      background: extractingMeta || !selected.id || !selected.body_md.trim() ? 'var(--text-light)' : 'var(--navy)',
+                    }}
+                  >
+                    {extractingMeta ? 'Extracting…' : 'Extract Metadata with Claude'}
+                  </button>
+                </div>
+                <textarea
+                  value={metaJsonText}
+                  onChange={(e) => { setMetaJsonText(e.target.value); setMetaJsonError(null); }}
+                  rows={12}
+                  spellCheck={false}
+                  className="w-full px-3 py-2 rounded-lg text-xs font-mono focus:outline-none"
+                  style={{
+                    background: 'white',
+                    border: metaJsonError ? '1px solid #DC2626' : '1px solid var(--border)',
+                    color: 'var(--text-dark)',
+                    lineHeight: 1.5,
+                  }}
+                  placeholder='{ "typical_dose": { "value": "2.5-15mg weekly", "detail": "Once weekly" }, ... }'
+                />
+                {metaJsonError && (
+                  <p className="text-[11px] mt-2" style={{ color: '#DC2626' }}>
+                    {metaJsonError}
+                  </p>
+                )}
+                <p className="text-[11px] mt-2" style={{ color: 'var(--text-light)' }}>
+                  Field reference: <code className="font-mono">lib/protocols/types.ts</code>. Save the protocol once before extracting — Claude pulls from the saved clinician body_md.
+                </p>
+              </div>
 
               {/* Share link helper — only when both versions exist + protocol is saved */}
               {selected.id && selected.patient_md.trim() && selected.status === 'published' && (

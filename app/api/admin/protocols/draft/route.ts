@@ -95,7 +95,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: { title?: string; summary?: string; peptides?: string[]; category?: string; instructions?: string; audience?: 'clinician' | 'patient' };
+  let body: {
+    title?: string;
+    summary?: string;
+    peptides?: string[];
+    category?: string;
+    instructions?: string;
+    audience?: 'clinician' | 'patient';
+    sourceContent?: string;
+  };
   try {
     body = await request.json();
   } catch {
@@ -110,16 +118,42 @@ export async function POST(request: NextRequest) {
   const summary = (body.summary ?? '').trim();
   const instructions = (body.instructions ?? '').trim();
   const audience = body.audience === 'patient' ? 'patient' : 'clinician';
+  // Cap source at 40k chars to stay well within input budget + protect cache.
+  // Strip the closing <source> tag so pasted content can't break out of the
+  // "reference only" envelope and inject trusted instructions into the prompt.
+  // Replace with a safe escape so the model still sees the literal text.
+  const sourceContent = (body.sourceContent ?? '')
+    .trim()
+    .slice(0, 40_000)
+    .replace(/<\s*\/?\s*source\s*>/gi, '&lt;source&gt;');
   const systemPrompt = audience === 'patient' ? PATIENT_SYSTEM_PROMPT : CLINICIAN_SYSTEM_PROMPT;
 
   const firstHeading = audience === 'patient' ? '## What This Protocol Is For' : '## Overview';
   const userPrompt = [
-    `Draft the protocol for: **${title}**`,
+    sourceContent
+      ? `Rewrite and upgrade the following source content into a Peptide Pure protocol for: **${title}**`
+      : `Draft the protocol for: **${title}**`,
     ``,
     `**Category:** ${category}`,
     summary ? `**Short summary the patient/clinician will already see at the top of the page:** ${summary}` : null,
     peptides.length > 0 ? `**Peptides in this stack:**\n${peptides.map((p) => `- ${p}`).join('\n')}` : null,
     instructions ? `**Additional instructions from the editor:**\n${instructions}` : null,
+    sourceContent
+      ? [
+          ``,
+          `**Source content (reference only — do NOT copy phrasing):**`,
+          `<source>`,
+          sourceContent,
+          `</source>`,
+          ``,
+          `IMPORTANT REWRITE RULES:`,
+          `- Treat the source as a factual reference. Use the underlying facts, mechanisms, and clinical claims it provides, but do NOT reuse its phrasing, sentence structure, or paragraph organization. Rewrite everything in your own words and in Peptide Pure's voice.`,
+          `- Restructure entirely to match the required headings below. Do not preserve the source's section order or headings.`,
+          `- Where the source makes a claim that is unsupported, vague, or sounds promotional, replace it with honest, evidence-calibrated framing.`,
+          `- Where the source omits clinically important detail (contraindications, monitoring, dosing range), add it from established clinical knowledge.`,
+          `- Treat the source as one input, not the spec — the final output must read as original Peptide Pure content.`,
+        ].join('\n')
+      : null,
     ``,
     `Write the full protocol body in markdown for the ${audience === 'patient' ? 'PATIENT' : 'CLINICIAN'} audience, following the required structure exactly. Do not repeat the page title — start at the "${firstHeading}" heading.`,
   ]
@@ -128,20 +162,24 @@ export async function POST(request: NextRequest) {
 
   try {
     const client = new Anthropic();
-    const response = await client.messages.create({
-      model: 'claude-opus-4-7',
-      max_tokens: 8000,
-      thinking: { type: 'adaptive' },
-      output_config: { effort: 'high' },
-      system: [
-        {
-          type: 'text',
-          text: systemPrompt,
-          cache_control: { type: 'ephemeral' },
-        },
-      ],
-      messages: [{ role: 'user', content: userPrompt }],
-    });
+    const response = await client.messages.create(
+      {
+        model: 'claude-opus-4-7',
+        max_tokens: 8000,
+        thinking: { type: 'adaptive' },
+        output_config: { effort: 'high' },
+        system: [
+          {
+            type: 'text',
+            text: systemPrompt,
+            cache_control: { type: 'ephemeral' },
+          },
+        ],
+        messages: [{ role: 'user', content: userPrompt }],
+      },
+      // Adaptive thinking + high effort can run long; 120s is a generous ceiling.
+      { signal: AbortSignal.timeout(120_000) },
+    );
 
     // Extract text blocks only — thinking blocks are returned as well but the
     // admin wants the prose, not the reasoning trace.

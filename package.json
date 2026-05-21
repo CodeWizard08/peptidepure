@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "batch-draft-protocols": "tsx scripts/batch-draft-protocols.ts"
+    "batch-draft-protocols": "tsx scripts/batch-draft-protocols.ts",
+    "embed-protocols": "tsx scripts/embed-protocols.ts",
+    "extract-protocol-metadata": "tsx scripts/extract-protocol-metadata.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.97.1",

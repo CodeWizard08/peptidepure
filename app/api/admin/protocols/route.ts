@@ -59,15 +59,21 @@ export async function POST(request: NextRequest) {
     .insert({
       title,
       slug,
+      subtitle: (body.subtitle as string | null) ?? null,
       category: (body.category as string | null) ?? null,
       summary: (body.summary as string | null) ?? null,
       body_md: (body.body_md as string | null) ?? '',
       patient_md: (body.patient_md as string | null) ?? '',
       peptides: Array.isArray(body.peptides) ? body.peptides : [],
+      tags: Array.isArray(body.tags) ? body.tags.filter((t) => typeof t === 'string') : [],
       image_url: (body.image_url as string | null) ?? null,
       status,
       sort_order: typeof body.sort_order === 'number' ? body.sort_order : 0,
       metadata: (body.metadata as Record<string, unknown>) ?? {},
+      protocol_meta:
+        body.protocol_meta && typeof body.protocol_meta === 'object'
+          ? body.protocol_meta
+          : {},
     })
     .select('*')
     .single();
@@ -107,16 +113,21 @@ export async function PATCH(request: NextRequest) {
   const update: Record<string, unknown> = {};
   if (typeof body.title === 'string') update.title = body.title;
   if (typeof body.slug === 'string') update.slug = body.slug;
+  if (body.subtitle !== undefined) update.subtitle = body.subtitle ?? null;
   if (body.category !== undefined) update.category = body.category ?? null;
   if (body.summary !== undefined) update.summary = body.summary ?? null;
   if (typeof body.body_md === 'string') update.body_md = body.body_md;
   if (typeof body.patient_md === 'string') update.patient_md = body.patient_md;
   if (Array.isArray(body.peptides)) update.peptides = body.peptides.filter((p) => typeof p === 'string');
+  if (Array.isArray(body.tags)) update.tags = body.tags.filter((t) => typeof t === 'string');
   if (body.image_url !== undefined) update.image_url = body.image_url ?? null;
   if (typeof body.status === 'string') update.status = body.status;
   if (typeof body.sort_order === 'number') update.sort_order = body.sort_order;
   if (body.metadata !== undefined && typeof body.metadata === 'object' && body.metadata !== null) {
     update.metadata = body.metadata;
+  }
+  if (body.protocol_meta !== undefined && typeof body.protocol_meta === 'object' && body.protocol_meta !== null) {
+    update.protocol_meta = body.protocol_meta;
   }
 
   if (Object.keys(update).length === 0) {

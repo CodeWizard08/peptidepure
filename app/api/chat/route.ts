@@ -4,6 +4,21 @@ import { createClient } from '@/lib/supabase/server';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+// RAG retrieval constants — keep in sync with scripts/embed-protocols.ts
+const EMBEDDING_MODEL = 'text-embedding-3-small';
+const EMBEDDING_DIM = 1536;
+const RETRIEVAL_COUNT = 5;
+const RETRIEVAL_MIN_SIMILARITY = 0.30;
+
+type Chunk = {
+  protocol_id: string;
+  slug: string;
+  title: string;
+  heading: string | null;
+  chunk_text: string;
+  similarity: number;
+};
+
 const SYSTEM_PROMPT = `You are a clinical AI assistant for PeptidePure™, a clinician-only peptide sourcing and research platform. You help licensed clinicians with peptide compound information, reconstitution math, dosing protocols, injection techniques, storage, clinical pearls, and safety considerations.
 
 IMPORTANT:
@@ -282,6 +297,80 @@ Longevity: NAD+ IV + Epithalon + MOTS-c + 5-Amino-1MQ
 Sexual Health (Male): PT-141 + Tadalafil + Kisspeptin (or HCG on TRT)
 Sexual Health (Female): PT-141 + low-dose Oxytocin`;
 
+/**
+ * Embed the user's most recent question and retrieve the top-K protocol
+ * chunks via the match_protocol_chunks RPC. Returns [] on any failure so a
+ * RAG outage degrades gracefully to the original static-knowledge chatbot.
+ */
+async function retrieveContext(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userQuery: string,
+): Promise<Chunk[]> {
+  if (!userQuery.trim()) return [];
+  try {
+    const embedRes = await openai.embeddings.create(
+      {
+        model: EMBEDDING_MODEL,
+        input: userQuery,
+        dimensions: EMBEDDING_DIM,
+      },
+      // Embedding is fast (<2s typical); 15s is a generous ceiling that lets
+      // the chat fall back to no-RAG behavior rather than hang the streaming
+      // response on a slow embedding call.
+      { signal: AbortSignal.timeout(15_000) },
+    );
+    const queryEmbedding = embedRes.data[0]?.embedding;
+    if (!queryEmbedding) return [];
+
+    const { data, error } = await supabase.rpc('match_protocol_chunks', {
+      query_embedding: queryEmbedding as unknown as string,
+      match_count: RETRIEVAL_COUNT,
+      target_audience: 'clinician',
+      min_similarity: RETRIEVAL_MIN_SIMILARITY,
+    });
+    if (error) {
+      console.error('[chat] RAG retrieval failed:', error.message);
+      return [];
+    }
+
+    // Defensive runtime shape check — a future RPC change could otherwise
+    // inject undefined fields into the system prompt as "undefined" strings.
+    const rows = Array.isArray(data) ? data : [];
+    return rows.filter((r): r is Chunk => {
+      if (!r || typeof r !== 'object') return false;
+      const rec = r as Record<string, unknown>;
+      return (
+        typeof rec.slug === 'string' && rec.slug.length > 0 &&
+        typeof rec.title === 'string' && rec.title.length > 0 &&
+        typeof rec.chunk_text === 'string' && rec.chunk_text.length > 0 &&
+        typeof rec.similarity === 'number'
+      );
+    });
+  } catch (err) {
+    console.error('[chat] RAG embed error:', err instanceof Error ? err.message : err);
+    return [];
+  }
+}
+
+function formatRagContext(chunks: Chunk[]): string {
+  if (chunks.length === 0) return '';
+  const sections = chunks.map((c, i) => {
+    const head = c.heading ? ` — ${c.heading}` : '';
+    return `### Source ${i + 1}: ${c.title}${head}\n` +
+      `Citation: [/protocols/${c.slug}](/protocols/${c.slug})\n\n` +
+      c.chunk_text;
+  });
+  return [
+    '═══════════════════════════════════════',
+    'RETRIEVED PROTOCOL CONTEXT (top matches from Peptide Pure clinical library)',
+    '═══════════════════════════════════════',
+    '',
+    'The following sections were retrieved from the Peptide Pure protocol library based on the user\'s latest question. Treat them as authoritative grounding for this turn. When you draw on a source, cite it by linking to its /protocols/<slug> URL in markdown (e.g. "see [BPC-157 GI Healing Protocol](/protocols/bpc-157-gi-healing)"). If the retrieved context is not relevant to the question, ignore it and answer from your general knowledge above.',
+    '',
+    ...sections,
+  ].join('\n');
+}
+
 export async function POST(req: NextRequest) {
   // Auth check — only logged-in clinicians can use the chatbot
   const supabase = await createClient();
@@ -298,13 +387,24 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: 'No messages provided' }), { status: 400 });
   }
 
+  // RAG step: retrieve top-K matching chunks for the user's most recent
+  // question (last 'user' message). Degrades gracefully if retrieval fails.
+  const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
+  const ragChunks = await retrieveContext(supabase, lastUserMessage);
+  const ragContext = formatRagContext(ragChunks);
+
+  const systemMessages: { role: 'system'; content: string }[] = [
+    { role: 'system', content: SYSTEM_PROMPT },
+  ];
+  if (ragContext) systemMessages.push({ role: 'system', content: ragContext });
+
   // Stream the response
   const stream = await openai.chat.completions.create({
     model: 'gpt-4o',
     max_tokens: 1024,
     stream: true,
     messages: [
-      { role: 'system', content: SYSTEM_PROMPT },
+      ...systemMessages,
       ...messages,
     ],
   });
