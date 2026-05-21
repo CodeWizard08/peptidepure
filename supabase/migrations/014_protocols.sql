@@ -45,9 +45,34 @@ ALTER TABLE protocols ADD COLUMN IF NOT EXISTS updated_at   timestamptz NOT NULL
 -- to the pre-existing table).
 CREATE UNIQUE INDEX IF NOT EXISTS protocols_slug_key ON protocols(slug);
 
--- Make sure the status CHECK constraint exists (CREATE TABLE skipped it on
--- a pre-existing table). Drop-and-readd to handle the case where an older
--- constraint allowed different values.
+-- If the pre-existing `status` column is an enum type (e.g. `protocol_status`
+-- with values that don't include 'published'), the CHECK constraint below
+-- can't coerce. Convert it to text first, preserving existing values.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_attribute a
+    JOIN pg_class c ON a.attrelid = c.oid
+    JOIN pg_type t ON a.atttypid = t.oid
+    WHERE c.relname = 'protocols'
+      AND a.attname = 'status'
+      AND t.typtype = 'e'
+  ) THEN
+    EXECUTE 'ALTER TABLE protocols ALTER COLUMN status TYPE text USING status::text';
+    EXECUTE 'ALTER TABLE protocols ALTER COLUMN status SET NOT NULL';
+    EXECUTE 'ALTER TABLE protocols ALTER COLUMN status SET DEFAULT ''draft''';
+  END IF;
+END $$;
+
+-- Normalize any pre-existing status values that don't match our expected set
+-- so the CHECK constraint can be added cleanly. Rows with unknown statuses
+-- get moved to 'draft' (safe — hidden from public).
+UPDATE protocols
+SET status = 'draft'
+WHERE status IS NULL OR status NOT IN ('draft','published','archived');
+
+-- (Re)add the status CHECK constraint so all three values are accepted.
 DO $$
 BEGIN
   IF EXISTS (
