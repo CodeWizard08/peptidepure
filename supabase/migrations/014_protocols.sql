@@ -6,6 +6,65 @@
 -- drafts and Scott edits. status='draft' hides from public; 'published'
 -- shows on /protocols and /protocols/<slug>.
 
+-- ───────────────────────────────────────────────────────────────────────────
+-- PRELUDE: rename the legacy patient-protocol tracker out of the way.
+--
+-- The Supabase instance has a pre-existing `protocols` table from a different
+-- feature (per-patient prescribed protocols with patient_id, dosing_schedule,
+-- monitoring_schedule, progress_percent, ai_rationale, etc.) plus its own
+-- `protocol_status` enum (draft/active/paused/completed/cancelled).
+--
+-- That schema is incompatible with what /protocols + /admin → Protocols
+-- needs (editorial pages with body_md, peptides, image_url). Moving the
+-- legacy table to `patient_protocols` preserves all its data and gives our
+-- migration a clean slate. The legacy table currently has no application
+-- code referencing it by name; this rename is safe.
+-- ───────────────────────────────────────────────────────────────────────────
+DO $$
+BEGIN
+  -- Discriminator: the patient tracker has a patient_id column. Our editorial
+  -- table never will. Use that to decide whether a rename is needed.
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'protocols' AND column_name = 'patient_id'
+  ) THEN
+    -- Drop the editorial columns and indexes/policies/triggers we may have
+    -- added in earlier attempts to make 014 idempotent. These are all empty
+    -- or unused on the patient-tracker table, so no data is lost.
+    ALTER TABLE protocols DROP COLUMN IF EXISTS slug;
+    ALTER TABLE protocols DROP COLUMN IF EXISTS title;
+    ALTER TABLE protocols DROP COLUMN IF EXISTS category;
+    ALTER TABLE protocols DROP COLUMN IF EXISTS summary;
+    ALTER TABLE protocols DROP COLUMN IF EXISTS body_md;
+    ALTER TABLE protocols DROP COLUMN IF EXISTS peptides;
+    ALTER TABLE protocols DROP COLUMN IF EXISTS image_url;
+    ALTER TABLE protocols DROP COLUMN IF EXISTS sort_order;
+    ALTER TABLE protocols DROP COLUMN IF EXISTS metadata;
+    ALTER TABLE protocols DROP COLUMN IF EXISTS patient_md;
+    ALTER TABLE protocols DROP CONSTRAINT IF EXISTS protocols_status_check;
+    DROP INDEX IF EXISTS public.protocols_slug_key;
+    DROP INDEX IF EXISTS public.idx_protocols_status_sort;
+    DROP INDEX IF EXISTS public.idx_protocols_category_published;
+    DROP POLICY IF EXISTS "Anyone can view published protocols" ON protocols;
+    DROP TRIGGER IF EXISTS protocols_updated_at ON protocols;
+
+    -- Rename the legacy patient-protocol table out of the way.
+    ALTER TABLE protocols RENAME TO patient_protocols;
+  END IF;
+
+  -- Rename the conflicting enum if it still exists. (A prior 014 attempt may
+  -- have converted the column to text, in which case the enum is unused but
+  -- still defined — rename it anyway so future migrations don't collide.)
+  IF EXISTS (
+    SELECT 1 FROM pg_type
+    WHERE typname = 'protocol_status' AND typtype = 'e'
+      AND typnamespace = 'public'::regnamespace
+  ) THEN
+    ALTER TYPE protocol_status RENAME TO patient_protocol_status;
+  END IF;
+END $$;
+-- ───────────────────────────────────────────────────────────────────────────
+
 CREATE TABLE IF NOT EXISTS protocols (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   slug         text NOT NULL UNIQUE,
