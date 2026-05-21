@@ -23,6 +23,44 @@ CREATE TABLE IF NOT EXISTS protocols (
   updated_at   timestamptz NOT NULL DEFAULT now()
 );
 
+-- Defensive: if a `protocols` table existed before this migration with a
+-- different shape (different Claude session, prior tooling, hand-rolled
+-- experiment), CREATE TABLE IF NOT EXISTS skipped silently. Add each
+-- expected column individually so the rest of the migration works.
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS slug         text;
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS title        text;
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS category     text;
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS summary      text;
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS body_md      text NOT NULL DEFAULT '';
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS peptides     text[] NOT NULL DEFAULT '{}';
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS image_url    text;
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS status       text NOT NULL DEFAULT 'draft';
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS sort_order   integer NOT NULL DEFAULT 0;
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS metadata     jsonb NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS created_at   timestamptz NOT NULL DEFAULT now();
+ALTER TABLE protocols ADD COLUMN IF NOT EXISTS updated_at   timestamptz NOT NULL DEFAULT now();
+
+-- Make slug unique if it isn't already (CREATE UNIQUE INDEX is idempotent
+-- via IF NOT EXISTS; the constraint shape inside CREATE TABLE didn't apply
+-- to the pre-existing table).
+CREATE UNIQUE INDEX IF NOT EXISTS protocols_slug_key ON protocols(slug);
+
+-- Make sure the status CHECK constraint exists (CREATE TABLE skipped it on
+-- a pre-existing table). Drop-and-readd to handle the case where an older
+-- constraint allowed different values.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'protocols_status_check'
+      AND conrelid = 'protocols'::regclass
+  ) THEN
+    ALTER TABLE protocols DROP CONSTRAINT protocols_status_check;
+  END IF;
+  ALTER TABLE protocols
+    ADD CONSTRAINT protocols_status_check CHECK (status IN ('draft','published','archived'));
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_protocols_status_sort
   ON protocols(status, sort_order);
 
