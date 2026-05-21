@@ -115,6 +115,7 @@ export default function Header() {
   const navLinks = [
     { label: 'All Peptides', href: '/peptides', section: 'main' as const },
     { label: 'Protocols', href: '/protocols', section: 'main' as const },
+    { label: 'AI Sherpa', href: '/ai-sherpa', section: 'main' as const, requiresAuth: true, featured: true as const },
     { label: 'Our Company', href: '/our-company', section: 'main' as const },
     { label: 'COA', href: '/coa', section: 'main' as const },
     { label: 'How It Works', href: '/how-it-works', section: 'main' as const, requiresAuth: true },
@@ -215,6 +216,21 @@ export default function Header() {
                       </div>
                     )}
                   </div>
+                ) : 'featured' in link && link.featured ? (
+                  // Featured nav link — gold-accented to draw attention (AI Sherpa).
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="px-3.5 py-2 text-sm font-bold rounded-md transition-all duration-200 inline-flex items-center gap-1.5"
+                    style={{
+                      background: pathname === link.href ? 'var(--gold)' : 'rgba(200,149,44,0.14)',
+                      color: pathname === link.href ? 'var(--navy)' : 'var(--gold)',
+                      border: '1px solid rgba(200,149,44,0.45)',
+                    }}
+                  >
+                    <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ background: pathname === link.href ? 'var(--navy)' : 'var(--gold)' }} aria-hidden />
+                    {link.label}
+                  </Link>
                 ) : (
                   <Link
                     key={link.href}

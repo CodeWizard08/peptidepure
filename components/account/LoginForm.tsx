@@ -1,14 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Field, PasswordField } from './AccountPrimitives';
 import { MailIcon } from './AccountIcons';
 
+// Only allow same-origin relative paths as a post-login redirect target.
+// Rejects external URLs, protocol-relative URLs ("//evil.com"), and anything
+// that doesn't start with a single forward slash.
+function safeNextPath(raw: string | null): string | null {
+  if (!raw) return null;
+  if (!raw.startsWith('/')) return null;
+  if (raw.startsWith('//')) return null;
+  if (raw.startsWith('/\\')) return null;
+  return raw;
+}
+
 export default function LoginForm() {
   const supabase = createClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,9 +32,16 @@ export default function LoginForm() {
     setError('');
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { setError(error.message); setLoading(false); }
-    else if (data.user?.app_metadata?.role === 'admin') { router.push('/admin'); }
-    else { router.refresh(); }
+    if (error) { setError(error.message); setLoading(false); return; }
+
+    const next = safeNextPath(searchParams.get('next'));
+    if (data.user?.app_metadata?.role === 'admin') {
+      router.push(next ?? '/admin');
+    } else if (next) {
+      router.push(next);
+    } else {
+      router.refresh();
+    }
   };
 
   const handleResetPassword = async () => {
