@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -41,6 +41,17 @@ export default function SherpaConsole() {
       transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // When streaming ends, return focus to the textarea so the user can ask the
+  // follow-up immediately (the form was unmounted during streaming, so focus
+  // would otherwise land nowhere).
+  const wasStreamingRef = useRef(false);
+  useEffect(() => {
+    if (wasStreamingRef.current && !streaming) {
+      inputRef.current?.focus();
+    }
+    wasStreamingRef.current = streaming;
+  }, [streaming]);
 
   const ask = useCallback(async (text: string) => {
     const trimmed = text.trim();
@@ -117,10 +128,19 @@ export default function SherpaConsole() {
       setStreaming(false);
       abortRef.current = null;
       inFlightRef.current = false;
+      stoppingRef.current = false;
+      setStopping(false);
     }
   }, [messages]);
 
+  // Guards against a double-click on the Stop button between abort signal
+  // and the fetch/read loop's finally{} unwinding.
+  const stoppingRef = useRef(false);
+  const [stopping, setStopping] = useState(false);
   const stop = () => {
+    if (stoppingRef.current) return;
+    stoppingRef.current = true;
+    setStopping(true);
     abortRef.current?.abort();
   };
 
@@ -130,7 +150,9 @@ export default function SherpaConsole() {
     abortRef.current?.abort();
     abortRef.current = null;
     inFlightRef.current = false;
+    stoppingRef.current = false;
     setStreaming(false);
+    setStopping(false);
     setMessages([]);
     setError(null);
     setInput('');
@@ -150,6 +172,14 @@ export default function SherpaConsole() {
   };
 
   const hasConversation = messages.length > 0;
+  // The user prompt currently being answered. While streaming, the messages
+  // tail is always [..., user, assistant_placeholder], so the second-to-last
+  // message is the prompt we're waiting on — O(1), no array copy.
+  const lastUserPrompt = useMemo(() => {
+    if (!streaming || messages.length < 2) return '';
+    const prev = messages[messages.length - 2];
+    return prev.role === 'user' ? prev.content : '';
+  }, [streaming, messages]);
 
   return (
     <section style={{ background: '#06112E' }} aria-labelledby="sherpa-heading">
@@ -186,51 +216,87 @@ export default function SherpaConsole() {
             Drop a symptom. Ask about a stack. Get a protocol summary. AI Sherpa is grounded in the Peptide Pure protocol library, IRB-aligned research, and house clinical knowledge. It answers questions, surfaces protocols, and flags when you should escalate to a colleague. Logged queries are used to improve the model — not to track you.
           </p>
 
-          {/* Query input */}
-          <form
-            onSubmit={onSubmit}
-            className="flex flex-col sm:flex-row gap-3 mb-6 rounded-xl p-2"
-            style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid var(--gold)' }}
-          >
-            <div className="flex items-start gap-3 flex-1 px-3 py-2">
-              <span className="font-mono text-lg pt-0.5" style={{ color: 'var(--gold)' }}>{'>'}</span>
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={onKeyDown}
-                rows={1}
-                disabled={streaming}
-                aria-label="Ask AI Sherpa"
-                className="flex-1 bg-transparent text-white text-sm sm:text-base placeholder:text-white/40 focus:outline-none resize-none font-mono"
-                style={{ minHeight: '24px', maxHeight: '180px', lineHeight: 1.5 }}
-                placeholder="e.g. patient is 52F with persistent rotator-cuff pain post-op, what's the highest-evidence protocol?"
-              />
+          {/* Query input — swaps to a "Sherpa is thinking" status card while streaming.
+              The wrapper has a fixed minHeight so the surrounding layout doesn't jump
+              when the form / status card swap on the streaming flip. */}
+          <div className="mb-6" style={{ minHeight: '76px' }}>
+          {streaming ? (
+            <div
+              className="flex items-center gap-4 rounded-xl px-4 py-3.5"
+              style={{
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid rgba(200,149,44,0.5)',
+                boxShadow: '0 0 32px rgba(200,149,44,0.08)',
+                minHeight: '76px',
+              }}
+              role="status"
+              aria-live="polite"
+            >
+              <span className="sherpa-scan inline-block w-2.5 h-2.5 rounded-full shrink-0" style={{ background: 'var(--gold)' }} aria-hidden />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] font-mono mb-1" style={{ color: 'var(--gold)' }}>
+                  Sherpa is thinking
+                </p>
+                <p className="text-sm font-mono truncate" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                  {lastUserPrompt || '…'}
+                </p>
+              </div>
+              <span className="sherpa-dots font-mono text-xl shrink-0" style={{ color: 'var(--gold)' }} aria-hidden>
+                <span>.</span><span>.</span><span>.</span>
+              </span>
+              <button
+                type="button"
+                onClick={stop}
+                disabled={stopping}
+                className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider font-mono transition-colors hover:bg-red-500/20 disabled:cursor-not-allowed"
+                style={{
+                  color: stopping ? 'rgba(252,165,165,0.45)' : '#fca5a5',
+                  border: '1px solid rgba(220,38,38,0.55)',
+                  background: 'rgba(220,38,38,0.08)',
+                  opacity: stopping ? 0.55 : 1,
+                }}
+                aria-label="Stop generation"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden>
+                  <rect width="10" height="10" rx="1" />
+                </svg>
+                {stopping ? 'Stopping…' : 'Stop'}
+              </button>
             </div>
-            <div className="flex gap-2">
-              {streaming && (
-                <button
-                  type="button"
-                  onClick={stop}
-                  className="px-4 py-2.5 rounded-lg text-sm font-bold transition-colors"
-                  style={{ background: 'rgba(220,38,38,0.18)', color: '#fca5a5', border: '1px solid rgba(220,38,38,0.5)' }}
-                >
-                  STOP
-                </button>
-              )}
+          ) : (
+            <form
+              onSubmit={onSubmit}
+              className="flex flex-col sm:flex-row gap-3 rounded-xl p-2"
+              style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid var(--gold)', minHeight: '76px' }}
+            >
+              <div className="flex items-start gap-3 flex-1 px-3 py-2">
+                <span className="font-mono text-lg pt-0.5" style={{ color: 'var(--gold)' }}>{'>'}</span>
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  rows={1}
+                  aria-label="Ask AI Sherpa"
+                  className="flex-1 bg-transparent text-white text-sm sm:text-base placeholder:text-white/40 focus:outline-none font-mono"
+                  style={{ minHeight: '24px', maxHeight: '180px', lineHeight: 1.5, resize: 'none' }}
+                  placeholder="e.g. patient is 52F with persistent rotator-cuff pain post-op, what's the highest-evidence protocol?"
+                />
+              </div>
               <button
                 type="submit"
-                disabled={streaming || !input.trim()}
+                disabled={!input.trim()}
                 className="px-5 py-2.5 rounded-lg text-sm font-bold transition-all"
                 style={{
-                  background: streaming || !input.trim() ? 'rgba(200,149,44,0.35)' : 'var(--gold)',
+                  background: !input.trim() ? 'rgba(200,149,44,0.35)' : 'var(--gold)',
                   color: 'var(--navy)',
                 }}
               >
-                {streaming ? 'THINKING…' : 'ASK →'}
+                Ask →
               </button>
-            </div>
-          </form>
+            </form>
+          )}
+          </div>
 
           {/* Suggestions */}
           {!hasConversation && (
@@ -270,24 +336,43 @@ export default function SherpaConsole() {
                 maxHeight: '60vh',
               }}
             >
-              {messages.map((m, i) => (
-                <div key={i} className="mb-6 last:mb-0">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] font-mono mb-2" style={{ color: m.role === 'user' ? 'rgba(255,255,255,0.5)' : 'var(--gold)' }}>
-                    {m.role === 'user' ? `${'//'} YOU` : `${'//'} SHERPA`}
-                  </p>
-                  {m.role === 'user' ? (
-                    <p className="text-sm leading-relaxed text-white whitespace-pre-wrap">{m.content}</p>
-                  ) : (
-                    <div className="sherpa-md text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.92)' }}>
-                      {m.content ? (
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
-                      ) : (
-                        <p className="font-mono text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>retrieving protocol context…</p>
+              {messages.map((m, i) => {
+                const isLast = i === messages.length - 1;
+                const isStreamingHere = streaming && isLast && m.role === 'assistant';
+                return (
+                  <div key={i} className="mb-6 last:mb-0">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.22em] font-mono mb-2 flex items-center gap-2" style={{ color: m.role === 'user' ? 'rgba(255,255,255,0.5)' : 'var(--gold)' }}>
+                      <span>{m.role === 'user' ? `${'//'} YOU` : `${'//'} SHERPA`}</span>
+                      {isStreamingHere && (
+                        <span className="sherpa-scan inline-block w-1.5 h-1.5 rounded-full" style={{ background: 'var(--gold)' }} aria-hidden />
                       )}
-                    </div>
-                  )}
-                </div>
-              ))}
+                    </p>
+                    {m.role === 'user' ? (
+                      <p className="text-sm leading-relaxed text-white whitespace-pre-wrap">{m.content}</p>
+                    ) : m.content ? (
+                      <div className="sherpa-md text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.92)' }}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                        {isStreamingHere && (
+                          /* Cursor outside ReactMarkdown so a mid-token pause */
+                          /* (e.g. unclosed **bold** or [link]() during stream)  */
+                          /* cannot drag the glyph into a half-parsed node.       */
+                          <span className="sherpa-cursor" aria-hidden style={{ color: 'var(--gold)', marginLeft: '2px' }}>▍</span>
+                        )}
+                      </div>
+                    ) : (
+                      // Pre-content streaming state — animated skeleton + status text.
+                      <div className="flex items-center gap-3">
+                        <span className="sherpa-dots font-mono text-2xl" style={{ color: 'var(--gold)' }} aria-hidden>
+                          <span>.</span><span>.</span><span>.</span>
+                        </span>
+                        <span className="font-mono text-xs" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                          reading the protocol library
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
               {error && (
                 <div className="sherpa-md text-sm rounded-lg p-3 mt-3" style={{ background: 'rgba(220,38,38,0.12)', color: '#fca5a5', border: '1px solid rgba(220,38,38,0.35)' }}>
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{error}</ReactMarkdown>
@@ -406,6 +491,26 @@ export default function SherpaConsole() {
           text-align: left;
         }
         .sherpa-md th { background: rgba(255,255,255,0.05); color: var(--gold); }
+
+        /* Pulsing scanner dot — slow throb on the gold indicator while Sherpa is thinking. */
+        @keyframes sherpa-scan-pulse {
+          0%, 100% { opacity: 0.35; transform: scale(0.85); box-shadow: 0 0 0 0 rgba(200,149,44,0.4); }
+          50%      { opacity: 1;    transform: scale(1);    box-shadow: 0 0 12px 2px rgba(200,149,44,0.45); }
+        }
+        .sherpa-scan { animation: sherpa-scan-pulse 1.4s ease-in-out infinite; }
+
+        /* Three bouncing dots, sequenced 0/0.15/0.3s. */
+        @keyframes sherpa-dot {
+          0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+          40%           { opacity: 1;    transform: translateY(-4px); }
+        }
+        .sherpa-dots span { display: inline-block; animation: sherpa-dot 1.2s ease-in-out infinite; line-height: 1; }
+        .sherpa-dots span:nth-child(2) { animation-delay: 0.15s; }
+        .sherpa-dots span:nth-child(3) { animation-delay: 0.30s; }
+
+        /* Streaming-response cursor — blink at ~1Hz */
+        @keyframes sherpa-cursor-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+        .sherpa-cursor { display: inline-block; animation: sherpa-cursor-blink 1s steps(2) infinite; font-weight: 700; }
       `}</style>
     </section>
   );
