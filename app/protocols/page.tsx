@@ -3,6 +3,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import PageHero from '@/components/sections/PageHero';
+import SherpaConsole from '@/components/ai-sherpa/SherpaConsole';
+import SherpaSignedOut from '@/components/ai-sherpa/SherpaSignedOut';
+
+// The Sherpa console is auth-aware (logged-in clinicians get the live input;
+// anon visitors get the sign-in CTA), so this page must be rendered per
+// request rather than cached.
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Clinical Protocols',
@@ -41,12 +48,18 @@ function safeImage(url: string | null): boolean {
 
 export default async function ProtocolsIndex() {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from('protocols')
-    .select('id, slug, title, category, summary, peptides, image_url, sort_order')
-    .eq('status', 'published')
-    .order('sort_order', { ascending: true })
-    .order('title', { ascending: true });
+  const [
+    { data: { user } },
+    { data },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('protocols')
+      .select('id, slug, title, category, summary, peptides, image_url, sort_order')
+      .eq('status', 'published')
+      .order('sort_order', { ascending: true })
+      .order('title', { ascending: true }),
+  ]);
 
   const protocols = (data ?? []) as ProtocolRow[];
 
@@ -68,8 +81,18 @@ export default async function ProtocolsIndex() {
         subtitle="Evidence-aligned peptide stacks for clinical practice — curated by the Peptide Pure medical team, organized by therapeutic focus."
       />
 
+      {user ? <SherpaConsole /> : <SherpaSignedOut />}
+
       <section className="py-16">
         <div className="container-xl">
+          <div className="flex items-baseline justify-between mb-8 gap-4">
+            <h2 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--navy)', fontFamily: 'var(--font-display)' }}>
+              Browse the Library
+            </h2>
+            <span className="text-xs font-semibold" style={{ color: 'var(--text-light)' }}>
+              {protocols.length} protocol{protocols.length === 1 ? '' : 's'} published
+            </span>
+          </div>
           {protocols.length === 0 ? (
             <p className="text-center text-sm" style={{ color: 'var(--text-light)' }}>
               Protocols are being curated. Check back soon.
@@ -79,9 +102,9 @@ export default async function ProtocolsIndex() {
               {categories.map((cat) => (
                 <div key={cat}>
                   <div className="flex items-baseline justify-between mb-5 gap-4">
-                    <h2 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--navy)', fontFamily: 'var(--font-display)' }}>
+                    <h3 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--navy)', fontFamily: 'var(--font-display)' }}>
                       {cat}
-                    </h2>
+                    </h3>
                     <span className="text-xs font-semibold" style={{ color: 'var(--text-light)' }}>
                       {byCategory.get(cat)!.length} protocol{byCategory.get(cat)!.length === 1 ? '' : 's'}
                     </span>
@@ -115,9 +138,9 @@ export default async function ProtocolsIndex() {
                           )}
                         </div>
                         <div className="flex-1 flex flex-col p-5">
-                          <h3 className="text-base font-bold mb-2 group-hover:underline" style={{ color: 'var(--navy)' }}>
+                          <h4 className="text-base font-bold mb-2 group-hover:underline" style={{ color: 'var(--navy)' }}>
                             {p.title}
-                          </h3>
+                          </h4>
                           {p.summary && (
                             <p className="text-sm leading-relaxed mb-4 line-clamp-3" style={{ color: 'var(--text-mid)' }}>
                               {p.summary}

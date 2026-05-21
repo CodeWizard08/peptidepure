@@ -152,7 +152,7 @@ export default function SherpaConsole() {
   const hasConversation = messages.length > 0;
 
   return (
-    <div style={{ background: '#06112E', minHeight: '100vh' }}>
+    <section style={{ background: '#06112E' }} aria-labelledby="sherpa-heading">
       <div className="container-xl py-10 lg:py-14">
         <div
           className="relative rounded-2xl p-6 sm:p-10 lg:p-14"
@@ -173,13 +173,14 @@ export default function SherpaConsole() {
             </div>
           </div>
 
-          {/* Title */}
-          <h1
+          {/* Title — h2 since /protocols already has the page's h1 */}
+          <h2
+            id="sherpa-heading"
             className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-5 text-white"
             style={{ fontFamily: 'var(--font-display)', letterSpacing: '-0.01em' }}
           >
             ASK THE SHERPA.
-          </h1>
+          </h2>
 
           <p className="text-sm sm:text-base leading-relaxed max-w-3xl mb-8" style={{ color: 'rgba(255,255,255,0.7)' }}>
             Drop a symptom. Ask about a stack. Get a protocol summary. AI Sherpa is grounded in the Peptide Pure protocol library, IRB-aligned research, and house clinical knowledge. It answers questions, surfaces protocols, and flags when you should escalate to a colleague. Logged queries are used to improve the model — not to track you.
@@ -406,6 +407,6 @@ export default function SherpaConsole() {
         }
         .sherpa-md th { background: rgba(255,255,255,0.05); color: var(--gold); }
       `}</style>
-    </div>
+    </section>
   );
 }

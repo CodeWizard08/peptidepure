@@ -115,7 +115,6 @@ export default function Header() {
   const navLinks = [
     { label: 'All Peptides', href: '/peptides', section: 'main' as const },
     { label: 'Protocols', href: '/protocols', section: 'main' as const },
-    { label: 'AI Sherpa', href: '/ai-sherpa', section: 'main' as const, requiresAuth: true, featured: true as const },
     { label: 'Our Company', href: '/our-company', section: 'main' as const },
     { label: 'COA', href: '/coa', section: 'main' as const },
     { label: 'How It Works', href: '/how-it-works', section: 'main' as const, requiresAuth: true },
