@@ -132,6 +132,17 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'price_cents must be a non-negative integer' }, { status: 400 });
   }
 
+  // stock_quantity is allowed to be null (unmanaged) or a non-negative integer.
+  if (
+    fields.stock_quantity !== undefined &&
+    fields.stock_quantity !== null &&
+    (typeof fields.stock_quantity !== 'number' ||
+      !Number.isInteger(fields.stock_quantity) ||
+      (fields.stock_quantity as number) < 0)
+  ) {
+    return NextResponse.json({ error: 'stock_quantity must be null or a non-negative integer' }, { status: 400 });
+  }
+
   const { data: product, error } = await supabase
     .from('products')
     .update(fields)

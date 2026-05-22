@@ -10,6 +10,7 @@ type Product = {
   category: string;
   subcategory: string;
   price_cents: number;
+  stock_quantity: number | null;
   is_active: boolean;
   metadata: {
     inventory?: InventoryStatus;
@@ -22,6 +23,7 @@ type Product = {
 type RowState = {
   price_dollars: string;
   patient_price_dollars: string;
+  stock_quantity: string;
   inventory: InventoryStatus;
   lead_time_days: string;
   dirty: boolean;
@@ -44,6 +46,7 @@ function productToRow(p: Product): RowState {
     patient_price_dollars: p.metadata?.patient_price_cents
       ? String((p.metadata.patient_price_cents as number) / 100)
       : '',
+    stock_quantity: typeof p.stock_quantity === 'number' ? String(p.stock_quantity) : '',
     inventory: (p.metadata?.inventory as InventoryStatus) || 'in_stock',
     lead_time_days: p.metadata?.lead_time_days ? String(p.metadata.lead_time_days) : '',
     dirty: false,
@@ -100,6 +103,12 @@ export default function AdminInventoryPanel() {
     const patient_price_cents = row.patient_price_dollars
       ? Math.round(parseFloat(row.patient_price_dollars) * 100)
       : undefined;
+    // Stock quantity — empty string clears (sets to null) so the column can
+    // be left unmanaged for SKUs that don't track per-unit stock. Trigger
+    // 020 propagates this to inventory.stock for any linked row.
+    const stockQty: number | null = row.stock_quantity.trim() === ''
+      ? null
+      : Math.max(0, Math.floor(parseFloat(row.stock_quantity) || 0));
 
     // Always set patient_price_cents (even to undefined) so JSON.stringify
     // drops it from the payload and the server-side full-metadata replace
@@ -118,7 +127,7 @@ export default function AdminInventoryPanel() {
       const res = await fetch('/api/admin/products', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: product.id, price_cents, metadata }),
+        body: JSON.stringify({ id: product.id, price_cents, stock_quantity: stockQty, metadata }),
       });
       if (!res.ok) throw new Error();
       showToast('success', `${product.name} updated`);
@@ -232,10 +241,12 @@ export default function AdminInventoryPanel() {
             <table className="w-full">
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--off-white)' }}>
-                  {['Product', 'Status', 'Clinician Price', 'Retail / Patient Price', 'Stock Status', 'Lead Time (days)', ''].map((h) => {
+                  {['Product', 'Status', 'Clinician Price', 'Retail / Patient Price', 'Stock Qty', 'Stock Status', 'Lead Time (days)', ''].map((h) => {
                     const hideMobile = ['Status', 'Retail / Patient Price', 'Lead Time (days)'].includes(h);
+                    const hideTablet = h === 'Stock Qty';
+                    const cls = hideMobile ? 'hidden lg:table-cell' : hideTablet ? 'hidden md:table-cell' : '';
                     return (
-                      <th key={h} className={`px-3 sm:px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${hideMobile ? 'hidden lg:table-cell' : ''}`} style={{ color: 'var(--text-light)' }}>
+                      <th key={h} className={`px-3 sm:px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide ${cls}`} style={{ color: 'var(--text-light)' }}>
                         {h}
                       </th>
                     );
@@ -315,6 +326,25 @@ export default function AdminInventoryPanel() {
                             }}
                           />
                         </div>
+                      </td>
+
+                      {/* Stock quantity — empty = unmanaged. Trigger 020 syncs to inventory.stock. */}
+                      <td className="px-3 sm:px-4 py-3 hidden md:table-cell">
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={row.stock_quantity}
+                          onChange={(e) => updateRow(product.id, { stock_quantity: e.target.value })}
+                          placeholder="—"
+                          className="w-20 px-2 py-1.5 rounded-lg text-sm focus:outline-none text-center"
+                          style={{
+                            background: 'var(--off-white)',
+                            border: `1px solid ${isDirty ? 'var(--gold)' : 'var(--border)'}`,
+                            color: 'var(--text-dark)',
+                          }}
+                          title="Stock count. Leave blank to leave unmanaged. Syncs to the /inventory clinician view."
+                        />
                       </td>
 
                       {/* Inventory status */}
