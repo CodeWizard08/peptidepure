@@ -17,6 +17,7 @@ type Product = {
   sku: string | null;
   requires_prescription: boolean;
   requires_consultation: boolean;
+  stock_quantity: number | null;
   metadata: Record<string, any> | null;
 };
 
@@ -26,6 +27,7 @@ type Variant = {
   slug: string;
   price_cents: number;
   sku: string | null;
+  stock_quantity: number | null;
   metadata: Record<string, any> | null;
 };
 
@@ -49,7 +51,13 @@ export default function ProductHero({
   // Normalize meta — callers occasionally pass null when the products row has
   // no metadata column populated. Treat as empty object to avoid null deref.
   const safeMeta = meta ?? {};
-  const inventory = (safeMeta.inventory as string) ?? 'in_stock';
+  // Stock state — inventory string from admin + raw stock_quantity from DB.
+  // Auto-flip to 'oos' when stock_quantity hits 0 even if admin hasn't
+  // manually set inventory='oos' yet (Scott's audit #9: should be automatic).
+  const rawInventory = (safeMeta.inventory as string) ?? 'in_stock';
+  const stockQty = product.stock_quantity;
+  const autoOOS = typeof stockQty === 'number' && stockQty <= 0 && rawInventory !== 'lead_time';
+  const inventory = autoOOS ? 'oos' : rawInventory;
   const leadTimeDays = safeMeta.lead_time_days as number | null;
   const patientPrice = (safeMeta.patient_price_cents as number | null) ?? product.price_cents * 2;
   const volumePricing = safeMeta.volume_pricing as Record<string, number> | null;
@@ -226,7 +234,10 @@ export default function ProductHero({
                     const vMeta = v.metadata ?? {};
                     const vStrength = vMeta.strength as string | undefined;
                     const vAmount = vMeta.amount as string | undefined;
-                    const vInventory = (vMeta.inventory as string) ?? 'in_stock';
+                    const rawVInv = (vMeta.inventory as string) ?? 'in_stock';
+                    // Same auto-OOS rule as the main product (audit #9).
+                    const vAutoOOS = typeof v.stock_quantity === 'number' && v.stock_quantity <= 0 && rawVInv !== 'lead_time';
+                    const vInventory = vAutoOOS ? 'oos' : rawVInv;
                     const isCurrentVariant = v.slug === product.slug;
 
                     return (

@@ -35,6 +35,7 @@ export type ProductRow = {
   sku: string | null;
   requires_prescription: boolean;
   requires_consultation: boolean;
+  stock_quantity: number | null;
   metadata: Record<string, any> | null;
 };
 
@@ -49,6 +50,7 @@ export type Product = {
   image_url: string | null;
   is_active: boolean;
   sort_order: number;
+  stock_quantity: number | null;
   metadata: {
     strength?: string; amount?: string; form?: string; brand?: string;
     inventory?: string; lead_time_days?: number | null;

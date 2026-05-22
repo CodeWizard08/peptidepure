@@ -97,8 +97,8 @@
   "freeShipping": {
     "badgeLabel": "Fulfillment",
     "heading": "Free Shipping",
-    "headingHighlight": "On Every Order",
-    "description": "U.S.A.-based fulfillment built for busy clinical practices — secure packaging, real-time tracking, and fast Mon–Fri dispatch so your protocols never miss a beat.",
+    "headingHighlight": "Minimum order $1,000",
+    "description": "U.S.A.-based fulfillment built for busy clinical practices — orders of $1,000+ ship free with secure packaging, real-time tracking, and fast Mon–Fri dispatch so your protocols never miss a beat.",
     "metrics": [
       { "value": "$0", "label": "Shipping", "sub": "always free" },
       { "value": "2–3", "label": "Business Days", "sub": "typical delivery" },

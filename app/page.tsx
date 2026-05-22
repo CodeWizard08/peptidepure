@@ -28,11 +28,15 @@ import FreeShippingSection from '@/components/home/FreeShippingSection';
 import PeptideBuzzCollection from '@/components/home/PeptideBuzzCollection';
 import FinalCTA from '@/components/home/FinalCTA';
 import { getContent } from '@/lib/content';
+import { createClient } from '@/lib/supabase/server';
 import type { HeroSliderContent, HomeContent } from '@/lib/content-types';
 
 export default async function HomePage() {
   const content = await getContent<HomeContent>('home');
   const heroContent = await getContent<HeroSliderContent>('hero-slider');
+  // Auth-aware so Create Account CTA can hide for signed-in clinicians.
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <>
@@ -41,7 +45,7 @@ export default async function HomePage() {
       {/* <StatsSection content={content.stats} /> */}
       <ThreeStepProcess content={content.threeSteps} />
       <USAResearchSection content={content.usaResearch} />
-      <WhyDifferentSection content={content.whyDifferent} />
+      <WhyDifferentSection content={content.whyDifferent} user={user} />
       <PeptideBuzzCollection />
       <FreeShippingSection content={content.freeShipping} />
       <FinalCTA content={content.finalCta} />

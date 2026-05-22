@@ -46,7 +46,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const baseName = getBaseProductName(product.name);
 
   const { data: allVariants } = await supabase
-    .from('products').select('id, name, slug, price_cents, sku, metadata')
+    .from('products').select('id, name, slug, price_cents, sku, stock_quantity, metadata')
     .eq('is_active', true).eq('category', product.category).order('price_cents', { ascending: true });
 
   const variants = (allVariants ?? []).filter((v) => getBaseProductName(v.name) === baseName);

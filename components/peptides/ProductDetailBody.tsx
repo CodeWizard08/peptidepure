@@ -19,7 +19,7 @@ import type { ProductRow } from '@/lib/peptideConfig';
 interface Props {
   product: ProductRow;
   baseName: string;
-  variants: { id: string; name: string; slug: string; price_cents: number; sku: string | null; metadata: Record<string, unknown> | null }[];
+  variants: { id: string; name: string; slug: string; price_cents: number; sku: string | null; stock_quantity: number | null; metadata: Record<string, unknown> | null }[];
   catConfig: { color: string; label: string };
   meta: Record<string, unknown>;
   slug: string;

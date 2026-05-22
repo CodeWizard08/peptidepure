@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { User } from '@supabase/supabase-js';
 
 const icons = [
   <svg key="w0" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,7 +26,7 @@ interface WhyDifferentContent {
   features: Feature[];
 }
 
-export default function WhyDifferentSection({ content }: { content: WhyDifferentContent }) {
+export default function WhyDifferentSection({ content, user }: { content: WhyDifferentContent; user?: User | null }) {
   return (
     <section className="py-24" style={{ background: 'var(--off-white)' }}>
       <div className="container-xl">
@@ -64,7 +65,9 @@ export default function WhyDifferentSection({ content }: { content: WhyDifferent
         <div className="flex flex-wrap justify-center gap-3">
           <Link href="/peptides" className="btn-outline">All Peptides</Link>
           <Link href="/how-it-works" className="btn-outline">How It Works</Link>
-          <Link href="/account" className="btn-primary">Create Account</Link>
+          {!user && (
+            <Link href="/account" className="btn-primary">Create Account</Link>
+          )}
         </div>
       </div>
     </section>
