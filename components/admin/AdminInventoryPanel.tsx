@@ -101,13 +101,17 @@ export default function AdminInventoryPanel() {
       ? Math.round(parseFloat(row.patient_price_dollars) * 100)
       : undefined;
 
+    // Always set patient_price_cents (even to undefined) so JSON.stringify
+    // drops it from the payload and the server-side full-metadata replace
+    // genuinely clears the field. Previously a conditional spread meant
+    // clearing the input left the old value in place (codex Q9, round 3).
     const metadata = {
       ...product.metadata,
       inventory: row.inventory,
       ...(row.inventory === 'lead_time' && row.lead_time_days
         ? { lead_time_days: parseInt(row.lead_time_days, 10) }
         : { lead_time_days: undefined }),
-      ...(patient_price_cents !== undefined ? { patient_price_cents } : {}),
+      patient_price_cents,
     };
 
     try {
