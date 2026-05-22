@@ -243,9 +243,14 @@ export default function ProductGrid({
                             <span className="text-base font-bold" style={{ color: 'var(--gold)' }}>
                               {formatCents(product.price_cents)}
                             </span>
-                            <span className="text-[10px]" style={{ color: 'var(--text-light)' }}>
-                              Retail: {formatCents((meta?.patient_price_cents as number | null) ?? product.price_cents * 2)}
-                            </span>
+                            {/* Only show retail line if admin actually set patient_price_cents.
+                                Previously fell back to price_cents*2 which surfaced a fabricated
+                                number even when the admin Edit form showed 0 (audit #1). */}
+                            {typeof meta?.patient_price_cents === 'number' && meta.patient_price_cents > 0 && (
+                              <span className="text-[10px]" style={{ color: 'var(--text-light)' }}>
+                                Retail: {formatCents(meta.patient_price_cents)}
+                              </span>
+                            )}
                           </div>
                         )}
                         {meta?.volume_pricing && (

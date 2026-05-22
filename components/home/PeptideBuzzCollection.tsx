@@ -77,13 +77,15 @@ function Card({ p, isClinician }: { p: BuzzProduct; isClinician: boolean }) {
   // Visitors see retail as the primary price; verified clinicians see bulk
   // (price_cents) primary with retail struck through. If retail isn't set we
   // fall back to whatever single price we have so the card never shows $0.
+  //
+  // Strikethrough only renders when upsell > bulk — defends against the
+  // inverted-data case (audit #1, $88 headline with $79 strikethrough).
+  const hasValidUpsell = typeof upsellCents === 'number' && upsellCents > p.price_cents;
   const showBulk = isClinician;
   const primaryCents = showBulk
     ? p.price_cents
-    : (upsellCents ?? p.price_cents);
-  const struckCents = showBulk && upsellCents && upsellCents !== p.price_cents
-    ? upsellCents
-    : null;
+    : (hasValidUpsell ? (upsellCents as number) : p.price_cents);
+  const struckCents = showBulk && hasValidUpsell ? (upsellCents as number) : null;
   const priceLabel = showBulk ? 'Clinic bulk · per unit' : 'Retail · per unit';
 
   return (

@@ -59,14 +59,27 @@ export default function ProductHero({
   const autoOOS = typeof stockQty === 'number' && stockQty <= 0 && rawInventory !== 'lead_time';
   const inventory = autoOOS ? 'oos' : rawInventory;
   const leadTimeDays = safeMeta.lead_time_days as number | null;
-  const patientPrice = (safeMeta.patient_price_cents as number | null) ?? product.price_cents * 2;
+  // Suggested retail price — null if admin hasn't set patient_price_cents.
+  // Audit #1 sub-bullet: previously this fell back to price_cents * 2, which
+  // surfaced a fabricated number on the storefront even though the admin
+  // Edit form showed 0. No fallback now — the "Suggested Retail Price" cell
+  // only renders when the value is explicitly set.
+  const rawPatientPrice = safeMeta.patient_price_cents as number | null | undefined;
+  const patientPrice = typeof rawPatientPrice === 'number' && rawPatientPrice > 0
+    ? rawPatientPrice
+    : null;
   const volumePricing = safeMeta.volume_pricing as Record<string, number> | null;
   const brand = (safeMeta.brand as string) ?? 'peptidepure';
   const strength = safeMeta.strength as string | undefined;
   const amount = safeMeta.amount as string | undefined;
   const form = safeMeta.form as string | undefined;
   const dosing = safeMeta.dosing as { recommended_dose?: string; route?: string; frequency?: string; notes?: string } | undefined;
-  const retailCents = safeMeta.upsell_cents as number | undefined;
+  // Retail strikethrough only renders when retail > clinic — never the
+  // inversion Scott reported ($88 headline with $79 strikethrough). Audit #1.
+  const rawRetailCents = safeMeta.upsell_cents as number | undefined;
+  const retailCents = typeof rawRetailCents === 'number' && rawRetailCents > product.price_cents
+    ? rawRetailCents
+    : undefined;
 
   const isOOS = inventory === 'oos';
   const isLeadTime = inventory === 'lead_time';
@@ -313,7 +326,7 @@ export default function ProductHero({
                   {strength && <SpecCell label="Strength" value={strength} />}
                   {amount && <SpecCell label="Volume / Qty" value={amount} />}
                   {form && <SpecCell label="Form" value={form} />}
-                  {product.price_cents > 0 && <SpecCell label="Suggested Retail Price" value={formatCents(patientPrice)} />}
+                  {patientPrice !== null && <SpecCell label="Suggested Retail Price" value={formatCents(patientPrice)} />}
                 </div>
               </div>
             )}
