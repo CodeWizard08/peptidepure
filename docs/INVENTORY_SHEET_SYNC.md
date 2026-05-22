@@ -11,13 +11,14 @@ runs but no-ops harmlessly.
 
 ```
 ┌──────────────────┐         ┌──────────────────┐
-│ Google Sheet     │◄────────│  Vercel Cron     │
-│ (master copy)    │         │  every 5 min     │
-│                  │         │  GET /api/       │
-│                  │         │   inventory-sync │
-│                  │         │   /to-sheet      │
+│ Google Sheet     │◄────────│  Scheduler       │
+│ (master copy)    │         │  hits GET        │
+│                  │         │  /api/inventory- │
+│                  │         │  sync/to-sheet   │
 └────────┬─────────┘         └──────────────────┘
-         │
+         │                            ▲
+         │                            │ Bearer CRON_SECRET
+         │                            │
          │ Apps Script onEdit
          │ POST /api/inventory-sync/from-sheet
          ▼
@@ -29,6 +30,23 @@ runs but no-ops harmlessly.
 │  products        │
 └──────────────────┘
 ```
+
+**Scheduler frequency** — the **DB → Sheet** push is currently scheduled by
+Vercel Cron at `0 6 * * *` (once daily at 06:00 UTC). The Vercel Hobby plan
+caps cron jobs at daily frequency. To get faster sync (every 5 minutes, or
+on-demand) without upgrading to Vercel Pro, point an external scheduler
+(GitHub Actions, cron-job.org, EasyCron, etc.) at the same endpoint:
+
+```
+GET https://peptidepure.com/api/inventory-sync/to-sheet
+  Authorization: Bearer <CRON_SECRET>
+```
+
+See [§External scheduler setup](#external-scheduler-setup) below.
+
+The **Sheet → DB** direction is event-driven via Apps Script `onEdit` and
+is unaffected by the cron schedule — Scott's edits propagate to Supabase
+within a second regardless of cron frequency.
 
 ## Setup steps
 
@@ -190,6 +208,50 @@ function onInventoryEdit(e) {
 - Vercel cron: included in Hobby/Pro tier
 - Google Sheets API: free tier is 500 req/100sec/user — we use ~12 req/hour
 - Network: ~10KB per cron run
+
+## External scheduler setup
+
+Vercel Hobby caps `crons` at daily frequency. For sub-daily DB → Sheet
+sync (e.g. every 5 minutes), point any external scheduler at the same
+endpoint. The endpoint already authenticates via `Authorization: Bearer
+<CRON_SECRET>`, so external callers just need that header.
+
+### Option A: GitHub Actions (free, runs every 5 min)
+
+Create `.github/workflows/inventory-sync.yml`:
+
+```yaml
+name: Inventory sync (DB → Sheet)
+on:
+  schedule:
+    - cron: '*/5 * * * *'   # every 5 min
+  workflow_dispatch:          # also manual-trigger from the Actions UI
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit to-sheet endpoint
+        run: |
+          curl -fsS -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://peptidepure.com/api/inventory-sync/to-sheet
+```
+
+Then in GitHub → Repo Settings → Secrets and variables → Actions, add
+`CRON_SECRET` matching the value in Vercel. (Note: GitHub's scheduled
+runs can be delayed 10–20 min under load — fine for inventory sync.)
+
+### Option B: cron-job.org (free, generally on-time)
+
+1. Sign in at https://cron-job.org
+2. Create job → URL = `https://peptidepure.com/api/inventory-sync/to-sheet`
+3. Headers → `Authorization: Bearer <CRON_SECRET>`
+4. Schedule = every 5 minutes
+
+### Option C: Upgrade Vercel to Pro
+
+Edit `vercel.json` schedule back to `*/5 * * * *` and redeploy. Pro
+removes the daily-only cap.
 
 ## Disabling
 
