@@ -14,7 +14,7 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { isSheetSyncConfigured, writeRange } from '@/lib/google-sheets';
+import { clearRange, isSheetSyncConfigured, writeRange } from '@/lib/google-sheets';
 
 // Don't pre-render — auth + DB read + external call every invocation.
 export const dynamic = 'force-dynamic';
@@ -52,10 +52,12 @@ function skuOf(row: InventoryWithProduct): string {
 
 export async function GET(request: Request) {
   // Vercel Cron sends `Authorization: Bearer <CRON_SECRET>`. Reject anything
-  // else so the endpoint can't be triggered externally.
+  // else so the endpoint can't be triggered externally. CRON_SECRET MUST be
+  // set; if missing we reject everything rather than letting requests through
+  // unauthenticated (codex round-8 Real #1).
   const cronSecret = process.env.CRON_SECRET;
   const authHeader = request.headers.get('authorization');
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -98,6 +100,11 @@ export async function GET(request: Request) {
     // The sheet should have at least as many rows allocated as we send; the
     // values endpoint auto-extends when needed.
     await writeRange(`${SHEET_TAB}!${DATA_RANGE_PREFIX}`, values);
+    // Clear any trailing rows from a previous push that's now smaller —
+    // otherwise stale stock numbers would linger in rows beyond our data
+    // (codex round-8 Real #2).
+    const lastDataRow = values.length + 1; // header in row 1, data in rows 2..(values.length + 1)
+    await clearRange(`${SHEET_TAB}!A${lastDataRow + 1}:Z10000`);
   } catch (err) {
     console.error('[sync to-sheet] Sheets write failed:', err);
     return NextResponse.json(
@@ -108,11 +115,12 @@ export async function GET(request: Request) {
 
   // Stamp last_synced_at on every row we just pushed. Failures here are
   // logged but not fatal — the next inbound webhook might apply an edit that
-  // was already pushed; harmless re-write.
+  // was already pushed; harmless re-write. Filter on `id IS NOT NULL` so we
+  // don't accidentally exclude rows whose sort_order is null (codex Warning #5).
   const { error: stampErr } = await supabase
     .from('inventory')
     .update({ last_synced_at: now })
-    .gte('sort_order', 0);
+    .not('id', 'is', null);
   if (stampErr) {
     console.error('[sync to-sheet] last_synced_at stamp failed:', stampErr.message);
   }

@@ -26,6 +26,9 @@ type ServiceAccount = {
   private_key: string;
 };
 
+// Cache is per function instance; Vercel doesn't share memory across
+// instances, so this is intentionally not a global cache. Each cold-started
+// Lambda fetches its own token.
 let cachedToken: { access_token: string; expires_at: number } | null = null;
 
 export function isSheetSyncConfigured(): boolean {
@@ -43,6 +46,10 @@ function getServiceAccount(): ServiceAccount {
   if (!parsed.client_email || !parsed.private_key) {
     throw new Error('Service account JSON missing client_email or private_key');
   }
+  // Vercel + many CI systems serialize multi-line env vars with literal `\n`
+  // sequences instead of real newlines. node:crypto's createSign requires
+  // real newlines in the PEM. Normalize both shapes.
+  parsed.private_key = parsed.private_key.replace(/\\n/g, '\n');
   return parsed;
 }
 
@@ -126,6 +133,25 @@ export async function readRange(range: string): Promise<string[][]> {
   }
   const data = (await res.json()) as { values?: string[][] };
   return data.values ?? [];
+}
+
+/**
+ * Clear all cell values in the given range. Used after a writeRange call
+ * shrinks the data set — without this, trailing rows from a previous push
+ * would show stale stock numbers.
+ */
+export async function clearRange(range: string): Promise<void> {
+  const token = await getAccessToken();
+  const id = process.env.GOOGLE_SHEETS_ID!;
+  const url = `${SHEETS_API_BASE}/${encodeURIComponent(id)}/values/${encodeURIComponent(range)}:clear`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Sheets clearRange failed (${res.status}): ${text}`);
+  }
 }
 
 /**

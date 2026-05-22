@@ -16,20 +16,24 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { timingSafeEqual } from 'node:crypto';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { isSheetSyncConfigured } from '@/lib/google-sheets';
 
 export const dynamic = 'force-dynamic';
 
 // If the row was last synced FROM the DB within this many milliseconds, the
-// incoming edit is almost certainly an echo. Skip to break the loop.
-const ECHO_WINDOW_MS = 60_000;
+// incoming edit is almost certainly an echo. 15s is tight enough that a
+// human edit ~30s after a cron push still applies (codex round-8 Warning #4).
+const ECHO_WINDOW_MS = 15_000;
 
+// Compare two secrets in constant time across both equal and unequal lengths.
+// Hashing both sides to a fixed-length digest before timingSafeEqual avoids
+// the length-leak that a raw length-check would introduce
+// (codex round-8 Warning #3).
 function safeEqual(a: string, b: string): boolean {
-  const ab = Buffer.from(a);
-  const bb = Buffer.from(b);
-  if (ab.length !== bb.length) return false;
-  return timingSafeEqual(ab, bb);
+  const ah = createHash('sha256').update(a).digest();
+  const bh = createHash('sha256').update(b).digest();
+  return timingSafeEqual(ah, bh);
 }
 
 export async function POST(request: NextRequest) {
@@ -111,6 +115,8 @@ export async function POST(request: NextRequest) {
 
   // Echo-skip: if we just pushed this row outbound within the window, the
   // edit is probably the cron's own write reflected back via Apps Script.
+  // NULL last_synced_at means the row has never been pushed by cron — apply
+  // inbound edits unconditionally in that case.
   if (row.last_synced_at) {
     const synced = new Date(row.last_synced_at).getTime();
     if (Number.isFinite(synced) && Date.now() - synced < ECHO_WINDOW_MS) {

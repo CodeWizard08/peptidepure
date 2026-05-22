@@ -77,6 +77,12 @@ Row 1 is the header. Rows 2+ are data. The cron always writes starting at A2.
 When the cron writes, it stamps column G with the ISO timestamp. The Apps
 Script reads the SKU from column A — that's the lookup key.
 
+**Important** — the cron clears rows beyond the data range on every push
+and rewrites columns A–G with `USER_ENTERED` semantics. Do **not** add
+formulas, conditional formatting per-cell, or notes in columns A–G or
+in rows past the data — they will be wiped. Put any auxiliary formulas
+in column H+ or on a separate tab.
+
 ### 6. Paste the Apps Script
 
 1. In the Sheet, click **Extensions → Apps Script**
@@ -112,7 +118,7 @@ function onInventoryEdit(e) {
   // would require a row-rename flow that's not in scope.
   if (col !== STOCK_COL && col !== STATUS_COL && col !== NOTES_COL) return;
 
-  const sku = sheet.getRange(row, SKU_COL).getValue();
+  const sku = String(sheet.getRange(row, SKU_COL).getValue() || '').trim();
   if (!sku) return;
 
   const stock = Number(sheet.getRange(row, STOCK_COL).getValue());
