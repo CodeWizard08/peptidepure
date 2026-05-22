@@ -7,7 +7,8 @@ type ProtocolsContent = PeptidesContent['protocols'];
 export default function ProtocolsSection({ content }: { content: ProtocolsContent }) {
   return (
     <>
-      <div className="mb-6">
+      {/* id used by deep links from ProtocolMembership / ProductHero ("#protocols") */}
+      <div id="protocols" className="mb-6 scroll-mt-28">
         <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--navy)' }}>{content.heading}</h2>
         <p className="text-sm" style={{ color: 'var(--text-light)' }}>
           {content.subtitle}

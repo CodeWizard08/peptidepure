@@ -13,6 +13,7 @@ type Product = {
   image_url: string | null;
   is_active: boolean;
   sort_order: number;
+  stock_quantity: number | null;
   metadata: {
     strength?: string;
     amount?: string;
@@ -145,7 +146,14 @@ export default function ProductGrid({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
             {products.map((product) => {
               const meta = product.metadata;
-              const inventory = meta?.inventory ?? 'in_stock';
+              const rawInv = meta?.inventory ?? 'in_stock';
+              // Auto-flip to OOS if stock_quantity reached 0, matching ProductHero
+              // (audit #9). Lead-time SKUs stay in backorder mode regardless of
+              // stock level — they show "21-Day Lead" not OOS.
+              const autoOOS = typeof product.stock_quantity === 'number'
+                && product.stock_quantity <= 0
+                && rawInv !== 'lead_time';
+              const inventory = autoOOS ? 'oos' : rawInv;
               const brand = meta?.brand ?? 'peptidepure';
               const form = meta?.form ?? product.subcategory;
               const catConfig = CATEGORY_CONFIG[product.category];

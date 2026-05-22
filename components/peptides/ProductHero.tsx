@@ -158,7 +158,7 @@ export default function ProductHero({
                   )}
                   {isLeadTime && (
                     <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full" style={{ background: '#FEF3C7', color: '#D97706' }}>
-                      {leadTimeDays}-Day Lead
+                      {leadTimeDays ?? 21}-Day Lead
                     </span>
                   )}
                   {!isOOS && !isLeadTime && (
@@ -264,7 +264,9 @@ export default function ProductHero({
                             <span className="text-[10px] ml-2 font-semibold" style={{ color: '#DC2626' }}>OOS</span>
                           )}
                           {vInventory === 'lead_time' && (
-                            <span className="text-[10px] ml-2 font-semibold" style={{ color: '#D97706' }}>21-Day</span>
+                            <span className="text-[10px] ml-2 font-semibold" style={{ color: '#D97706' }}>
+                              {(vMeta.lead_time_days as number | null) ?? 21}-Day
+                            </span>
                           )}
                         </div>
                         <span className="font-bold text-sm" style={{ color: 'var(--gold)' }}>

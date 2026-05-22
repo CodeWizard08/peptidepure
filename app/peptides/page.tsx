@@ -52,7 +52,7 @@ export default async function PeptidesPage({
   // Grid: only real priced products
   let query = supabase
     .from('products')
-    .select('id, name, slug, description, category, subcategory, price_cents, image_url, is_active, sort_order, metadata', { count: 'exact' })
+    .select('id, name, slug, description, category, subcategory, price_cents, image_url, is_active, sort_order, stock_quantity, metadata', { count: 'exact' })
     .eq('is_active', true)
     .neq('category', 'peptide')
     .order('sort_order', { ascending: true })

@@ -100,7 +100,7 @@
     "headingHighlight": "Minimum order $1,000",
     "description": "U.S.A.-based fulfillment built for busy clinical practices — orders of $1,000+ ship free with secure packaging, real-time tracking, and fast Mon–Fri dispatch so your protocols never miss a beat.",
     "metrics": [
-      { "value": "$0", "label": "Shipping", "sub": "always free" },
+      { "value": "$1k+", "label": "Order Minimum", "sub": "free shipping above this" },
       { "value": "2–3", "label": "Business Days", "sub": "typical delivery" },
       { "value": "48h", "label": "Processing", "sub": "weekday cutoff" }
     ],
