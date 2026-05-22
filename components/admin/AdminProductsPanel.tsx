@@ -10,8 +10,14 @@ type ProductMetadata = {
   inventory?: 'in_stock' | 'lead_time' | 'oos';
   lead_time_days?: number;
   patient_price_cents?: number;
+  volume_pricing?: Record<string, number>;
   [key: string]: unknown;
 };
+
+// Editor-side shape of a volume tier — Scott's audit #1 wants up to 4 tiers
+// per product. Stored on disk as metadata.volume_pricing (range → cents).
+type VolumeTier = { range: string; price_dollars: string };
+const MAX_TIERS = 4;
 
 type Product = {
   id: string;
@@ -45,6 +51,7 @@ type FormState = {
   brand: string;
   inventory: 'in_stock' | 'lead_time' | 'oos';
   lead_time_days: string;
+  volume_tiers: VolumeTier[];
 };
 
 const EMPTY_FORM: FormState = {
@@ -64,6 +71,7 @@ const EMPTY_FORM: FormState = {
   brand: '',
   inventory: 'in_stock',
   lead_time_days: '',
+  volume_tiers: [],
 };
 
 function slugify(name: string) {
@@ -91,6 +99,12 @@ function productToForm(p: Product): FormState {
     brand: (meta.brand as string) || '',
     inventory: (meta.inventory as 'in_stock' | 'lead_time' | 'oos') || 'in_stock',
     lead_time_days: meta.lead_time_days ? String(meta.lead_time_days) : '',
+    volume_tiers: meta.volume_pricing
+      ? Object.entries(meta.volume_pricing).map(([range, cents]) => ({
+          range,
+          price_dollars: String((cents as number) / 100),
+        }))
+      : [],
   };
 }
 
@@ -110,6 +124,20 @@ function formToPayload(f: FormState): Record<string, unknown> {
     metadata.lead_time_days = parseInt(f.lead_time_days, 10);
   }
   if (patient_price_cents !== undefined) metadata.patient_price_cents = patient_price_cents;
+
+  // Volume tiers — convert array form back to range→cents map.
+  const validTiers = f.volume_tiers.filter(
+    (t) => t.range.trim() && t.price_dollars.trim() && !isNaN(parseFloat(t.price_dollars)),
+  );
+  if (validTiers.length > 0) {
+    metadata.volume_pricing = Object.fromEntries(
+      validTiers.map((t) => [t.range.trim(), Math.round(parseFloat(t.price_dollars) * 100)]),
+    );
+  } else {
+    // Explicitly clear if all rows were emptied so the storefront stops
+    // rendering a stale tier table.
+    metadata.volume_pricing = undefined;
+  }
 
   return {
     name: f.name,
@@ -210,6 +238,18 @@ export default function AdminProductsPanel() {
     setEditingId(product.id);
     setFormState(productToForm(product));
     setSlugManuallyEdited(true); // Don't auto-update slug when editing existing
+  };
+
+  // Audit #2 — Duplicate Product: clone all fields, regenerate slug, mark as
+  // unsaved-new. Editor only needs to tweak the differentiating fields (dose,
+  // SKU, price) before saving as a new row.
+  const handleDuplicate = (product: Product) => {
+    const cloned = productToForm(product);
+    cloned.name = `${cloned.name} (Copy)`;
+    cloned.slug = slugify(cloned.name);
+    setEditingId('new');
+    setFormState(cloned);
+    setSlugManuallyEdited(false); // Allow slug to track name edits in the copy
   };
 
   const handleAddNew = () => {
@@ -497,6 +537,80 @@ export default function AdminProductsPanel() {
             />
           </div>
 
+          {/* Volume Pricing Tiers — up to 4 (audit #1) */}
+          <div className="mt-6">
+            <div className="flex items-baseline justify-between mb-3">
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-light)' }}>
+                Volume Pricing Tiers
+                <span className="ml-2 normal-case font-normal" style={{ color: 'var(--text-mid)' }}>
+                  ({formState.volume_tiers.length}/{MAX_TIERS}) · per-unit price at quantity break
+                </span>
+              </p>
+              {formState.volume_tiers.length < MAX_TIERS && (
+                <button
+                  type="button"
+                  onClick={() => setField('volume_tiers', [...formState.volume_tiers, { range: '', price_dollars: '' }])}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-lg"
+                  style={{ color: 'var(--gold)', border: '1px solid rgba(200,149,44,0.3)', background: 'var(--gold-pale)' }}
+                >
+                  + Add Tier
+                </button>
+              )}
+            </div>
+            {formState.volume_tiers.length === 0 ? (
+              <p className="text-xs italic px-3 py-2 rounded-lg" style={{ background: 'var(--off-white)', color: 'var(--text-light)', border: '1px dashed var(--border)' }}>
+                No volume tiers. Click &ldquo;+ Add Tier&rdquo; to seed e.g. &ldquo;10-19&rdquo; → $125, &ldquo;20-49&rdquo; → $119, &ldquo;50+&rdquo; → $112.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {formState.volume_tiers.map((tier, i) => (
+                  <div key={i} className="grid grid-cols-12 gap-2 items-center">
+                    <div className="col-span-5">
+                      <input
+                        type="text"
+                        value={tier.range}
+                        onChange={(e) => {
+                          const next = [...formState.volume_tiers];
+                          next[i] = { ...next[i], range: e.target.value };
+                          setField('volume_tiers', next);
+                        }}
+                        className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none font-mono"
+                        style={{ background: 'var(--off-white)', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
+                        placeholder="Range (e.g. 10-19, 50+)"
+                      />
+                    </div>
+                    <div className="col-span-5">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={tier.price_dollars}
+                        onChange={(e) => {
+                          const next = [...formState.volume_tiers];
+                          next[i] = { ...next[i], price_dollars: e.target.value };
+                          setField('volume_tiers', next);
+                        }}
+                        className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none font-mono"
+                        style={{ background: 'var(--off-white)', border: '1px solid var(--border)', color: 'var(--text-dark)' }}
+                        placeholder="Unit price ($)"
+                      />
+                    </div>
+                    <div className="col-span-2 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setField('volume_tiers', formState.volume_tiers.filter((_, j) => j !== i))}
+                        className="text-xs font-semibold px-2 py-1.5 rounded-lg"
+                        style={{ color: '#DC2626', border: '1px solid rgba(220,38,38,0.3)' }}
+                        title="Remove tier"
+                      >
+                        ✕ Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Description */}
           <div className="mt-5">
             <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: 'var(--text-mid)' }}>
@@ -702,6 +816,14 @@ export default function AdminProductsPanel() {
                             <div className="flex items-center gap-2">
                               <button onClick={() => handleEdit(product)} className="text-xs px-3 py-1.5 rounded-lg font-semibold" style={{ color: 'var(--navy)', background: 'var(--off-white)', border: '1px solid var(--border)' }}>
                                 Edit
+                              </button>
+                              <button
+                                onClick={() => handleDuplicate(product)}
+                                className="text-xs px-3 py-1.5 rounded-lg font-semibold"
+                                style={{ color: 'var(--gold)', background: 'var(--gold-pale)', border: '1px solid rgba(200,149,44,0.3)' }}
+                                title="Clone all fields into a new product — edit dose/SKU/price, then save"
+                              >
+                                Duplicate
                               </button>
                               <button onClick={() => handleToggleActive(product)} className="text-xs px-3 py-1.5 rounded-lg font-semibold" style={{ color: product.is_active ? '#991B1B' : '#065F46', background: product.is_active ? '#FEE2E2' : '#D1FAE5', border: `1px solid ${product.is_active ? '#FCA5A5' : '#6EE7B7'}` }}>
                                 {product.is_active ? 'Deactivate' : 'Activate'}

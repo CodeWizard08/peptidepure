@@ -19,6 +19,9 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get('status');
+  // Audit #16 — Admin can drill from a user row into their order history.
+  // The orders table stores the buyer as `patient_id` (matches auth.users.id).
+  const patientId = searchParams.get('patient_id');
   const page = parseInt(searchParams.get('page') || '1', 10);
   const limit = 20;
   const offset = (page - 1) * limit;
@@ -33,6 +36,14 @@ export async function GET(request: Request) {
 
   if (status && status !== 'all') {
     query = query.eq('status', status);
+  }
+  if (patientId) {
+    // Reject obviously malformed UUIDs early so we don't issue a wasteful
+    // unmatched query.
+    if (!/^[0-9a-fA-F-]{32,40}$/.test(patientId)) {
+      return NextResponse.json({ error: 'Invalid patient_id' }, { status: 400 });
+    }
+    query = query.eq('patient_id', patientId);
   }
 
   const { data: orders, error, count } = await query;

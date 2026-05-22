@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 
 type UserMetadata = {
   full_name: string;
@@ -18,6 +18,18 @@ type AdminUser = {
   user_metadata: UserMetadata;
 };
 
+// Drilldown shape — orders for a single clinician. Audit #16.
+type OrderRow = {
+  id: string;
+  status: string;
+  total_cents: number;
+  tracking_number?: string | null;
+  created_at: string;
+  items?: { product_name: string; quantity: number }[];
+};
+
+const formatCents = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+
 const fmtDate = (iso: string | null) => {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -33,6 +45,10 @@ export default function AdminUsersPanel() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  // Audit #16 — per-user order drilldown
+  const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
+  const [userOrders, setUserOrders] = useState<OrderRow[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
 
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message });
@@ -49,6 +65,29 @@ export default function AdminUsersPanel() {
   };
 
   useEffect(() => { fetchUsers(); }, []);
+
+  const handleViewOrders = async (userId: string) => {
+    // Toggle off if clicking the already-expanded user.
+    if (expandedUserId === userId) {
+      setExpandedUserId(null);
+      setUserOrders([]);
+      return;
+    }
+    setExpandedUserId(userId);
+    setLoadingOrders(true);
+    setUserOrders([]);
+    try {
+      const res = await fetch(`/api/admin/orders?patient_id=${encodeURIComponent(userId)}`);
+      if (!res.ok) throw new Error('Failed to load orders');
+      const data = await res.json();
+      setUserOrders((data.orders ?? []) as OrderRow[]);
+    } catch {
+      showToast('error', 'Failed to load orders for this user');
+      setExpandedUserId(null);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
 
   const handleDelete = async (id: string) => {
     setDeleting(true);
@@ -156,11 +195,12 @@ export default function AdminUsersPanel() {
                 {filteredUsers.map((user, idx) => {
                   const meta = user.user_metadata;
                   const isConfirming = confirmDeleteId === user.id;
+                  const isExpanded = expandedUserId === user.id;
                   return (
+                    <Fragment key={user.id}>
                     <tr
-                      key={user.id}
                       className="transition-colors hover:bg-gray-50"
-                      style={{ borderBottom: idx < filteredUsers.length - 1 ? '1px solid var(--border)' : 'none' }}
+                      style={{ borderBottom: isExpanded ? 'none' : (idx < filteredUsers.length - 1 ? '1px solid var(--border)' : 'none'), background: isExpanded ? 'var(--gold-pale)' : undefined }}
                     >
                       <td className="px-3 sm:px-5 py-4">
                         <p className="text-sm font-semibold" style={{ color: 'var(--navy)' }}>{meta.full_name || '—'}</p>
@@ -200,16 +240,83 @@ export default function AdminUsersPanel() {
                             </button>
                           </div>
                         ) : (
-                          <button
-                            onClick={() => setConfirmDeleteId(user.id)}
-                            className="text-xs px-3 py-1.5 rounded-lg font-semibold"
-                            style={{ color: '#991B1B', background: '#FEE2E2', border: '1px solid #FCA5A5' }}
-                          >
-                            Delete
-                          </button>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <button
+                              onClick={() => handleViewOrders(user.id)}
+                              className="text-xs px-3 py-1.5 rounded-lg font-semibold"
+                              style={{ color: 'var(--navy)', background: isExpanded ? 'var(--gold)' : 'var(--off-white)', border: '1px solid var(--border)' }}
+                              title="View this clinician's order history"
+                            >
+                              {isExpanded ? 'Hide orders' : 'Orders'}
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteId(user.id)}
+                              className="text-xs px-3 py-1.5 rounded-lg font-semibold"
+                              style={{ color: '#991B1B', background: '#FEE2E2', border: '1px solid #FCA5A5' }}
+                            >
+                              Delete
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
+                    {isExpanded && (
+                      <tr style={{ borderBottom: idx < filteredUsers.length - 1 ? '1px solid var(--border)' : 'none', background: 'var(--gold-pale)' }}>
+                        <td colSpan={7} className="px-3 sm:px-5 py-4">
+                          <div className="rounded-xl p-4" style={{ background: 'white', border: '1px solid rgba(200,149,44,0.3)' }}>
+                            <div className="flex items-baseline justify-between mb-3">
+                              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--gold)' }}>
+                                Order History · {user.email}
+                              </p>
+                              {!loadingOrders && (
+                                <span className="text-xs" style={{ color: 'var(--text-light)' }}>
+                                  {userOrders.length} order{userOrders.length === 1 ? '' : 's'}
+                                </span>
+                              )}
+                            </div>
+                            {loadingOrders ? (
+                              <p className="text-xs italic" style={{ color: 'var(--text-light)' }}>Loading orders…</p>
+                            ) : userOrders.length === 0 ? (
+                              <p className="text-xs italic" style={{ color: 'var(--text-light)' }}>No orders found for this clinician.</p>
+                            ) : (
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-xs">
+                                  <thead>
+                                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                                      <th className="text-left px-2 py-1.5 font-semibold uppercase tracking-wider" style={{ color: 'var(--text-light)' }}>Order ID</th>
+                                      <th className="text-left px-2 py-1.5 font-semibold uppercase tracking-wider" style={{ color: 'var(--text-light)' }}>Date</th>
+                                      <th className="text-left px-2 py-1.5 font-semibold uppercase tracking-wider" style={{ color: 'var(--text-light)' }}>Status</th>
+                                      <th className="text-left px-2 py-1.5 font-semibold uppercase tracking-wider" style={{ color: 'var(--text-light)' }}>Items</th>
+                                      <th className="text-left px-2 py-1.5 font-semibold uppercase tracking-wider" style={{ color: 'var(--text-light)' }}>Tracking</th>
+                                      <th className="text-right px-2 py-1.5 font-semibold uppercase tracking-wider" style={{ color: 'var(--text-light)' }}>Total</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {userOrders.map((o) => (
+                                      <tr key={o.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                                        <td className="px-2 py-2 font-mono" style={{ color: 'var(--navy)' }}>{o.id.slice(0, 8).toUpperCase()}</td>
+                                        <td className="px-2 py-2" style={{ color: 'var(--text-mid)' }}>{fmtDate(o.created_at)}</td>
+                                        <td className="px-2 py-2">
+                                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'var(--off-white)', color: 'var(--navy)' }}>
+                                            {o.status}
+                                          </span>
+                                        </td>
+                                        <td className="px-2 py-2" style={{ color: 'var(--text-mid)' }}>
+                                          {(o.items ?? []).map((it) => `${it.product_name} x${it.quantity}`).join(', ') || '—'}
+                                        </td>
+                                        <td className="px-2 py-2 font-mono" style={{ color: 'var(--text-mid)' }}>{o.tracking_number || '—'}</td>
+                                        <td className="px-2 py-2 text-right font-bold" style={{ color: 'var(--navy)' }}>{formatCents(o.total_cents)}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
                   );
                 })}
               </tbody>
