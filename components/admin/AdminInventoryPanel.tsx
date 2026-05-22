@@ -110,14 +110,22 @@ export default function AdminInventoryPanel() {
       ? null
       : Math.max(0, Math.floor(parseFloat(row.stock_quantity) || 0));
 
+    // If admin set a positive stock_quantity but the inventory string is
+    // still 'oos' from a prior depletion, auto-restore to 'in_stock'.
+    // Otherwise the storefront display logic keeps showing OOS even though
+    // there's stock available (codex round-5 review, Warning #9).
+    const effectiveInventory = stockQty !== null && stockQty > 0 && row.inventory === 'oos'
+      ? 'in_stock'
+      : row.inventory;
+
     // Always set patient_price_cents (even to undefined) so JSON.stringify
     // drops it from the payload and the server-side full-metadata replace
     // genuinely clears the field. Previously a conditional spread meant
     // clearing the input left the old value in place (codex Q9, round 3).
     const metadata = {
       ...product.metadata,
-      inventory: row.inventory,
-      ...(row.inventory === 'lead_time' && row.lead_time_days
+      inventory: effectiveInventory,
+      ...(effectiveInventory === 'lead_time' && row.lead_time_days
         ? { lead_time_days: parseInt(row.lead_time_days, 10) }
         : { lead_time_days: undefined }),
       patient_price_cents,

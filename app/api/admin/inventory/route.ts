@@ -34,38 +34,38 @@ export async function GET() {
   return NextResponse.json({ inventory: data });
 }
 
-// PUT — full replace (delete all + re-insert) used by admin list editor
+// PUT — full replace used by admin list editor.
+// Calls replace_inventory(jsonb) RPC (migration 022) so DELETE + INSERT
+// happen in a single transaction — a concurrent purchase can't lose its
+// decrement against the empty intermediate state.
 export async function PUT(request: Request) {
   const authed = await isAuthenticated();
   if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json();
-  const items: InventoryRow[] = (body.inventory ?? []).map(
-    (item: InventoryRow, idx: number) => ({
+  const items: InventoryRow[] = [];
+  for (const [idx, item] of ((body.inventory ?? []) as InventoryRow[]).entries()) {
+    const stock = Number(item.stock);
+    if (!Number.isFinite(stock) || stock < 0 || !Number.isInteger(stock)) {
+      return NextResponse.json(
+        { error: `Row ${idx + 1}: stock must be a non-negative integer` },
+        { status: 400 },
+      );
+    }
+    items.push({
       product: item.product,
       dose: item.dose,
-      stock: Number(item.stock) || 0,
+      stock,
       status: item.status,
       notes: item.notes || null,
       sort_order: idx,
       product_id: item.product_id || null,
-    })
-  );
+    });
+  }
 
   const supabase = getAdminSupabase();
-
-  // Delete everything then re-insert so real-time fires for all changes
-  const { error: delErr } = await supabase
-    .from('inventory')
-    .delete()
-    .gte('sort_order', 0); // matches all rows
-
-  if (delErr) return NextResponse.json({ error: delErr.message }, { status: 500 });
-
-  if (items.length > 0) {
-    const { error: insErr } = await supabase.from('inventory').insert(items);
-    if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 });
-  }
+  const { error } = await supabase.rpc('replace_inventory', { p_rows: items });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({ ok: true });
 }
@@ -77,6 +77,16 @@ export async function PATCH(request: Request) {
 
   const { id, ...updates } = await request.json();
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+
+  // Stock must be a non-negative integer if provided — otherwise the reverse
+  // trigger would copy a negative value into products.stock_quantity.
+  if (updates.stock !== undefined) {
+    const stock = Number(updates.stock);
+    if (!Number.isFinite(stock) || stock < 0 || !Number.isInteger(stock)) {
+      return NextResponse.json({ error: 'stock must be a non-negative integer' }, { status: 400 });
+    }
+    updates.stock = stock;
+  }
 
   const supabase = getAdminSupabase();
   const { error } = await supabase.from('inventory').update(updates).eq('id', id);
