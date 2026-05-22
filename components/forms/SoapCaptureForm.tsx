@@ -705,7 +705,7 @@ ${body}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field id="protocols" label="Protocol(s)">
-                  <input id="protocols" style={inputStyle} placeholder="e.g. BPC-157, Tirzepatide" value={meta.protocols} onChange={setField('protocols')} />
+                  <input id="protocols" style={inputStyle} placeholder="e.g. BPC-157, Tirz" value={meta.protocols} onChange={setField('protocols')} />
                 </Field>
                 <Field id="weekNum" label="Week #">
                   <input id="weekNum" type="number" style={inputStyle} placeholder="e.g. 4" min={0} max={104} value={meta.weekNum} onChange={setField('weekNum')} />
@@ -738,7 +738,7 @@ Labs: TSH 2.1, Free T4 1.2, Total T 680, Free T 18.2, IGF-1 245, Hgb A1c 5.4, CR
 
 A: Good response to BPC-157 5mg/wk and CJC/Ipamorelin. Labs within normal limits.
 
-P: Continue current protocol. Added Tirzepatide 2.5mg/wk for metabolic optimization.`}
+P: Continue current protocol. Added Tirz 2.5mg/wk for metabolic optimization.`}
                 style={{
                   ...inputStyle,
                   minHeight: '260px',

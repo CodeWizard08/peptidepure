@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Peptide Dosing & Safety Guide — PeptidePure™',
     description:
-      'Clinical reconstitution protocols, U-100 syringe conversions, and dosing guidelines for BPC-157, Tirzepatide, Retatrutide, and more.',
+      'Clinical reconstitution protocols, U-100 syringe conversions, and dosing guidelines for BPC-157, Tirz, Reta, and more.',
   },
 };
 

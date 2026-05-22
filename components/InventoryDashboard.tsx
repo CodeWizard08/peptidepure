@@ -228,7 +228,7 @@ function ProductRequestForm({ userEmail, userName }: { userEmail: string; userNa
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
                 {[
-                  { label: 'Product Name *', value: productName, onChange: setProductName, placeholder: 'e.g. Semaglutide', required: true },
+                  { label: 'Product Name *', value: productName, onChange: setProductName, placeholder: 'e.g. Sema', required: true },
                   { label: 'Preferred Dosage', value: dosage, onChange: setDosage, placeholder: 'e.g. 10mg', required: false },
                   { label: 'Estimated Qty (kits)', value: quantity, onChange: setQuantity, placeholder: 'e.g. 10', required: false },
                   { label: 'Additional Notes', value: notes, onChange: setNotes, placeholder: 'Urgency, brand preference, etc.', required: false },
