@@ -16,12 +16,6 @@ const SUGGESTIONS = [
   'Tirz vs Reta for weight loss',
 ];
 
-const PHASE2 = [
-  { label: 'DROP LABS (PDF/IMG)', sub: 'Bloodwork, DEXA, imaging reports', tag: 'PHASE 2' },
-  { label: 'VOICE QUERY', sub: 'Talk it out. Transcribed + answered.', tag: 'PHASE 2' },
-  { label: 'SAVE TO CHART', sub: 'Build a private, clinician-only record.', tag: 'SOON' },
-];
-
 export default function SherpaConsole() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -396,37 +390,6 @@ export default function SherpaConsole() {
               </span>
             </div>
           )}
-
-          {/* Phase 2 cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-            {PHASE2.map((p) => (
-              <div
-                key={p.label}
-                role="group"
-                aria-disabled="true"
-                aria-label={`${p.label} — coming soon`}
-                className="rounded-xl p-4 flex items-start justify-between gap-3 cursor-not-allowed"
-                style={{
-                  background: 'rgba(255,255,255,0.025)',
-                  border: '1px dashed rgba(255,255,255,0.12)',
-                  opacity: 0.55,
-                }}
-              >
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] font-mono" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                    {p.label}
-                  </p>
-                  <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>{p.sub}</p>
-                </div>
-                <span
-                  className="shrink-0 text-[9px] font-bold uppercase tracking-[0.16em] font-mono px-2 py-0.5 rounded"
-                  style={{ background: 'rgba(200,149,44,0.14)', color: 'var(--gold)', border: '1px solid rgba(200,149,44,0.3)' }}
-                >
-                  {p.tag}
-                </span>
-              </div>
-            ))}
-          </div>
 
           {/* Footer disclaimer */}
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] font-mono pt-4" style={{ color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
