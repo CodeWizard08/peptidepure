@@ -100,10 +100,18 @@ export async function sendPatientPortalLink({
       subject: 'Your PeptidePure™ patient portal link',
       html: dashboardLinkHtml(magicLink, displayName),
     });
-    if (sent) return true;
+    if (sent) {
+      console.log(`[patient-auth] branded magic-link sent to ${email}`);
+      return true;
+    }
     console.error('[patient-auth] branded sendEmail failed for', email, '— falling back to Supabase OTP');
   } else if (error) {
-    console.warn('[patient-auth] generateLink failed (will fall back):', error.message);
+    console.warn('[patient-auth] generateLink failed (will fall back):', JSON.stringify({
+      message: error.message,
+      status: error.status,
+      code: (error as { code?: string }).code,
+      name: error.name,
+    }));
   }
 
   // Path 2 — fallback to Supabase built-in via anon signInWithOtp. This
@@ -122,8 +130,14 @@ export async function sendPatientPortalLink({
     },
   });
   if (otpError) {
-    console.error('[patient-auth] signInWithOtp fallback failed:', otpError.message);
+    console.error('[patient-auth] signInWithOtp fallback failed:', JSON.stringify({
+      message: otpError.message,
+      status: otpError.status,
+      code: (otpError as { code?: string }).code,
+      name: otpError.name,
+    }));
     return false;
   }
+  console.log(`[patient-auth] OTP fallback magic-link sent to ${email} (Supabase built-in email)`);
   return true;
 }
