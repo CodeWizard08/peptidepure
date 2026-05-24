@@ -5,6 +5,9 @@ export type CartItem = {
   priceCents: number;
   imageUrl: string | null;
   quantity: number;
+  // Minimum order qty per the product's inventory state (lead-time SKUs require 10).
+  // Cart UI uses this to block decrement below the threshold (audit #9.27).
+  minQty?: number;
 };
 
 export type OrderItemJson = {

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
 import type { Order } from '@/lib/types/order';
 import { OrderRow, StatCard } from './AccountShared';
+import PatientIntakeLinkCard from './PatientIntakeLinkCard';
 
 interface Props {
   user: User;
@@ -11,7 +12,7 @@ interface Props {
   onViewOrders: () => void;
 }
 
-export default function DashboardHome({ displayName, orders, ordersLoading, onViewOrders }: Props) {
+export default function DashboardHome({ user, displayName, orders, ordersLoading, onViewOrders }: Props) {
   return (
     <div className="space-y-6">
       <div className="rounded-2xl p-6 md:p-8" style={{ background: 'white', border: '1px solid var(--border)' }}>
@@ -24,6 +25,8 @@ export default function DashboardHome({ displayName, orders, ordersLoading, onVi
           manage your shipping and billing addresses, and edit your password and account details.
         </p>
       </div>
+
+      <PatientIntakeLinkCard userId={user.id} displayName={displayName} />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard label="Total Orders" value={ordersLoading ? '—' : String(orders.length)}

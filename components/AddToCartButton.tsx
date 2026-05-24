@@ -53,6 +53,10 @@ export default function AddToCartButton({ product, inventory = 'in_stock', leadT
         slug: product.slug,
         priceCents: product.price_cents,
         imageUrl: product.image_url,
+        // Audit #9.27 — propagate MOQ so CartPage blocks sub-10 decrements
+        // for lead-time SKUs (server already rejects, this prevents the
+        // user from hitting checkout with a sub-MOQ quantity).
+        minQty: isLeadTime ? 10 : undefined,
       },
       quantity
     );
