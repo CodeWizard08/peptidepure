@@ -111,7 +111,7 @@ export default async function PeptidesPage({
             <StarterPackages user={user} packages={content.starterPackages} />
 
             {/* Essential Protocols sits between Bundles and All Peptides per Scott's audit (#23) */}
-            <ProtocolsSection content={content.protocols} />
+            <ProtocolsSection content={content.protocols} user={user} />
 
             <ProductGrid
               products={(products ?? []) as Product[]}

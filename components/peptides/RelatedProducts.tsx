@@ -40,7 +40,7 @@ export default function RelatedProducts({ products }: { products: RelatedProduct
                 alt={item.name}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-contain p-4"
+                className="object-contain p-2"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
             </div>

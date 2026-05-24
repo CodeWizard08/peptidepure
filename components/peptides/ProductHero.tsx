@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import AddToCartButton from '@/components/AddToCartButton';
 import StockNotificationForm from '@/components/peptides/StockNotificationForm';
+import ProductImage from '@/components/peptides/ProductImage';
 import { formatCents } from '@/lib/format';
 
 type Product = {
@@ -143,24 +144,39 @@ export default function ProductHero({
                 className="rounded-2xl overflow-hidden flex items-center justify-center aspect-square shadow-lg relative"
                 style={{ background: 'linear-gradient(145deg, #0B1F3A 0%, #1a3a6b 60%, #243f6e 100%)' }}
               >
-                {product.image_url ? (
-                  <Image
-                    src={product.image_url}
-                    alt={baseName}
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 42vw"
-                    className="object-contain p-8"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '20px 20px' }} />
-                    <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="1.5" className="opacity-40">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
-                    </svg>
-                    {strength && <span className="text-white/60 text-lg font-bold relative z-10">{strength}</span>}
-                  </div>
-                )}
+                {(() => {
+                  // Placeholder card — used both for missing image_url AND
+                  // as the ProductImage error fallback so a broken URL
+                  // degrades gracefully to the same visual.
+                  const placeholder = (
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '20px 20px' }} />
+                      <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="1.5" className="opacity-40">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+                      </svg>
+                      {strength && <span className="text-white/60 text-lg font-bold relative z-10">{strength}</span>}
+                    </div>
+                  );
+                  if (!product.image_url) return placeholder;
+                  return (
+                    <ProductImage
+                      src={product.image_url}
+                      alt={baseName}
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 42vw"
+                      // Audit PDF #9.25 — Mort flagged hero photos as
+                      // "zoomed in / cropped too tight." object-contain
+                      // never crops, but the prior p-8 padding made the
+                      // product render at ~85% of the frame; p-4 nearly
+                      // halves the dead space. ProductImage also falls
+                      // back to the placeholder on broken URLs so missing
+                      // CDN entries degrade cleanly.
+                      className="object-contain p-4"
+                      fallback={placeholder}
+                    />
+                  );
+                })()}
 
                 {/* Inventory badge */}
                 <div className="absolute top-3 right-3">

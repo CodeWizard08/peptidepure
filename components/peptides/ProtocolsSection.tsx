@@ -1,10 +1,29 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import type { User } from '@supabase/supabase-js';
 import type { PeptidesContent } from '@/lib/content-types';
 
 type ProtocolsContent = PeptidesContent['protocols'];
 
-export default function ProtocolsSection({ content }: { content: ProtocolsContent }) {
+export default function ProtocolsSection({
+  content,
+  user,
+}: {
+  content: ProtocolsContent;
+  user: User | null;
+}) {
+  // Audit PDF #8.24 — protocol cards used to send EVERY click (including
+  // logged-in clinicians) to /contact via a "Request Protocol" button,
+  // generating support-team noise and friction. Now:
+  //   - Authenticated clinicians get a "View Protocols" button → /protocols
+  //     (the published protocol library; no contact-form detour).
+  //   - Anonymous visitors get "Sign in to view" → /account?next=/protocols,
+  //     so they enter the registration funnel instead of pinging support.
+  // Protocol detail pages at /protocols/[slug] are public, so the auth
+  // gate here is a soft lead-capture nudge, not a hard wall.
+  const isClinician = !!user;
+  const ctaLabel = isClinician ? 'View Protocols' : 'Sign in to view';
+  const ctaHref = isClinician ? '/protocols' : '/account?next=/protocols';
   return (
     <>
       {/* id used by deep links from ProtocolMembership / ProductHero ("#protocols") */}
@@ -85,11 +104,11 @@ export default function ProtocolsSection({ content }: { content: ProtocolsConten
               </div>
 
               <Link
-                href="/contact"
+                href={ctaHref}
                 className="mt-auto text-center py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
                 style={{ background: 'var(--navy)' }}
               >
-                Request Protocol
+                {ctaLabel}
               </Link>
             </div>
           </div>

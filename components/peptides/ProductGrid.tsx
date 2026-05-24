@@ -174,7 +174,9 @@ export default function ProductGrid({
                         alt={product.name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-contain p-4"
+                        // Audit #9.25 — match ProductHero: drop padding so the
+                        // product fills more of the card frame.
+                        className="object-contain p-2"
                       />
                     ) : (
                       <div className="flex flex-col items-center gap-2 relative z-10">
