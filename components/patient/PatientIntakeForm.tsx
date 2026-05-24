@@ -113,7 +113,7 @@ export default function PatientIntakeForm() {
     return (
       <FormSuccessScreen
         title="Thanks — your intake is in."
-        message="A member of the PeptidePure clinical team will review your submission and reach out by email within two business days."
+        message="We just emailed you a link to your patient portal. Click it to track your submission and see clinician follow-ups. A PeptidePure clinician will also review your intake within two business days."
         resetHref="/p/intake"
         onReset={reset}
       />

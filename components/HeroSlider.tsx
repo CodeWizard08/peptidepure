@@ -245,22 +245,30 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
         </button>
       ))}
 
-      {/* ── Bottom navigation — promoted to card-style selectors ── */}
+      {/* ── Bottom navigation — promoted to card-style selectors ──
+          Mobile: single-row horizontal scroll (cards were wrapping into
+          two rows on ~360px viewports and eating enough vertical space
+          to overlap the "Browse Peptides" CTA in the slide content).
+          sm+: keep the flex-wrap layout so wide screens use the space. */}
       <div className="absolute bottom-0 left-0 right-0" style={{ zIndex: 20 }}>
         <div className="container-xl pb-8 flex items-end justify-between gap-4">
-          <div className="flex items-stretch gap-2 sm:gap-3 flex-wrap">
+          <div
+            className="flex items-stretch gap-2 sm:gap-3 overflow-x-auto sm:overflow-visible sm:flex-wrap hero-slider-nav"
+            style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+          >
             {slides.map((s, i) => {
               const active = i === current;
               return (
                 <button
                   key={i}
                   onClick={() => goTo(i)}
-                  className="group flex flex-col items-start gap-1.5 px-4 py-2.5 rounded-xl transition-all duration-300 text-left min-w-0"
+                  className="group flex flex-col items-start gap-1.5 px-4 py-2.5 rounded-xl transition-all duration-300 text-left shrink-0 sm:shrink"
                   style={{
                     background: active ? 'rgba(200,149,44,0.18)' : 'rgba(255,255,255,0.06)',
                     border: active ? '1px solid rgba(200,149,44,0.55)' : '1px solid rgba(255,255,255,0.10)',
                     backdropFilter: 'blur(8px)',
                     minWidth: '120px',
+                    scrollSnapAlign: 'start',
                   }}
                 >
                   <div className="flex items-center gap-1.5">
@@ -301,6 +309,13 @@ export default function HeroSlider({ content }: { content: HeroSliderContent }) 
           />
         </div>
       </div>
+
+      {/* Hide the scrollbar on the slide-nav row so the horizontal scroll
+          feels native-app (touch swipe) rather than desktop-scrollbar. */}
+      <style jsx>{`
+        .hero-slider-nav::-webkit-scrollbar { display: none; }
+        .hero-slider-nav { scrollbar-width: none; -ms-overflow-style: none; }
+      `}</style>
     </section>
   );
 }

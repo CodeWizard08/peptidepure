@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendAdminNotification } from '@/lib/email';
 import { slidingWindowLimit, getClientIp } from '@/lib/rate-limit';
+import { sendPatientPortalLink } from '@/lib/patient-auth';
 
 // Service-role client for the public intake. The form is open to the
 // internet, so there's no user session to authorize the insert against —
@@ -252,6 +253,15 @@ export async function POST(request: Request) {
       clinicSlug,
     })
   );
+
+  // Patient Auth Slice 2 — fire-and-forget magic link so the patient can
+  // claim their intake at /p/dashboard. We derive origin from the request
+  // URL so dev and prod both work. If Supabase/Resend errors, the helper
+  // logs and returns false; the patient still got their 201 so the form's
+  // success screen renders fine. The success screen tells them to check
+  // their email; if nothing arrives they can retry from /p/intake.
+  const origin = new URL(request.url).origin;
+  void sendPatientPortalLink({ email, displayName: name, origin });
 
   return NextResponse.json({ id: intake.id }, { status: 201 });
 }
