@@ -55,3 +55,55 @@ export function isAllowedImageHost(hostname: string): boolean {
   const h = hostname.toLowerCase();
   return ALLOWED_IMAGE_HOSTS.some((allowed) => allowed.toLowerCase() === h);
 }
+
+/**
+ * Convert a Next.js remotePatterns `pathname` glob to a RegExp.
+ *
+ * Next supports:
+ *   `*`   — matches any characters except `/` (single path segment)
+ *   `**`  — matches any characters including `/` (any depth of segments)
+ *
+ * Everything else is treated literally; regex-meta chars must be escaped
+ * so a pathname like `/storage/v1/object/public/**` doesn't accidentally
+ * treat the dots as any-char wildcards. The final regex is anchored at
+ * both ends so partial-path matches don't slip through.
+ */
+function pathnameGlobToRegExp(pattern: string): RegExp {
+  // Escape all regex specials EXCEPT `*` (handled separately below).
+  // Then replace `**` first with a placeholder, then `*` with the
+  // single-segment matcher, then expand the placeholder. Order matters:
+  // doing `*` first would consume the `**` as two adjacent `*`s.
+  const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+  const withDoubleStar = escaped.replace(/\*\*/g, '__DOUBLE_STAR__');
+  const withSingleStar = withDoubleStar.replace(/\*/g, '[^/]*');
+  const final = withSingleStar.replace(/__DOUBLE_STAR__/g, '.*');
+  return new RegExp(`^${final}$`);
+}
+
+/**
+ * Does the given URL match ANY entry in REMOTE_IMAGE_PATTERNS, checking
+ * BOTH hostname and pathname glob?
+ *
+ * Codex final verification flagged that hostname-only checking still
+ * lets `https://peptidepure.com/not-wp/logo.png` pass save-time
+ * validation only to fail at next/image render time. This closes that
+ * gap: the API validator can call this to enforce path patterns too,
+ * keeping save-time and render-time invariants aligned.
+ *
+ * Hostname comparison is case-insensitive (URL spec normalizes it
+ * anyway); pathname is case-sensitive (matches Next/web semantics).
+ */
+export function matchesRemotePattern(url: URL): boolean {
+  const host = url.hostname.toLowerCase();
+  return REMOTE_IMAGE_PATTERNS.some((pattern) => {
+    if (pattern.protocol && url.protocol !== `${pattern.protocol}:`) return false;
+    if (typeof pattern.hostname === 'string' && pattern.hostname.toLowerCase() !== host) {
+      return false;
+    }
+    if (typeof pattern.pathname === 'string') {
+      const re = pathnameGlobToRegExp(pattern.pathname);
+      if (!re.test(url.pathname)) return false;
+    }
+    return true;
+  });
+}

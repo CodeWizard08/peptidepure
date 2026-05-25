@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "batch-draft-protocols": "tsx scripts/batch-draft-protocols.ts",
     "embed-protocols": "tsx scripts/embed-protocols.ts",
     "extract-protocol-metadata": "tsx scripts/extract-protocol-metadata.ts",
@@ -38,6 +40,7 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "tsx": "^4.22.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^2.1.9"
   }
 }

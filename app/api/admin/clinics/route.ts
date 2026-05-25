@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/admin-auth';
 import { createClient } from '@supabase/supabase-js';
-import { ALLOWED_IMAGE_HOSTS, isAllowedImageHost } from '@/lib/image-hosts';
+import { matchesRemotePattern, REMOTE_IMAGE_PATTERNS } from '@/lib/image-hosts';
 
 function getAdminSupabase() {
   return createClient(
@@ -90,15 +90,15 @@ function validateClinic(body: ClinicBody, partial: boolean): { ok: true; patch: 
       if (url.length > LOGO_URL_MAX) {
         return { ok: false, error: `brand_logo_url exceeds ${LOGO_URL_MAX} chars` };
       }
-      // Codex review fixes (a) + (b) — use URL parsing (not regex) so
-      // edge cases like ports, fragments, userinfo, and unusual hostname
-      // shapes are handled correctly, then check three things:
+      // Codex review fixes (a) + (b) + final-pass — use URL parsing
+      // (not regex) so edge cases like ports, fragments, userinfo, and
+      // unusual hostname shapes are handled correctly, then check:
       //   1. scheme is https (blocks javascript:, data:, http:)
-      //   2. hostname is in next.config.ts's remotePatterns (blocks the
-      //      "saved but won't render via next/image" failure mode)
-      //   3. no whitespace in the path
-      // The hostname allowlist lives in lib/image-hosts.ts so the
-      // validator and the next/image renderer can never drift.
+      //   2. no whitespace in the path (defense vs %20 in user input)
+      //   3. hostname AND pathname match an entry in REMOTE_IMAGE_PATTERNS
+      //      so save-time and render-time invariants stay aligned.
+      // The patterns live in lib/image-hosts.ts so the validator and the
+      // next/image renderer can never drift.
       let parsed: URL;
       try {
         parsed = new URL(url);
@@ -111,10 +111,17 @@ function validateClinic(body: ClinicBody, partial: boolean): { ok: true; patch: 
       if (/\s/.test(parsed.pathname)) {
         return { ok: false, error: 'brand_logo_url path must not contain whitespace' };
       }
-      if (!isAllowedImageHost(parsed.hostname)) {
+      if (!matchesRemotePattern(parsed)) {
+        // Build a developer-readable list of allowed host+path patterns
+        // so the admin can see WHY a perfectly-valid-looking URL was
+        // rejected (e.g. "host OK but path doesn't match the /img/**
+        // pattern for www.peptide.buzz").
+        const allowedSummary = REMOTE_IMAGE_PATTERNS
+          .map((p) => `${p.hostname}${typeof p.pathname === 'string' ? p.pathname : ''}`)
+          .join(', ');
         return {
           ok: false,
-          error: `brand_logo_url host "${parsed.hostname}" is not allowed. Allowed hosts: ${ALLOWED_IMAGE_HOSTS.join(', ')}`,
+          error: `brand_logo_url ("${parsed.hostname}${parsed.pathname}") doesn't match any allowed host+path pattern. Allowed: ${allowedSummary}`,
         };
       }
     }
