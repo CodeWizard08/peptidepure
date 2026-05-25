@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '@/lib/admin-auth';
 import { createClient } from '@supabase/supabase-js';
+import { ALLOWED_IMAGE_HOSTS, isAllowedImageHost } from '@/lib/image-hosts';
 
 function getAdminSupabase() {
   return createClient(
@@ -89,12 +90,32 @@ function validateClinic(body: ClinicBody, partial: boolean): { ok: true; patch: 
       if (url.length > LOGO_URL_MAX) {
         return { ok: false, error: `brand_logo_url exceeds ${LOGO_URL_MAX} chars` };
       }
-      // Codex review (b) — restrict to https:// to block javascript:,
-      // data:, and mixed-content http:. Defense-in-depth: next/image
-      // would reject most of these at render, but a strict scheme +
-      // hostname-shape check here keeps obvious garbage out of the DB.
-      if (!/^https:\/\/[A-Za-z0-9._-]+(:\d+)?(\/[^\s]*)?$/.test(url)) {
-        return { ok: false, error: 'brand_logo_url must be an https:// URL' };
+      // Codex review fixes (a) + (b) — use URL parsing (not regex) so
+      // edge cases like ports, fragments, userinfo, and unusual hostname
+      // shapes are handled correctly, then check three things:
+      //   1. scheme is https (blocks javascript:, data:, http:)
+      //   2. hostname is in next.config.ts's remotePatterns (blocks the
+      //      "saved but won't render via next/image" failure mode)
+      //   3. no whitespace in the path
+      // The hostname allowlist lives in lib/image-hosts.ts so the
+      // validator and the next/image renderer can never drift.
+      let parsed: URL;
+      try {
+        parsed = new URL(url);
+      } catch {
+        return { ok: false, error: 'brand_logo_url must be a valid URL' };
+      }
+      if (parsed.protocol !== 'https:') {
+        return { ok: false, error: 'brand_logo_url must use https://' };
+      }
+      if (/\s/.test(parsed.pathname)) {
+        return { ok: false, error: 'brand_logo_url path must not contain whitespace' };
+      }
+      if (!isAllowedImageHost(parsed.hostname)) {
+        return {
+          ok: false,
+          error: `brand_logo_url host "${parsed.hostname}" is not allowed. Allowed hosts: ${ALLOWED_IMAGE_HOSTS.join(', ')}`,
+        };
       }
     }
     patch.brand_logo_url = url;

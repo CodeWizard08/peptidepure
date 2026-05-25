@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { REMOTE_IMAGE_PATTERNS } from "./lib/image-hosts";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -7,28 +8,9 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 31536000,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [32, 48, 64, 96, 128, 256],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'dzbvaswimmaxfvambivu.supabase.co',
-        pathname: '/storage/v1/object/public/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'peptidepure.com',
-        pathname: '/wp-content/uploads/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.peptide.buzz',
-        pathname: '/img/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'peptide.buzz',
-        pathname: '/img/**',
-      },
-    ],
+    // Single source of truth in lib/image-hosts.ts — also referenced by
+    // the admin clinic-logo validator so the two can never drift.
+    remotePatterns: REMOTE_IMAGE_PATTERNS,
   },
   async headers() {
     return [
