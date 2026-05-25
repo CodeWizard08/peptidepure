@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import { FieldLabel, REQUIRED, FormSuccessScreen } from '@/components/forms/FormPrimitives';
+import type { ClinicBranding } from '@/app/p/intake/page';
 
 const CONCERN_OPTIONS: { value: string; label: string }[] = [
   { value: 'pain_recovery', label: 'Pain & injury recovery' },
@@ -26,11 +27,12 @@ const INPUT_STYLE: React.CSSProperties = {
   color: 'var(--navy)',
 };
 
-export default function PatientIntakeForm() {
+export default function PatientIntakeForm({ clinic }: { clinic: ClinicBranding | null }) {
   const searchParams = useSearchParams();
-  // White-label attribution. Clinicians share /p/intake?clinic=<slug> so we
-  // know which clinic referred the patient. Normalize to lowercase + strip
-  // anything that isn't a-z, 0-9, dash, or underscore.
+  // White-label attribution. The page server-fetches the matching clinic
+  // and passes it as a prop; we still read the raw slug from the URL so
+  // we can attribute the intake server-side even when no matching clinic
+  // is registered (the slug stays as a free-text hint for admin).
   const clinicSlugRaw = searchParams.get('clinic') ?? '';
   const clinicSlug = clinicSlugRaw.toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 64);
   // Clinician-specific share link: /p/intake?ref=<uuid> attributes the
@@ -40,6 +42,16 @@ export default function PatientIntakeForm() {
   const referringUserId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(refRaw)
     ? refRaw.toLowerCase()
     : '';
+
+  // Slice 4 — render the clinic's branding tokens (logo + primary/accent
+  // hex). Server-fetched in /p/intake/page.tsx, so first paint is already
+  // branded; no flash of unbranded content. Each token is independently
+  // optional — a clinic with only a logo (no colors) still renders the
+  // default PeptidePure palette.
+  const brandPrimary = clinic?.brand_primary ?? null;
+  const brandAccent = clinic?.brand_accent ?? null;
+  const brandLogoUrl = clinic?.brand_logo_url ?? null;
+  const clinicDisplayName = clinic?.name ?? null;
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -52,30 +64,6 @@ export default function PatientIntakeForm() {
   const [consentResearch, setConsentResearch] = useState(false);
   const [consentContact, setConsentContact] = useState(false);
   const [hpField, setHpField] = useState('');
-
-  // Slice 3 — resolve the clinic slug to a registered clinic so the
-  // "Referred via X" pill shows the proper name (e.g. "Acme Medical
-  // Group") instead of the bare slug. Falls back to the slug when no
-  // matching active clinic is registered. RLS on clinics allows public
-  // SELECT of active rows, so the anon client can do this directly.
-  const [clinicDisplayName, setClinicDisplayName] = useState<string | null>(null);
-  useEffect(() => {
-    if (!clinicSlug) return;
-    const supabase = createClient();
-    let cancelled = false;
-    supabase
-      .from('clinics')
-      .select('name')
-      .eq('slug', clinicSlug)
-      .eq('status', 'active')
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!cancelled && data?.name) setClinicDisplayName(data.name);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [clinicSlug]);
 
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -145,15 +133,65 @@ export default function PatientIntakeForm() {
     );
   }
 
+  // Slice 4 — derive the branded color set. brand_primary swaps in for the
+  // form's accent border + section header; brand_accent swaps for the
+  // "Referred via" pill background and the submit-button gradient. Falls
+  // back to gold/navy when a clinic hasn't set its own palette. Build a
+  // hex+alpha rgba() helper so the pill background mirrors the existing
+  // 8% gold-pale tint exactly.
+  const accent = brandAccent ?? 'var(--gold)';
+  const primary = brandPrimary ?? 'var(--navy)';
+  const hexToRgba = (hex: string | null, alpha: number) => {
+    if (!hex) return null;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  };
+  const pillBg = hexToRgba(brandAccent, 0.08) ?? 'var(--gold-pale)';
+  const pillBorder = hexToRgba(brandAccent, 0.3) ?? 'rgba(200,149,44,0.3)';
+
   return (
     <section className="py-10" style={{ background: 'var(--off-white)' }}>
       <div className="container-xl max-w-3xl">
+        {/* Clinic logo strip — only renders when the registered clinic
+            uploaded a logo. Sits above the "Referred via" pill so the
+            patient immediately recognizes the clinic, then sees who's
+            handling their intake. PeptidePure clinical-team co-branding
+            stays in the section header below. */}
+        {brandLogoUrl && (
+          <div
+            className="mb-6 px-5 py-4 rounded-2xl bg-white flex items-center gap-4"
+            style={{ border: '1px solid var(--border)', borderTop: `3px solid ${primary}` }}
+          >
+            <div className="relative h-12 w-32 shrink-0">
+              <Image
+                src={brandLogoUrl}
+                alt={`${clinicDisplayName ?? clinicSlug} logo`}
+                fill
+                sizes="128px"
+                className="object-contain object-left"
+              />
+            </div>
+            {clinicDisplayName && (
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: accent }}>
+                  Patient portal
+                </p>
+                <p className="text-sm font-semibold truncate" style={{ color: primary }}>
+                  {clinicDisplayName}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {clinicSlug && (
           <div
             className="mb-6 px-4 py-3 rounded-lg text-xs"
-            style={{ background: 'var(--gold-pale)', border: '1px solid rgba(200,149,44,0.3)', color: 'var(--text-mid)' }}
+            style={{ background: pillBg, border: `1px solid ${pillBorder}`, color: 'var(--text-mid)' }}
           >
-            Referred via <strong style={{ color: 'var(--navy)' }}>{clinicDisplayName ?? clinicSlug}</strong>. Your intake will be routed to that clinic.
+            Referred via <strong style={{ color: primary }}>{clinicDisplayName ?? clinicSlug}</strong>. Your intake will be routed to that clinic.
           </div>
         )}
 
@@ -321,7 +359,14 @@ export default function PatientIntakeForm() {
             type="submit"
             disabled={submitting || !consentContact || !consentResearch}
             className="btn-primary w-full sm:w-auto"
-            style={{ opacity: submitting || !consentContact || !consentResearch ? 0.6 : 1 }}
+            style={{
+              opacity: submitting || !consentContact || !consentResearch ? 0.6 : 1,
+              // Slice 4 — when a clinic has set its primary brand color,
+              // swap the button to that color so the CTA matches the rest
+              // of the white-label palette. Default `.btn-primary` styling
+              // takes over when no brand color is set.
+              ...(brandPrimary ? { background: brandPrimary, color: 'white' } : {}),
+            }}
           >
             {submitting ? 'Submitting…' : 'Submit intake'}
           </button>

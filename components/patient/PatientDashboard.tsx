@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
@@ -15,6 +16,14 @@ type IntakeRow = {
   admin_notes: string | null;
   reviewed_at: string | null;
   clinic_slug: string | null;
+};
+
+type ClinicBranding = {
+  name: string;
+  slug: string;
+  brand_primary: string | null;
+  brand_accent: string | null;
+  brand_logo_url: string | null;
 };
 
 const STATUS_COPY: Record<IntakeRow['status'], { label: string; color: string; bg: string; description: string }> = {
@@ -62,9 +71,11 @@ function fmtDate(iso: string) {
 export default function PatientDashboard({
   email,
   intakes,
+  clinic,
 }: {
   email: string;
   intakes: IntakeRow[];
+  clinic: ClinicBranding | null;
 }) {
   const router = useRouter();
 
@@ -75,12 +86,62 @@ export default function PatientDashboard({
     router.push('/');
   };
 
+  // Slice 4 — use the clinic's brand_primary as the dashboard header
+  // background, brand_accent as the "Patient Portal" eyebrow color, and
+  // render the clinic logo + name at the top. Falls back to default
+  // PeptidePure framing when no clinic branding is present.
+  const headerBg = clinic?.brand_primary ?? 'var(--navy)';
+  const accent = clinic?.brand_accent ?? 'var(--gold)';
+  const onDarkText = clinic?.brand_primary ? '#ffffff' : undefined; // when we paint our own dark header, force white text
+
   return (
     <div style={{ background: 'var(--off-white)', minHeight: '100vh' }}>
+      {clinic && (
+        <div
+          className="py-8"
+          style={{ background: headerBg, color: onDarkText, borderBottom: `3px solid ${accent}` }}
+        >
+          <div className="container-xl flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-4 min-w-0">
+              {clinic.brand_logo_url && (
+                <div className="relative h-12 w-32 shrink-0 bg-white/10 rounded-lg px-3 py-2">
+                  <Image
+                    src={clinic.brand_logo_url}
+                    alt={`${clinic.name} logo`}
+                    fill
+                    sizes="128px"
+                    className="object-contain object-left p-2"
+                  />
+                </div>
+              )}
+              <div className="min-w-0">
+                <p
+                  className="text-[10px] font-bold uppercase tracking-[0.22em]"
+                  style={{ color: accent }}
+                >
+                  Patient portal
+                </p>
+                <p className="text-lg font-semibold truncate" style={{ color: 'white' }}>
+                  {clinic.name}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleSignOut}
+              className="text-xs font-semibold px-3.5 py-2 rounded-lg transition-colors"
+              style={{ background: 'rgba(255,255,255,0.12)', color: 'white', border: '1px solid rgba(255,255,255,0.25)' }}
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      )}
       <div className="py-8" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="container-xl flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <span className="section-label">Patient Portal</span>
+            <span className="section-label" style={{ color: accent }}>
+              {clinic ? `Welcome to your ${clinic.name} portal` : 'Patient Portal'}
+            </span>
             <h1 className="text-2xl md:text-3xl font-bold mt-1" style={{ color: 'var(--navy)' }}>
               Welcome back
             </h1>
@@ -88,17 +149,22 @@ export default function PatientDashboard({
               Signed in as <strong style={{ color: 'var(--navy)' }}>{email}</strong>
             </p>
           </div>
-          <button
-            onClick={handleSignOut}
-            className="text-xs font-semibold px-3.5 py-2 rounded-lg transition-colors"
-            style={{
-              background: 'white',
-              color: 'var(--text-mid)',
-              border: '1px solid var(--border)',
-            }}
-          >
-            Sign out
-          </button>
+          {!clinic && (
+            // Show the sign-out button here only when there's no branded
+            // header above (which has its own sign-out). Avoids two
+            // sign-out buttons stacked when a clinic is set.
+            <button
+              onClick={handleSignOut}
+              className="text-xs font-semibold px-3.5 py-2 rounded-lg transition-colors"
+              style={{
+                background: 'white',
+                color: 'var(--text-mid)',
+                border: '1px solid var(--border)',
+              }}
+            >
+              Sign out
+            </button>
+          )}
         </div>
       </div>
 
