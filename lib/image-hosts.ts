@@ -14,7 +14,13 @@
  * a host here is enough to make it saveable as a logo AND renderable.
  */
 
-import type { RemotePattern } from 'next/dist/shared/lib/image-config';
+import type { NextConfig } from 'next';
+
+// Derive the RemotePattern shape from the public NextConfig surface
+// rather than importing from `next/dist/shared/lib/image-config`, which
+// is an internal path and not version-stable. Codex round-3 review flagged
+// the prior internal import as a framework-upgrade hazard.
+type RemotePattern = NonNullable<NonNullable<NextConfig['images']>['remotePatterns']>[number];
 
 export const REMOTE_IMAGE_PATTERNS: RemotePattern[] = [
   {
