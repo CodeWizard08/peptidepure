@@ -85,7 +85,18 @@ function validateClinic(body: ClinicBody, partial: boolean): { ok: true; patch: 
   }
   if (body.brand_logo_url !== undefined) {
     const url = body.brand_logo_url?.trim() || null;
-    if (url && url.length > LOGO_URL_MAX) return { ok: false, error: `brand_logo_url exceeds ${LOGO_URL_MAX} chars` };
+    if (url) {
+      if (url.length > LOGO_URL_MAX) {
+        return { ok: false, error: `brand_logo_url exceeds ${LOGO_URL_MAX} chars` };
+      }
+      // Codex review (b) — restrict to https:// to block javascript:,
+      // data:, and mixed-content http:. Defense-in-depth: next/image
+      // would reject most of these at render, but a strict scheme +
+      // hostname-shape check here keeps obvious garbage out of the DB.
+      if (!/^https:\/\/[A-Za-z0-9._-]+(:\d+)?(\/[^\s]*)?$/.test(url)) {
+        return { ok: false, error: 'brand_logo_url must be an https:// URL' };
+      }
+    }
     patch.brand_logo_url = url;
   }
   if (body.status !== undefined) {

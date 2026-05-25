@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import BrandedLogo from '@/components/patient/BrandedLogo';
+import { readableTextOn } from '@/lib/brand';
 
 type IntakeRow = {
   id: string;
@@ -13,7 +14,6 @@ type IntakeRow = {
   primary_concerns: string[];
   goals: string | null;
   current_peptides: string | null;
-  admin_notes: string | null;
   reviewed_at: string | null;
   clinic_slug: string | null;
 };
@@ -90,27 +90,54 @@ export default function PatientDashboard({
   // background, brand_accent as the "Patient Portal" eyebrow color, and
   // render the clinic logo + name at the top. Falls back to default
   // PeptidePure framing when no clinic branding is present.
+  //
+  // Codex review (f): hard-coding white text on `brand_primary` broke
+  // contrast for clinics with light brand colors. readableTextOn picks
+  // black-on-light vs white-on-dark using YIQ luminance. PeptidePure
+  // default navy → white text; arbitrary clinic palette → readable.
   const headerBg = clinic?.brand_primary ?? 'var(--navy)';
   const accent = clinic?.brand_accent ?? 'var(--gold)';
-  const onDarkText = clinic?.brand_primary ? '#ffffff' : undefined; // when we paint our own dark header, force white text
+  const onHeaderText = clinic?.brand_primary ? readableTextOn(clinic.brand_primary) : '#ffffff';
 
   return (
     <div style={{ background: 'var(--off-white)', minHeight: '100vh' }}>
-      {clinic && (
+      {clinic && (() => {
+        // Codex review (f): chip/button background and border are derived
+        // from onHeaderText so a light brand_primary doesn't render a
+        // light tint that's invisible. Dark header → light tint; light
+        // header → dark tint.
+        const isDarkHeader = onHeaderText === '#ffffff';
+        const chipBg = isDarkHeader ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)';
+        const chipBorder = isDarkHeader ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.12)';
+        const logoSlotBg = isDarkHeader ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+        return (
         <div
           className="py-8"
-          style={{ background: headerBg, color: onDarkText, borderBottom: `3px solid ${accent}` }}
+          style={{ background: headerBg, color: onHeaderText, borderBottom: `3px solid ${accent}` }}
         >
           <div className="container-xl flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-4 min-w-0">
               {clinic.brand_logo_url && (
-                <div className="relative h-12 w-32 shrink-0 bg-white/10 rounded-lg px-3 py-2">
-                  <Image
+                <div
+                  className="relative h-12 w-32 shrink-0 rounded-lg px-3 py-2"
+                  style={{ background: logoSlotBg }}
+                >
+                  <BrandedLogo
                     src={clinic.brand_logo_url}
                     alt={`${clinic.name} logo`}
                     fill
                     sizes="128px"
                     className="object-contain object-left p-2"
+                    // Codex review (a): unallowlisted host or 404 falls
+                    // back to text-only so the header band stays intact.
+                    fallback={
+                      <span
+                        className="text-sm font-bold flex items-center h-full px-2"
+                        style={{ color: onHeaderText }}
+                      >
+                        {clinic.name}
+                      </span>
+                    }
                   />
                 </div>
               )}
@@ -121,7 +148,7 @@ export default function PatientDashboard({
                 >
                   Patient portal
                 </p>
-                <p className="text-lg font-semibold truncate" style={{ color: 'white' }}>
+                <p className="text-lg font-semibold truncate" style={{ color: onHeaderText }}>
                   {clinic.name}
                 </p>
               </div>
@@ -129,13 +156,14 @@ export default function PatientDashboard({
             <button
               onClick={handleSignOut}
               className="text-xs font-semibold px-3.5 py-2 rounded-lg transition-colors"
-              style={{ background: 'rgba(255,255,255,0.12)', color: 'white', border: '1px solid rgba(255,255,255,0.25)' }}
+              style={{ background: chipBg, color: onHeaderText, border: `1px solid ${chipBorder}` }}
             >
               Sign out
             </button>
           </div>
         </div>
-      )}
+        );
+      })()}
       <div className="py-8" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="container-xl flex items-center justify-between gap-4 flex-wrap">
           <div>
@@ -252,19 +280,13 @@ function IntakeCard({ intake }: { intake: IntakeRow }) {
         )}
       </div>
 
-      {intake.admin_notes && (
-        <div
-          className="rounded-xl p-4 mt-5"
-          style={{ background: 'var(--gold-pale)', border: '1px solid rgba(200,149,44,0.3)' }}
-        >
-          <p className="text-xs font-bold uppercase tracking-widest mb-1.5" style={{ color: 'var(--gold)' }}>
-            From your clinician
-          </p>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--navy)' }}>
-            {intake.admin_notes}
-          </p>
-        </div>
-      )}
+      {/* admin_notes panel intentionally removed — Codex rescue review
+          (NEW-1): the admin UI labels that field "Admin notes" and used
+          it for internal clinician-team notes, but the patient-side
+          dashboard was rendering it as "From your clinician." Names + intent
+          diverged, leaking internal notes to patients. If we ever want a
+          true patient-message field, a future slice should add a separate
+          `patient_visible_notes` column with explicit semantics. */}
     </div>
   );
 }

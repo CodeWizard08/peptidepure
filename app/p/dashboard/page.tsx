@@ -6,6 +6,12 @@ import PatientDashboard from '@/components/patient/PatientDashboard';
 // Local row type — supabase-js infers PostgREST embeds as arrays even
 // when the FK is single-column. We know clinic_id maps to one clinic, so
 // pin it as a single object here. Matches the columns we SELECT below.
+//
+// Codex rescue review (Slices 3+4, NEW-1): admin_notes is NOT selected
+// here even though migration 031 used to grant it to authenticated. The
+// patient dashboard exposed it as "From your clinician" but the admin
+// UI labels it "Admin notes" — names diverged, leaking internal notes.
+// Migration 034 also revokes the column-level grant as defense-in-depth.
 type DashboardIntakeRow = {
   id: string;
   created_at: string;
@@ -14,7 +20,6 @@ type DashboardIntakeRow = {
   primary_concerns: string[];
   goals: string | null;
   current_peptides: string | null;
-  admin_notes: string | null;
   reviewed_at: string | null;
   clinic_slug: string | null;
   clinic: {
@@ -61,7 +66,7 @@ export default async function PatientDashboardPage() {
   const { data: intakes, error } = await supabase
     .from('patient_intakes')
     .select(
-      'id, created_at, status, name, primary_concerns, goals, current_peptides, admin_notes, reviewed_at, clinic_slug, clinic:clinics(name, slug, brand_primary, brand_accent, brand_logo_url)'
+      'id, created_at, status, name, primary_concerns, goals, current_peptides, reviewed_at, clinic_slug, clinic:clinics(name, slug, brand_primary, brand_accent, brand_logo_url)'
     )
     .ilike('email', user.email ?? '')
     .order('created_at', { ascending: false });

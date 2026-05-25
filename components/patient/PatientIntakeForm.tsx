@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
+import BrandedLogo from '@/components/patient/BrandedLogo';
 import { FieldLabel, REQUIRED, FormSuccessScreen } from '@/components/forms/FormPrimitives';
+import { readableTextOn } from '@/lib/brand';
 import type { ClinicBranding } from '@/app/p/intake/page';
 
 const CONCERN_OPTIONS: { value: string; label: string }[] = [
@@ -165,12 +166,23 @@ export default function PatientIntakeForm({ clinic }: { clinic: ClinicBranding |
             style={{ border: '1px solid var(--border)', borderTop: `3px solid ${primary}` }}
           >
             <div className="relative h-12 w-32 shrink-0">
-              <Image
+              <BrandedLogo
                 src={brandLogoUrl}
                 alt={`${clinicDisplayName ?? clinicSlug} logo`}
                 fill
                 sizes="128px"
                 className="object-contain object-left"
+                // Codex review (a): if the logo URL is outside the
+                // next/image allowlist (or 404s), don't crash the page —
+                // show the clinic name as text in the logo slot instead.
+                fallback={
+                  <span
+                    className="text-sm font-bold flex items-center h-full"
+                    style={{ color: primary }}
+                  >
+                    {clinicDisplayName ?? clinicSlug}
+                  </span>
+                }
               />
             </div>
             {clinicDisplayName && (
@@ -362,10 +374,13 @@ export default function PatientIntakeForm({ clinic }: { clinic: ClinicBranding |
             style={{
               opacity: submitting || !consentContact || !consentResearch ? 0.6 : 1,
               // Slice 4 — when a clinic has set its primary brand color,
-              // swap the button to that color so the CTA matches the rest
-              // of the white-label palette. Default `.btn-primary` styling
-              // takes over when no brand color is set.
-              ...(brandPrimary ? { background: brandPrimary, color: 'white' } : {}),
+              // swap the button to that color. Codex review (f): foreground
+              // text was hard-coded white, which read as illegible on
+              // bright/light brand_primary colors. readableTextOn picks
+              // black on light bgs, white on dark.
+              ...(brandPrimary
+                ? { background: brandPrimary, color: readableTextOn(brandPrimary) }
+                : {}),
             }}
           >
             {submitting ? 'Submitting…' : 'Submit intake'}
