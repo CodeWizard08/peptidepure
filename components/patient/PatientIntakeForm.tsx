@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 import { FieldLabel, REQUIRED, FormSuccessScreen } from '@/components/forms/FormPrimitives';
 
 const CONCERN_OPTIONS: { value: string; label: string }[] = [
@@ -51,6 +52,30 @@ export default function PatientIntakeForm() {
   const [consentResearch, setConsentResearch] = useState(false);
   const [consentContact, setConsentContact] = useState(false);
   const [hpField, setHpField] = useState('');
+
+  // Slice 3 — resolve the clinic slug to a registered clinic so the
+  // "Referred via X" pill shows the proper name (e.g. "Acme Medical
+  // Group") instead of the bare slug. Falls back to the slug when no
+  // matching active clinic is registered. RLS on clinics allows public
+  // SELECT of active rows, so the anon client can do this directly.
+  const [clinicDisplayName, setClinicDisplayName] = useState<string | null>(null);
+  useEffect(() => {
+    if (!clinicSlug) return;
+    const supabase = createClient();
+    let cancelled = false;
+    supabase
+      .from('clinics')
+      .select('name')
+      .eq('slug', clinicSlug)
+      .eq('status', 'active')
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data?.name) setClinicDisplayName(data.name);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [clinicSlug]);
 
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -128,7 +153,7 @@ export default function PatientIntakeForm() {
             className="mb-6 px-4 py-3 rounded-lg text-xs"
             style={{ background: 'var(--gold-pale)', border: '1px solid rgba(200,149,44,0.3)', color: 'var(--text-mid)' }}
           >
-            Referred via <strong style={{ color: 'var(--navy)' }}>{clinicSlug}</strong>. Your intake will be routed to that clinic.
+            Referred via <strong style={{ color: 'var(--navy)' }}>{clinicDisplayName ?? clinicSlug}</strong>. Your intake will be routed to that clinic.
           </div>
         )}
 

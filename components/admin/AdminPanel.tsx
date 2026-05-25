@@ -14,8 +14,9 @@ import AdminBundlesPanel from './AdminBundlesPanel';
 import AdminProtocolsPanel from './AdminProtocolsPanel';
 import AdminCoaPanel from './AdminCoaPanel';
 import AdminPatientIntakesPanel from './AdminPatientIntakesPanel';
+import AdminClinicsPanel from './AdminClinicsPanel';
 
-type Section = 'dashboard' | 'orders' | 'products' | 'inventory' | 'inventory-list' | 'bundles' | 'protocols' | 'users' | 'forms' | 'intakes' | 'content' | 'coa';
+type Section = 'dashboard' | 'orders' | 'products' | 'inventory' | 'inventory-list' | 'bundles' | 'protocols' | 'users' | 'forms' | 'intakes' | 'clinics' | 'content' | 'coa';
 
 const NAV: { key: Section; label: string; icon: React.ReactNode }[] = [
   {
@@ -105,6 +106,15 @@ const NAV: { key: Section; label: string; icon: React.ReactNode }[] = [
     icon: (
       <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'clinics',
+    label: 'Clinics',
+    icon: (
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3m4-9h10m-10 4h10" />
       </svg>
     ),
   },
@@ -300,6 +310,7 @@ export default function AdminPanel() {
         {activeSection === 'users' && <AdminUsersPanel />}
         {activeSection === 'forms' && <AdminFormsPanel />}
         {activeSection === 'intakes' && <AdminPatientIntakesPanel />}
+        {activeSection === 'clinics' && <AdminClinicsPanel />}
         {activeSection === 'coa' && <AdminCoaPanel />}
         {activeSection === 'content' && <AdminContentPanel />}
       </main>

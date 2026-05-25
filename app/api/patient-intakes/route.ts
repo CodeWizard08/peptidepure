@@ -193,6 +193,22 @@ export async function POST(request: Request) {
 
   const supabase = getAdminSupabase();
 
+  // Slice 3 — resolve clinic_slug → clinic_id when an active clinic exists.
+  // If no matching active clinic, clinic_slug is still stored (so admin
+  // can see who the patient *thought* they came from and decide whether
+  // to register that clinic) but clinic_id is null. Inactive/suspended
+  // clinics also resolve to null since the RLS policy filters by status.
+  let clinicId: string | null = null;
+  if (clinicSlug) {
+    const { data: clinic } = await supabase
+      .from('clinics')
+      .select('id')
+      .eq('slug', clinicSlug)
+      .eq('status', 'active')
+      .maybeSingle();
+    clinicId = clinic?.id ?? null;
+  }
+
   // Dedupe: if the same email submitted within the dedupe window AND that
   // row is still in the 'new' status, return 200 with the existing id
   // rather than stacking duplicates. Codex rescue review (MEDIUM): silent
@@ -224,6 +240,7 @@ export async function POST(request: Request) {
       referring_clinician: body.referringClinician?.trim() || null,
       referring_user_id: referringUserId,
       clinic_slug: clinicSlug,
+      clinic_id: clinicId,
       consent_research: true,
       consent_contact: true,
     })

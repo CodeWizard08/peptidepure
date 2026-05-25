@@ -24,9 +24,13 @@ export async function GET(request: NextRequest) {
   const offset = (page - 1) * limit;
 
   const supabase = getAdminSupabase();
+  // Slice 3 — join the linked clinic so the admin panel can show the
+  // canonical clinic name next to the slug. `clinic:clinics(...)` is
+  // PostgREST's foreign-table embedding syntax; resolves through the
+  // patient_intakes.clinic_id FK added in migration 033.
   let query = supabase
     .from('patient_intakes')
-    .select('*', { count: 'exact' })
+    .select('*, clinic:clinics(id, slug, name, status)', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 

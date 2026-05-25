@@ -6,6 +6,10 @@ type Intake = {
   id: string;
   created_at: string;
   clinic_slug: string | null;
+  // Slice 3 — joined from the clinics table when patient_intakes.clinic_id
+  // resolves to an active clinic. Null when the slug didn't match any
+  // registered clinic (or was empty).
+  clinic: { id: string; slug: string; name: string; status: string } | null;
   name: string;
   email: string;
   phone: string | null;
@@ -234,10 +238,26 @@ export default function AdminPatientIntakesPanel() {
                       </span>
                       {intake.clinic_slug && (
                         <span
-                          className="text-[10px] font-mono px-2 py-0.5 rounded"
+                          className="text-[10px] px-2 py-0.5 rounded"
                           style={{ background: 'var(--gold-pale)', color: 'var(--gold)' }}
+                          title={
+                            intake.clinic
+                              ? `Registered clinic: ${intake.clinic.name} (${intake.clinic.slug})`
+                              : 'Slug submitted, but no matching registered clinic. Add it under Clinics to link future intakes.'
+                          }
                         >
-                          {intake.clinic_slug}
+                          {/* Show the canonical clinic name when the slug
+                              resolves to a registered active clinic; fall
+                              back to the bare slug otherwise so admin can
+                              see what the patient submitted. */}
+                          {intake.clinic ? (
+                            <>
+                              <span className="font-semibold">{intake.clinic.name}</span>
+                              <span className="font-mono ml-1 opacity-60">/{intake.clinic.slug}</span>
+                            </>
+                          ) : (
+                            <span className="font-mono">{intake.clinic_slug} (unregistered)</span>
+                          )}
                         </span>
                       )}
                       {intake.referring_user_id && (
