@@ -10,7 +10,8 @@
  *
  * Idempotent: re-running replaces all chunks for each protocol it processes.
  * Filters: by default processes only `status='published'` protocols. Pass
- * `EMBED_ALL=1` to include drafts too.
+ * `--tcd-only` (or TCD_ONLY=1) for indexed TCD chapters, or EMBED_ALL=1
+ * to include every protocol status.
  *
  * Cost: ~$0.10 for 100 protocols × 2 audiences × ~8 chunks each ≈ 1,600 chunks
  * at ~$0.00002 per 1k tokens × ~500 tokens per chunk.
@@ -38,6 +39,8 @@ type Audience = 'clinician' | 'patient';
 type ProtocolRow = {
   id: string;
   slug: string;
+  source: string | null;
+  category: string | null;
   status: string;
   body_md: string;
   patient_md: string;
@@ -132,14 +135,22 @@ async function main() {
   );
 
   const embedAll = process.env.EMBED_ALL === '1';
+  const tcdOnly = process.env.TCD_ONLY === '1' || process.argv.includes('--tcd-only');
   const targetSlug = process.env.SLUG; // optional — embed a single protocol
+
+  if (embedAll && tcdOnly) {
+    console.error('Use either EMBED_ALL=1 or --tcd-only/TCD_ONLY=1, not both.');
+    process.exit(1);
+  }
 
   let query = supabase
     .from('protocols')
-    .select('id, slug, status, body_md, patient_md');
-  // By default embed published + indexed (TCD book chapters). Pass
-  // EMBED_ALL=1 to also include drafts and archived.
-  if (!embedAll) query = query.in('status', ['published', 'indexed']);
+    .select('id, slug, source, category, status, body_md, patient_md');
+  if (tcdOnly) {
+    query = query.eq('source', 'tcd').eq('status', 'indexed');
+  } else if (!embedAll) {
+    query = query.eq('source', 'protocol').eq('status', 'published');
+  }
   if (targetSlug) query = query.eq('slug', targetSlug);
 
   const { data: protocols, error } = await query;

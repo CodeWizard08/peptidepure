@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { NextRequest } from 'next/server';
+import { createClient as createSupabaseServiceClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -14,10 +15,19 @@ type Chunk = {
   protocol_id: string;
   slug: string;
   title: string;
+  category: string | null;
+  source: string;
+  source_label: string;
   heading: string | null;
   chunk_text: string;
   similarity: number;
 };
+
+const TCD_QUERY_RE = /\b(tcd|cockroach diet|roach coach|started|fabricated adversity|12-week rollout|noble pursuits|trifecta perfecta|scammed|arsenal)\b/i;
+
+function shouldIncludeTcd(userQuery: string): boolean {
+  return TCD_QUERY_RE.test(userQuery);
+}
 
 const SYSTEM_PROMPT = `You are a clinical AI assistant for PeptidePure™, a clinician-only peptide sourcing and research platform. You help licensed clinicians with peptide compound information, reconstitution math, dosing protocols, injection techniques, storage, clinical pearls, and safety considerations. You are also the "Roach Coach" — grounded in The Cockroach Diet (TCD) book by Dr. M. Scott Mortensen. When questions touch TCD topics (the STARTED protocol, Fabricated Adversity, the 12-Week Rollout, the Arsenal, Noble Pursuits, the Trifecta Perfecta, SCAMMED domains, men's/women's wellness, the Roach Coach itself, or any TCD chapter content), cite TCD chapters by name and draw on the TCD knowledge base alongside the clinical protocol library.
 
@@ -315,10 +325,14 @@ Sexual Health (Female): PT-141 + low-dose Oxytocin`;
  * RAG outage degrades gracefully to the original static-knowledge chatbot.
  */
 async function retrieveContext(
-  supabase: Awaited<ReturnType<typeof createClient>>,
   userQuery: string,
 ): Promise<Chunk[]> {
   if (!userQuery.trim()) return [];
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('[chat] RAG retrieval skipped: Supabase service env vars missing.');
+    return [];
+  }
+
   try {
     const embedRes = await openai.embeddings.create(
       {
@@ -333,12 +347,21 @@ async function retrieveContext(
     );
     const queryEmbedding = embedRes.data[0]?.embedding;
     if (!queryEmbedding) return [];
+    const includeIndexed = shouldIncludeTcd(userQuery);
+    const sourceFilter = includeIndexed ? 'all' : 'protocol';
+    const ragSupabase = createSupabaseServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
+      { auth: { persistSession: false } },
+    );
 
-    const { data, error } = await supabase.rpc('match_protocol_chunks', {
+    const { data, error } = await ragSupabase.rpc('match_protocol_chunks', {
       query_embedding: queryEmbedding as unknown as string,
       match_count: RETRIEVAL_COUNT,
       target_audience: 'clinician',
       min_similarity: RETRIEVAL_MIN_SIMILARITY,
+      include_indexed: includeIndexed,
+      source_filter: sourceFilter,
     });
     if (error) {
       console.error('[chat] RAG retrieval failed:', error.message);
@@ -354,6 +377,8 @@ async function retrieveContext(
       return (
         typeof rec.slug === 'string' && rec.slug.length > 0 &&
         typeof rec.title === 'string' && rec.title.length > 0 &&
+        typeof rec.source === 'string' && rec.source.length > 0 &&
+        typeof rec.source_label === 'string' && rec.source_label.length > 0 &&
         typeof rec.chunk_text === 'string' && rec.chunk_text.length > 0 &&
         typeof rec.similarity === 'number'
       );
@@ -368,8 +393,11 @@ function formatRagContext(chunks: Chunk[]): string {
   if (chunks.length === 0) return '';
   const sections = chunks.map((c, i) => {
     const head = c.heading ? ` — ${c.heading}` : '';
-    return `### Source ${i + 1}: ${c.title}${head}\n` +
-      `Citation: [/protocols/${c.slug}](/protocols/${c.slug})\n\n` +
+    const citation = c.source_label === 'TCD'
+      ? `TCD Book: ${c.title}`
+      : `[/protocols/${c.slug}](/protocols/${c.slug})`;
+    return `### Source ${i + 1}: [${c.source_label}] ${c.title}${head}\n` +
+      `Citation: ${citation}\n\n` +
       c.chunk_text;
   });
   return [
@@ -377,7 +405,7 @@ function formatRagContext(chunks: Chunk[]): string {
     'RETRIEVED PROTOCOL CONTEXT (top matches from Peptide Pure clinical library)',
     '═══════════════════════════════════════',
     '',
-    'The following sections were retrieved from the Peptide Pure protocol library based on the user\'s latest question. Treat them as authoritative grounding for this turn. When you draw on a source, cite it by linking to its /protocols/<slug> URL in markdown (e.g. "see [BPC-157 GI Healing Protocol](/protocols/bpc-157-gi-healing)"). If the retrieved context is not relevant to the question, ignore it and answer from your general knowledge above.',
+    'The following sections were retrieved from the Peptide Pure protocol library and TCD book index based on the user\'s latest question. Treat them as authoritative grounding for this turn. Clinical protocol sources include /protocols/<slug> links; TCD sources are labeled [TCD] and should be cited by chapter name. If the retrieved context is not relevant to the question, ignore it and answer from your general knowledge above.',
     '',
     ...sections,
   ].join('\n');
@@ -402,7 +430,7 @@ export async function POST(req: NextRequest) {
   // RAG step: retrieve top-K matching chunks for the user's most recent
   // question (last 'user' message). Degrades gracefully if retrieval fails.
   const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
-  const ragChunks = await retrieveContext(supabase, lastUserMessage);
+  const ragChunks = await retrieveContext(lastUserMessage);
   const ragContext = formatRagContext(ragChunks);
 
   const systemMessages: { role: 'system'; content: string }[] = [

@@ -12,14 +12,15 @@
  *   <content>
  *
  * Each chapter becomes one protocol row with:
- *   - slug = chapter_id
+ *   - slug = tcd-<chapter_id>
  *   - title = chapter heading
+ *   - source = 'tcd'
  *   - category = 'TCD Book'
  *   - body_md = full chapter body
  *   - status = 'indexed' (retrievable via RAG but hidden from /protocols page)
  *
- * After running this, run `npm run embed-protocols` (or with EMBED_ALL=1)
- * to generate the vector embeddings for the new chunks.
+ * After running this, run `npm run embed-protocols -- --tcd-only`
+ * to generate vector embeddings for the new TCD chunks.
  *
  * Usage:
  *   1. Save the TCD extract to content/tcd-sherpa-extract.md
@@ -39,6 +40,10 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+const TCD_CATEGORY = 'TCD Book';
+const TCD_SLUG_PREFIX = 'tcd-';
+const MIN_CHAPTER_BODY_CHARS = 500;
+
 type Chapter = {
   slug: string;
   title: string;
@@ -46,6 +51,18 @@ type Chapter = {
   sections: string[];
   body: string;
 };
+
+function normalizeTcdSlug(rawSlug: string): string {
+  const slug = rawSlug
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-');
+
+  if (!slug) return '';
+  return slug.startsWith(TCD_SLUG_PREFIX) ? slug : `${TCD_SLUG_PREFIX}${slug}`;
+}
 
 function parseTCDExtract(md: string): Chapter[] {
   // Split on `---` separators (horizontal rules between chapters).
@@ -71,7 +88,7 @@ function parseTCDExtract(md: string): Chapter[] {
       // **chapter_id**: `slug`
       if (line.startsWith('**chapter_id**:')) {
         const match = line.match(/`([^`]+)`/);
-        if (match) slug = match[1];
+        if (match) slug = normalizeTcdSlug(match[1]);
       }
 
       // **word_count**: N
@@ -95,7 +112,7 @@ function parseTCDExtract(md: string): Chapter[] {
     if (!slug || !title || bodyStartIdx < 0) continue;
 
     const body = lines.slice(bodyStartIdx).join('\n').trim();
-    if (body.length < 100) continue; // skip near-empty chapters
+    if (body.length < MIN_CHAPTER_BODY_CHARS) continue; // skip near-empty chapters and placeholders
 
     chapters.push({ slug, title, wordCount, sections, body });
   }
@@ -115,24 +132,28 @@ async function main() {
   const chapters = parseTCDExtract(md);
 
   console.log(`Parsed ${chapters.length} TCD chapters.`);
+  if (chapters.length === 0) {
+    console.error(
+      `No TCD chapters were parsed. Expected chapter blocks with ## title, **chapter_id**, and at least ${MIN_CHAPTER_BODY_CHARS} body characters.`
+    );
+    process.exit(1);
+  }
 
   let upserted = 0;
   let skipped = 0;
 
   for (const ch of chapters) {
-    // Upsert: if a protocol with this slug already exists (from a prior run
-    // or a real protocol that happens to share the slug), update body_md +
-    // category. Otherwise insert.
     const { data: existing } = await supabase
       .from('protocols')
-      .select('id')
+      .select('id, source, category, tags, status')
       .eq('slug', ch.slug)
       .maybeSingle();
 
     const payload = {
       slug: ch.slug,
       title: ch.title,
-      category: 'TCD Book',
+      source: 'tcd',
+      category: TCD_CATEGORY,
       summary: ch.sections.length > 0
         ? `Sections: ${ch.sections.join(', ')} (${ch.wordCount} words)`
         : `${ch.wordCount} words`,
@@ -145,6 +166,19 @@ async function main() {
     };
 
     if (existing) {
+      const tags = Array.isArray(existing.tags) ? existing.tags : [];
+      const isExistingTcd =
+        existing.source === 'tcd' ||
+        existing.category === TCD_CATEGORY ||
+        tags.includes('tcd') ||
+        (existing.status === 'indexed' && ch.slug.startsWith(TCD_SLUG_PREFIX));
+
+      if (!isExistingTcd) {
+        console.error(`Refusing to overwrite non-TCD protocol with slug ${ch.slug}. Rename the TCD chapter slug.`);
+        skipped++;
+        continue;
+      }
+
       const { error } = await supabase
         .from('protocols')
         .update(payload)
@@ -171,7 +205,7 @@ async function main() {
   }
 
   console.log(`\nDone. ${upserted} upserted, ${skipped} skipped.`);
-  console.log('Next: run `npm run embed-protocols` to generate vector embeddings.');
+  console.log('Next: run `npm run embed-protocols -- --tcd-only` to generate vector embeddings.');
 }
 
 main().catch((err) => {
