@@ -252,33 +252,33 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Could not save your intake. Please try again.' }, { status: 500 });
   }
 
-  // Fire-and-forget admin notification. Uses the already-normalized
-  // clinicSlug so a malicious raw payload can't smuggle markup or
-  // unbounded text into the subject line / HTML body.
-  sendAdminNotification(
-    `New patient intake from ${name}${clinicSlug ? ` (${clinicSlug})` : ''}`,
-    intakeAdminHtml({
-      id: intake.id,
-      name,
-      email,
-      phone: body.phone?.trim() || null,
-      dateOfBirth,
-      primaryConcerns: concerns,
-      currentPeptides: body.currentPeptides?.trim() || null,
-      goals: body.goals?.trim() || null,
-      referringClinician: body.referringClinician?.trim() || null,
-      clinicSlug,
-    })
-  );
-
-  // Patient Auth Slice 2 — fire-and-forget magic link so the patient can
-  // claim their intake at /p/dashboard. We derive origin from the request
-  // URL so dev and prod both work. If Supabase/Resend errors, the helper
-  // logs and returns false; the patient still got their 201 so the form's
-  // success screen renders fine. The success screen tells them to check
-  // their email; if nothing arrives they can retry from /p/intake.
+  // Guard: skip admin email + patient magic link when not in production.
+  // Localhost smoke tests and Vercel preview deploys shouldn't ping Scott's
+  // inbox or send magic links for fake @test.local addresses.
   const origin = new URL(request.url).origin;
-  void sendPatientPortalLink({ email, displayName: name, origin });
+  const isProd = /^https:\/\/(www\.)?peptidepure\.com$/.test(origin);
+  const isTestEmail = /@test\.local$/i.test(email) || /\+(smoke|diag|test)/i.test(email);
+
+  if (isProd && !isTestEmail) {
+    sendAdminNotification(
+      `New patient intake from ${name}${clinicSlug ? ` (${clinicSlug})` : ''}`,
+      intakeAdminHtml({
+        id: intake.id,
+        name,
+        email,
+        phone: body.phone?.trim() || null,
+        dateOfBirth,
+        primaryConcerns: concerns,
+        currentPeptides: body.currentPeptides?.trim() || null,
+        goals: body.goals?.trim() || null,
+        referringClinician: body.referringClinician?.trim() || null,
+        clinicSlug,
+      })
+    );
+    void sendPatientPortalLink({ email, displayName: name, origin });
+  } else {
+    console.log(`[patient-intakes] skipping emails (prod=${isProd}, testEmail=${isTestEmail})`);
+  }
 
   return NextResponse.json({ id: intake.id }, { status: 201 });
 }

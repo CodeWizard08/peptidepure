@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import BrandedLogo from '@/components/patient/BrandedLogo';
+import PatientSherpa from '@/components/patient/PatientSherpa';
 import { readableTextOn } from '@/lib/brand';
 
 type IntakeRow = {
@@ -206,6 +207,13 @@ export default function PatientDashboard({
             ))}
           </div>
         )}
+
+        {/* Patient-side Sherpa — Slice 5. Grounded in TCD content only,
+            patient-friendly tone. Sits below the intake cards so the patient
+            can ask questions about their health journey. */}
+        <div className="mt-8">
+          <PatientSherpa />
+        </div>
 
         <div
           className="rounded-2xl p-6 mt-8"
