@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
 const VALID_ROUTES = new Set(['SQ', 'IM', 'oral', 'nasal', 'topical', 'nebulized', 'other']);
+const MAX_SIDE_EFFECTS = 20;
+
+function text(v: unknown): string {
+  return typeof v === 'string' ? v.trim() : '';
+}
 
 export async function GET() {
   const supabase = await createClient();
@@ -26,9 +31,9 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => ({}));
 
-  const peptideName = (body.peptide_name ?? '').trim();
-  const doseAmount = (body.dose_amount ?? '').trim();
-  const route = body.route ?? 'SQ';
+  const peptideName = text(body.peptide_name);
+  const doseAmount = text(body.dose_amount);
+  const route = typeof body.route === 'string' ? body.route : 'SQ';
 
   if (!peptideName || peptideName.length > 200) {
     return NextResponse.json({ error: 'peptide_name is required (max 200 chars)' }, { status: 400 });
@@ -41,7 +46,7 @@ export async function POST(request: Request) {
   }
 
   const sideEffects = Array.isArray(body.side_effects)
-    ? body.side_effects.filter((s: unknown): s is string => typeof s === 'string' && s.length <= 200)
+    ? body.side_effects.filter((s: unknown): s is string => typeof s === 'string' && s.length <= 200).slice(0, MAX_SIDE_EFFECTS)
     : [];
 
   const { data, error } = await supabase
@@ -51,8 +56,8 @@ export async function POST(request: Request) {
       peptide_name: peptideName,
       dose_amount: doseAmount,
       route,
-      injection_site: (body.injection_site ?? '').trim().slice(0, 200) || null,
-      notes: (body.notes ?? '').trim().slice(0, 2000) || null,
+      injection_site: text(body.injection_site).slice(0, 200) || null,
+      notes: text(body.notes).slice(0, 2000) || null,
       side_effects: sideEffects,
     })
     .select('id, created_at')

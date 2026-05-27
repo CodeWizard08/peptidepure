@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -7,6 +8,7 @@ import BrandedLogo from '@/components/patient/BrandedLogo';
 import PatientSherpa from '@/components/patient/PatientSherpa';
 import DosingLogForm from '@/components/patient/DosingLogForm';
 import CheckInForm from '@/components/patient/CheckInForm';
+import PatientLogHistory from '@/components/patient/PatientLogHistory';
 import { readableTextOn } from '@/lib/brand';
 
 type IntakeRow = {
@@ -81,6 +83,8 @@ export default function PatientDashboard({
   clinic: ClinicBranding | null;
 }) {
   const router = useRouter();
+  const [newLogs, setNewLogs] = useState<{ id: string; created_at: string; peptide_name: string; dose_amount: string; route: string; side_effects: string[] }[]>([]);
+  const [newCheckIns, setNewCheckIns] = useState<{ id: string; created_at: string; energy_level: number; sleep_quality: number; mood: number; pain_level: number; weight_lbs: number | null; notes: string | null; goals_progress: string | null }[]>([]);
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -213,13 +217,11 @@ export default function PatientDashboard({
         {/* Slice 6 — dosing logs + check-ins. Collapsible forms so the
             dashboard doesn't feel overwhelming; patients expand when ready. */}
         <div className="mt-8 space-y-4">
-          <DosingLogForm onLogged={(entry) => {
-            console.log('[dashboard] dose logged:', entry.id);
-          }} />
-          <CheckInForm onCheckedIn={(entry) => {
-            console.log('[dashboard] check-in:', entry.id);
-          }} />
+          <DosingLogForm onLogged={(entry) => setNewLogs((prev) => [entry, ...prev])} />
+          <CheckInForm onCheckedIn={(entry) => setNewCheckIns((prev) => [entry, ...prev])} />
         </div>
+
+        <PatientLogHistory newLogs={newLogs} newCheckIns={newCheckIns} />
 
         {/* Patient-side Sherpa — Slice 5. Grounded in TCD content only,
             patient-friendly tone. */}

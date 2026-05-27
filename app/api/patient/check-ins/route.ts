@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+function text(v: unknown): string {
+  return typeof v === 'string' ? v.trim() : '';
+}
+
+function score(n: unknown): number | null {
+  if (!Number.isInteger(n)) return null;
+  return (n as number) >= 1 && (n as number) <= 10 ? (n as number) : null;
+}
+
 export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -17,11 +26,6 @@ export async function GET() {
   return NextResponse.json({ checkIns: data ?? [] });
 }
 
-function clamp(n: unknown, min: number, max: number): number | null {
-  if (typeof n !== 'number' || isNaN(n)) return null;
-  return Math.max(min, Math.min(max, Math.round(n)));
-}
-
 export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -29,21 +33,26 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => ({}));
 
-  const energy = clamp(body.energy_level, 1, 10);
-  const sleep = clamp(body.sleep_quality, 1, 10);
-  const mood = clamp(body.mood, 1, 10);
-  const pain = clamp(body.pain_level, 1, 10);
+  const energy = score(body.energy_level);
+  const sleep = score(body.sleep_quality);
+  const mood = score(body.mood);
+  const pain = score(body.pain_level);
 
   if (energy === null || sleep === null || mood === null || pain === null) {
     return NextResponse.json(
-      { error: 'energy_level, sleep_quality, mood, and pain_level are required (1-10)' },
+      { error: 'energy_level, sleep_quality, mood, and pain_level must be integers 1-10' },
       { status: 400 }
     );
   }
 
-  const weightLbs = typeof body.weight_lbs === 'number' && !isNaN(body.weight_lbs)
-    ? Math.round(body.weight_lbs * 10) / 10
-    : null;
+  let weightLbs: number | null = null;
+  if (body.weight_lbs != null) {
+    const w = typeof body.weight_lbs === 'number' ? body.weight_lbs : parseFloat(body.weight_lbs);
+    if (isNaN(w) || w < 50 || w > 1000) {
+      return NextResponse.json({ error: 'weight_lbs must be between 50 and 1000' }, { status: 400 });
+    }
+    weightLbs = Math.round(w * 10) / 10;
+  }
 
   const { data, error } = await supabase
     .from('patient_check_ins')
@@ -54,8 +63,8 @@ export async function POST(request: Request) {
       mood,
       pain_level: pain,
       weight_lbs: weightLbs,
-      notes: (body.notes ?? '').trim().slice(0, 2000) || null,
-      goals_progress: (body.goals_progress ?? '').trim().slice(0, 2000) || null,
+      notes: text(body.notes).slice(0, 2000) || null,
+      goals_progress: text(body.goals_progress).slice(0, 2000) || null,
     })
     .select('id, created_at')
     .single();
