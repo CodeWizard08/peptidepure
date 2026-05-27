@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import BrandedLogo from '@/components/patient/BrandedLogo';
 import PatientSherpa from '@/components/patient/PatientSherpa';
+import DosingLogForm from '@/components/patient/DosingLogForm';
+import CheckInForm from '@/components/patient/CheckInForm';
 import { readableTextOn } from '@/lib/brand';
 
 type IntakeRow = {
@@ -208,9 +210,19 @@ export default function PatientDashboard({
           </div>
         )}
 
+        {/* Slice 6 — dosing logs + check-ins. Collapsible forms so the
+            dashboard doesn't feel overwhelming; patients expand when ready. */}
+        <div className="mt-8 space-y-4">
+          <DosingLogForm onLogged={(entry) => {
+            console.log('[dashboard] dose logged:', entry.id);
+          }} />
+          <CheckInForm onCheckedIn={(entry) => {
+            console.log('[dashboard] check-in:', entry.id);
+          }} />
+        </div>
+
         {/* Patient-side Sherpa — Slice 5. Grounded in TCD content only,
-            patient-friendly tone. Sits below the intake cards so the patient
-            can ask questions about their health journey. */}
+            patient-friendly tone. */}
         <div className="mt-8">
           <PatientSherpa />
         </div>
