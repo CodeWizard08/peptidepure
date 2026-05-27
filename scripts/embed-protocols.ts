@@ -137,7 +137,9 @@ async function main() {
   let query = supabase
     .from('protocols')
     .select('id, slug, status, body_md, patient_md');
-  if (!embedAll) query = query.eq('status', 'published');
+  // By default embed published + indexed (TCD book chapters). Pass
+  // EMBED_ALL=1 to also include drafts and archived.
+  if (!embedAll) query = query.in('status', ['published', 'indexed']);
   if (targetSlug) query = query.eq('slug', targetSlug);
 
   const { data: protocols, error } = await query;

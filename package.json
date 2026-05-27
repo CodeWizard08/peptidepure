@@ -11,6 +11,7 @@
     "test:watch": "vitest",
     "batch-draft-protocols": "tsx scripts/batch-draft-protocols.ts",
     "embed-protocols": "tsx scripts/embed-protocols.ts",
+    "ingest-tcd": "tsx scripts/ingest-tcd.ts",
     "extract-protocol-metadata": "tsx scripts/extract-protocol-metadata.ts",
     "sync-content-to-redis": "tsx scripts/sync-content-to-redis.ts"
   },
